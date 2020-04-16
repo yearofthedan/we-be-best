@@ -1,26 +1,16 @@
 <template>
-  <div class="hello">
-    <h1>{{ styleObject.left }}, {{ styleObject.top }}</h1>
-    <h3>Fancy moving thing</h3>
-    <ul>
-      <NoteItem />
-      <NoteItem />
-      <NoteItem />
-    </ul>
-  </div>
+  <li v-bind:style="styleObject" v-on:mousedown="onMouseDown">
+    Test
+  </li>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import NoteItem from "./NoteItem.vue";
 
 export default Vue.extend({
-  name: "HelloWorld",
+  name: "NoteItem",
   props: {
     msg: String
-  },
-  components: {
-    NoteItem
   },
   created: function() {
     window.addEventListener("mousemove", event => {
@@ -46,36 +36,25 @@ export default Vue.extend({
       left: 100
     },
     styleObject: {
-      top: '100px',
-      left: '100px',
-      color: 'yellow'
+      top: "100px",
+      left: "100px",
+      color: "yellow"
     }
   }),
   methods: {
     onMouseDown: function() {
       this.moving = true;
-    },
+    }
   }
 });
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
 li {
   position: fixed;
   border: red solid;
   display: inline-block;
   margin: 0 10px;
   cursor: grab;
-}
-a {
-  color: #42b983;
 }
 </style>
