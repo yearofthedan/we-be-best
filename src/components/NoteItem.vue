@@ -20,6 +20,13 @@ export default Vue.extend({
 
         this.styleObject.left = `${this.curr.left}px`;
         this.styleObject.top = `${this.curr.top}px`;
+        const socket = (this as any).$socket;
+        socket.send(JSON.stringify({
+          type: 'NOTE_MOVED',
+          by: 'DAN',
+          newX: `${this.curr.left}px`,
+          newY: `${this.curr.top}px`
+        }));
       }
     });
     window.addEventListener("mouseup", () => {
