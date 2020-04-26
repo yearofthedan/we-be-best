@@ -23,6 +23,10 @@ class Gatherings {
 
   addMember = (gatheringId: string, name: string): Gathering | null => {
     const gathering = this.data.get(gatheringId);
+    if (gathering?.members.has(name)) {
+      return null;
+    }
+
     gathering?.members.add(name);
 
     return gathering || null;
