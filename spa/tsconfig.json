@@ -12,7 +12,9 @@
     "baseUrl": ".",
     "types": [
       "webpack-env",
-      "jest"
+      "jest",
+      "cypress",
+      "@types/testing-library__cypress"
     ],
     "paths": {
       "@/*": [

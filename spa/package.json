@@ -15,6 +15,8 @@
     "vue-native-websocket": "^2.0.14"
   },
   "devDependencies": {
+    "@testing-library/cypress": "^6.0.0",
+    "@testing-library/vue": "^5.0.2",
     "@types/jest": "^24.0.19",
     "@typescript-eslint/eslint-plugin": "^2.26.0",
     "@typescript-eslint/parser": "^2.26.0",
