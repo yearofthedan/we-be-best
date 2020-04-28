@@ -1,7 +1,6 @@
 <template>
   <div class="hello">
     <h1>{{ styleObject.left }}, {{ styleObject.top }}</h1>
-    <h3>Fancy moving thing</h3>
     <ul>
       <NoteItem />
       <NoteItem />
@@ -16,9 +15,6 @@ import NoteItem from "./NoteItem.vue";
 
 export default Vue.extend({
   name: "HelloWorld",
-  props: {
-    msg: String
-  },
   components: {
     NoteItem
   },
@@ -35,9 +31,6 @@ export default Vue.extend({
     window.addEventListener("mouseup", () => {
       this.moving = false;
     });
-  },
-  destroyed: function() {
-    //tbd
   },
   data: () => ({
     moving: false,

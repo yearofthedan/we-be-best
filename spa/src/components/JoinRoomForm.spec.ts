@@ -2,7 +2,7 @@ import {render} from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
 import JoinRoomForm from './JoinRoomForm.vue';
 
-describe('<JoinRoomFom />', () => {
+describe('<join-room-form />', () => {
   it('shows an error message when I try to submit without a name', async () => {
     const { getByText, findByText } = render(JoinRoomForm);
 

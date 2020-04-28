@@ -2,7 +2,7 @@
 import Vue from "vue";
 
 export default Vue.extend({
-  name: "Lobby",
+  name: "join-room-form",
   data() {
     return {
       errors: [],

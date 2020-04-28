@@ -10,6 +10,6 @@ describe("<Lobby />", () => {
 
     userEvent.click(getByText('New gathering'));
 
-    await expect(await findByText('In room placeholder-id')).toBeInTheDocument();
+    await expect(await findByText('Room for placeholder-id')).toBeInTheDocument();
   });
 });

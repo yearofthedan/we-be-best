@@ -1,18 +1,20 @@
 <script lang="ts">
 import Vue from "vue";
 import JoinRoomForm from "@/components/JoinRoomForm.vue";
+import JoinedRoom from "@/components/JoinedRoom.vue";
 
 export default Vue.extend({
   components: {
-    JoinRoomForm
+    "join-room-form": JoinRoomForm,
+    "joined-room": JoinedRoom
   },
   name: "Lobby",
   data() {
-    return { currentRoom: null };
+    return { roomId: null };
   },
   methods: {
-    onJoined: function(room: { id: string }) {
-      this.currentRoom = room.id;
+    $_onJoined: function(room: { id: string }) {
+      this.roomId = room.id;
     }
   }
 });
@@ -23,11 +25,8 @@ export default Vue.extend({
     <header>
       <h1>We be best</h1>
     </header>
-    <section v-if="currentRoom !== null">
-      <p>Gathering</p>
-      In room {{ currentRoom }}
-    </section>
-    <JoinRoomForm v-else v-on:joined="onJoined" />
+    <joined-room v-if="roomId" v-bind:room-id="roomId" />
+    <join-room-form v-else v-on:joined="$_onJoined" />
   </article>
 </template>
 
