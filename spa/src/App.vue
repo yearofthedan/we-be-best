@@ -12,9 +12,6 @@ export default Vue.extend({
   name: "App",
   components: {
     HelloWorld
-  },
-  beforeMount(): void {
-    (this.$options as any).sockets.onmessage = (data: any) => console.log(data);
   }
 });
 </script>

@@ -1,9 +1,21 @@
-import VueNativeSock from 'vue-native-websocket';
+import ApolloClient from 'apollo-boost'
+import VueApollo from 'vue-apollo'
 import Vue from "vue";
 import App from "./App.vue";
 
 Vue.config.productionTip = false;
 
-Vue.use(VueNativeSock, 'ws://localhost:8081');
+const apolloClient = new ApolloClient({
+  uri: '/graphql'
+});
 
-new Vue({render: h => h(App)}).$mount("#app");
+const apolloProvider = new VueApollo({
+  defaultClient: apolloClient,
+});
+
+Vue.use(VueApollo);
+
+new Vue({
+  render: h => h(App),
+  apolloProvider,
+}).$mount("#app");

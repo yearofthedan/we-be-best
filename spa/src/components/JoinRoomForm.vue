@@ -3,7 +3,7 @@ import Vue from "vue";
 
 export default Vue.extend({
   name: "join-room-form",
-  data() {
+  data(): { errors: string[], name: string | null } {
     return {
       errors: [],
       name: null,

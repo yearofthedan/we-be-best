@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from "vue";
-import JoinRoomForm from "@/components/JoinRoomForm.vue";
 import JoinedRoom from "@/components/JoinedRoom.vue";
+import JoinRoomForm from '@/components/JoinRoomForm.vue';
 
 export default Vue.extend({
   components: {
@@ -9,7 +9,7 @@ export default Vue.extend({
     "joined-room": JoinedRoom
   },
   name: "Lobby",
-  data() {
+  data(): { roomId: string | null } {
     return { roomId: null };
   },
   methods: {
