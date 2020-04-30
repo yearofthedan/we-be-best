@@ -12,10 +12,7 @@
     "baseUrl": ".",
     "types": [
       "vue/types/options",
-      "webpack-env",
-      "jest",
-      "cypress",
-      "@types/testing-library__cypress",
+      "webpack-env"
     ],
     "paths": {
       "@/*": [

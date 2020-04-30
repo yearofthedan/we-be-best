@@ -10,7 +10,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    onFormSubmit(e) {
+    onFormSubmit(e: Event) {
       this.errors = [];
       e.preventDefault();
 
