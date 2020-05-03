@@ -23,6 +23,7 @@ describe('<joined-room />', () => {
       },
         apolloProvider
       },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       vue => vue.use(VueApollo),
     );

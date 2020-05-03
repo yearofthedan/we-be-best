@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from "vue";
 import JoinedRoom from "@/components/JoinedRoom.vue";
-import JoinRoomForm from '@/components/JoinRoomForm.vue';
+import JoinRoomForm from "@/components/JoinRoomForm.vue";
 
 export default Vue.extend({
   components: {
@@ -13,7 +13,7 @@ export default Vue.extend({
     return { roomId: null };
   },
   methods: {
-    $_onJoined: function(room: { id: string }) {
+    _onJoined: function(room: { id: string }) {
       this.roomId = room.id;
     }
   }
@@ -26,7 +26,7 @@ export default Vue.extend({
       <h1>We be best</h1>
     </header>
     <joined-room v-if="roomId" v-bind:room-id="roomId" />
-    <join-room-form v-else v-on:joined="$_onJoined" />
+    <join-room-form v-else v-on:joined="_onJoined" />
   </article>
 </template>
 

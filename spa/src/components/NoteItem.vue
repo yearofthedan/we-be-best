@@ -1,5 +1,5 @@
 <template>
-  <li v-bind:style="styleObject" v-on:mousedown="onMouseDown">
+  <li v-bind:style="styleObject" v-on:mousedown="_onMouseDown">
     Test
   </li>
 </template>
@@ -20,13 +20,17 @@ export default Vue.extend({
 
         this.styleObject.left = `${this.curr.left}px`;
         this.styleObject.top = `${this.curr.top}px`;
-        const socket = (this as any).$socket;
-        socket.send(JSON.stringify({
-          type: 'NOTE_MOVED',
-          by: 'DAN',
-          newX: `${this.curr.left}px`,
-          newY: `${this.curr.top}px`
-        }));
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        const socket = this.$socket;
+        socket.send(
+          JSON.stringify({
+            type: "NOTE_MOVED",
+            by: "DAN",
+            newX: `${this.curr.left}px`,
+            newY: `${this.curr.top}px`
+          })
+        );
       }
     });
     window.addEventListener("mouseup", () => {
@@ -36,22 +40,28 @@ export default Vue.extend({
   destroyed: function() {
     //tbd
   },
-  data: () => ({
-    moving: false,
-    curr: {
-      top: 100,
-      left: 100
-    },
-    styleObject: {
-      top: "100px",
-      left: "100px",
-      color: "yellow"
-    }
-  }),
   methods: {
-    onMouseDown: function() {
+    _onMouseDown: function(): void {
       this.moving = true;
     }
+  },
+  data(): {
+    moving: boolean;
+    curr: { top: number; left: number };
+    styleObject: { top: string; left: string; color: string };
+  } {
+    return {
+      moving: false,
+      curr: {
+        top: 100,
+        left: 100
+      },
+      styleObject: {
+        top: "100px",
+        left: "100px",
+        color: "yellow"
+      }
+    };
   }
 });
 </script>

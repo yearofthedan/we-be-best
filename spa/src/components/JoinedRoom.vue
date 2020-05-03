@@ -1,8 +1,7 @@
 <script lang="ts">
 import Vue from "vue";
-import { gql } from "apollo-boost";
-import {RoomQueryResponseData} from '@/components/RoomTypes';
-import {ROOM_QUERY} from '@/components/RoomQueries';
+import { RoomQueryResponseData } from "@/components/RoomTypes";
+import { ROOM_QUERY } from "@/components/RoomQueries";
 
 export default Vue.extend({
   name: "joined-room",

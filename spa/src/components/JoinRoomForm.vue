@@ -35,12 +35,12 @@ export default Vue.extend({
       action="https://vuejs.org/"
       method="post"
     >
-      <p v-if="errors.length > 0">
+      <div v-if="errors.length > 0">
         <h3>Please correct the following errors:</h3>
         <ul>
           <li v-for="err in errors" :key="err" >{{err}}</li>
         </ul>
-      </p>
+      </div>
       <label for="your-name">
         Your name
       </label>

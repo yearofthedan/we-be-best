@@ -19,6 +19,7 @@ describe("<Lobby />", () => {
     const { getByLabelText, getByText, findByText } = render(Lobby, {
       apolloProvider
     },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       vue => vue.use(VueApollo),
     );
