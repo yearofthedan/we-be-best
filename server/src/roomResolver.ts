@@ -1,4 +1,4 @@
-import {DataSources} from './index';
+import {DataSources} from './server';
 
 interface Room {
   id: string;
@@ -7,10 +7,10 @@ interface Room {
 
 const resolveRoom = async (
   _: unknown,
-  __: unknown,
+  { id }: { id: string },
   { dataSources }: { dataSources: Pick<DataSources, 'Room'> }
 ): Promise<Room | undefined> => {
-  return dataSources.Room.getRoom();
+  return dataSources.Room.getRoom(id);
 };
 
 export default resolveRoom;

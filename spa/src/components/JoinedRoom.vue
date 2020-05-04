@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { RoomQueryResponseData } from "@/components/RoomTypes";
-import { ROOM_QUERY } from "@/components/RoomQueries";
+import { GET_ROOM_QUERY } from "@/components/RoomQueries";
 
 export default Vue.extend({
   name: "joined-room",
@@ -20,7 +20,7 @@ export default Vue.extend({
   mounted() {
     this.$apollo
       .query({
-        query: ROOM_QUERY,
+        query: GET_ROOM_QUERY,
         variables: {
           message: "123"
         }

@@ -2,9 +2,9 @@ import {DataSource} from 'apollo-datasource';
 
 class RoomDataSource extends DataSource {
 
-  getRoom() {
+  getRoom(id: string) {
     return {
-      id: '',
+      id: id,
       members: ['stub']
     };
   }
