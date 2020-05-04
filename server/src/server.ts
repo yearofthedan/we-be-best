@@ -1,4 +1,5 @@
-import {ApolloServer} from 'apollo-server';
+import { ApolloServer } from 'apollo-server-express';
+
 import typeDefs from './typeDefs';
 import RoomDataSource from './RoomDataSource';
 import resolveRoom from './roomResolver';
