@@ -1,5 +1,4 @@
-#! /usr/bin/env sh
-set -euo pipefail
+#!/usr/bin/env bash
 
 docker tag we-be-best/app registry.heroku.com/we-be-best/web
 
