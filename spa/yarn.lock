@@ -1224,13 +1224,6 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
-"@types/graphql@^14.0.0":
-  version "14.5.0"
-  resolved "https://registry.yarnpkg.com/@types/graphql/-/graphql-14.5.0.tgz#a545fb3bc8013a3547cf2f07f5e13a33642b75d6"
-  integrity sha512-MOkzsEp1Jk5bXuAsHsUi6BVv0zCO+7/2PTiZMXWDSsMXvNU6w/PLMQT2vHn8hy2i0JqojPz1Sz6rsFjHtsU0lA==
-  dependencies:
-    graphql "*"
-
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.1.tgz#42995b446db9a48a11a07ec083499a860e9138ff"
@@ -2176,14 +2169,6 @@ apollo-client@^2.6.7:
     ts-invariant "^0.4.0"
     tslib "^1.10.0"
     zen-observable "^0.8.0"
-
-apollo-link-dedup@^1.0.13:
-  version "1.0.21"
-  resolved "https://registry.yarnpkg.com/apollo-link-dedup/-/apollo-link-dedup-1.0.21.tgz#7fcbb209bdf11ce42e0e31f58f3f8008f960f240"
-  integrity sha512-r+mbfzMxj6m+oSKoNJTrTOTWbG4ysGscBla6ibdyvq/leLiroQw8HP9TtWRxVDtNlfkExEC548fUxr3LUgVssw==
-  dependencies:
-    apollo-link "^1.2.14"
-    tslib "^1.9.3"
 
 apollo-link-error@^1.0.3:
   version "1.1.13"
@@ -5430,7 +5415,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.3.tgz#4a12ff1b60376ef09862c2093edd908328be8423"
   integrity sha512-a30VEBm4PEdx1dRB7MFK7BejejvCvBronbLjht+sHuGYj8PHs7M/5Z+rt5lw551vZ7yfTCj4Vuyy3mSJytDWRQ==
 
-graphql-tag@^2.4.2:
+graphql-tag@^2.10.3, graphql-tag@^2.4.2:
   version "2.10.3"
   resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-2.10.3.tgz#ea1baba5eb8fc6339e4c4cf049dabe522b0edf03"
   integrity sha512-4FOv3ZKfA4WdOKJeHdz6B3F/vxBLSgmBcGeAFPf4n1F64ltJUvOOerNj0rsJxONQGdhUMynQIvd6LzB+1J5oKA==
@@ -5448,11 +5433,6 @@ graphql-tools@^5.0.0:
     node-fetch "^2.6.0"
     tslib "^1.11.1"
     uuid "^7.0.3"
-
-graphql@*:
-  version "15.0.0"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.0.0.tgz#042a5eb5e2506a2e2111ce41eb446a8e570b8be9"
-  integrity sha512-ZyVO1xIF9F+4cxfkdhOJINM+51B06Friuv4M66W7HzUOeFd+vNzUn4vtswYINPi6sysjf1M2Ri/rwZALqgwbaQ==
 
 graphql@^14.0.0:
   version "14.6.0"

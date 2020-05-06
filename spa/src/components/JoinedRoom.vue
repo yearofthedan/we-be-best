@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { RoomQueryResponseData } from "@/components/RoomTypes";
-import { GET_ROOM_QUERY } from "@/components/RoomQueries";
+import {GET_ROOM_QUERY} from '@/components/roomGraphQLQuery';
 
 export default Vue.extend({
   name: "joined-room",
@@ -22,7 +22,7 @@ export default Vue.extend({
       .query({
         query: GET_ROOM_QUERY,
         variables: {
-          message: "123"
+          id: "123"
         }
       })
       .then((res: RoomQueryResponseData) => {

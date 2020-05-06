@@ -11,6 +11,9 @@ module.exports = {
   transform: {
     '^.+\\.(ts|tsx)$': './node_modules/ts-jest/preprocessor.js'
   },
+  moduleNameMapper: {
+    'graphql-tag': '<rootDir>/node_modules/graphql-tag'
+  },
   testMatch: [
     '**/src/**/*.test.(ts|js)'
   ],

@@ -1,7 +1,7 @@
-import {gql} from 'apollo-boost';
+import gql from 'graphql-tag';
 
 export const GET_ROOM_QUERY = gql`
-    query Room($id: ID!) {
+    query room($id: ID!) {
         room(id: $id) {
             id
             members

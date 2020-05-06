@@ -1,7 +1,7 @@
 import {render} from '@testing-library/vue';
 import JoinedRoom from '@/components/JoinedRoom.vue';
 import {createMockClient} from 'mock-apollo-client';
-import {GET_ROOM_QUERY} from '@/components/RoomQueries';
+import {GET_ROOM_QUERY} from '@/components/roomGraphQLQuery';
 import VueApollo from 'vue-apollo';
 
 describe('<joined-room />', () => {
@@ -10,6 +10,7 @@ describe('<joined-room />', () => {
     mockApolloClient.setRequestHandler(
       GET_ROOM_QUERY,
       () => Promise.resolve({ data: { room: {
+            id: '123',
             members: ['my-name']
           } } })
     );

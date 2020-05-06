@@ -2,8 +2,8 @@ import {render} from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
 import Lobby from "@/components/Lobby.vue";
 import { createMockClient } from 'mock-apollo-client';
-import {GET_ROOM_QUERY} from '@/components/RoomQueries';
 import VueApollo from 'vue-apollo'
+import {GET_ROOM_QUERY} from '@/components/roomGraphQLQuery';
 
 describe("<Lobby />", () => {
   it("creates a gathering when I input a valid name and continue", async () => {
