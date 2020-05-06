@@ -3,8 +3,8 @@ services:
   - docker
 script:
   - docker build -t we-be-best/app .
-after_success:
   - ./pushToHeroku.sh
+after_success:
   - docker-compose up heroku-deployment
 env:
   global:
