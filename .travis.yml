@@ -2,4 +2,10 @@ language: node_js
 services:
   - docker
 script:
-  - docker build -t we-be-best/spa ./spa
+  - docker build -t we-be-best/app .
+after_success:
+  - ./pushToHeroku.sh
+  - docker-compose up heroku-deployment
+env:
+  global:
+    secure: S9nELzeFUy8Sg4YRUEExzmlT52ygkkBa5E3SY2i99M5WyFSM3Ut/GOENgOXjzmeGcqZBhFtlVeqSi17faHwcD5SjgMDT5zm5T+1WJC4o2o0N4BWx20uaUxZRaf3p/QXI/3Z24rXlpc4jwD44yjMx5VaBiCMeKcLpnLHIJFjeuu2toW9nZVs/LmyjWLh2v0FmnBH5Y4gHg3SlwuRYoTljUxS3ERAlu6LN0JeXsU9rtIPOQVxsSnAcAoYZP8VvnALJAVOicLgMTmxg9KAuaehZ1H6gqgUx2XsmdbpjEg0skAGZ6L8jIIAAom75MxOGKeYnqoNdQFpRCD1ExGBi4i+oglCjwqP7kuwtH6eI0YLnaEhjppWHt8zw7pxEasSkw3dOuKJQ4OMo2jRuNY4bYgiSqaWu2uN5nebUcY+HPCxr0bAtGcxMLZHR97dXn/1IwSjWWK0E9dET7y/ER0Ia69ysyE99hBI75jpSzvvoPbDOx/TAoYcvClZTqyCzBGhPY+SlrTkvkgJA/nOElBcT5D5u3aU72GfRnVAWxhdcnuDnthaCLQJCjqC3BClTuWHr2NHXNoHmuoXvwjrrob6B9XBl5GXB8ibKRYa9lvNEITC/YlyouYYVfS/7JDiahmi3xtxoQJQRtAtQJ0GgXN17KzWHa7aa6EjTosHKarm2DLvvHdg=
