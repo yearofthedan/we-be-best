@@ -21,6 +21,7 @@
     "apollo-server-express": "^2.12.0",
     "express": "^4.17.1",
     "graphql": "^15.0.0",
+    "graphql-subscriptions": "^1.1.0",
     "graphql-tag": "^2.10.3"
   },
   "devDependencies": {
