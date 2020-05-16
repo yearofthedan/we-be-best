@@ -1,0 +1,9 @@
+version: '2.0'
+services:
+  heroku-deployment:
+    image: finalgene/heroku-cli:latest
+    entrypoint: ''
+    command: heroku container:release --app we-be-best web
+    environment:
+      HEROKU_API_KEY: ${HEROKU_API_KEY}
+      HEROKU_APP_NAME: we-be-best
