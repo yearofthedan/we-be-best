@@ -9,6 +9,15 @@ const typeDefs = gql`
     type Query {
         room(id: ID!): Room
     }
+
+    type Subscription {
+        roomChanged: Room!
+    }
+    
+    type Mutation {
+        roomChanged: Room!
+    }
+    
 `;
 
 export default typeDefs;

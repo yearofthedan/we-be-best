@@ -1,4 +1,4 @@
-import {DataSources} from './server';
+import {DataSources} from './apolloServer';
 
 interface Room {
   id: string;

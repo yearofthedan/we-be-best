@@ -1,8 +1,8 @@
 import {createTestClient} from 'apollo-server-testing';
-import server from '../server';
+import server from '../apolloServer';
 import {GET_ROOM_QUERY} from '../../../spa/src/components/roomGraphQLQuery';
 
-const { query } = createTestClient(server);
+const { query } = createTestClient(server());
 
 describe('integration: rooms', () => {
   it('gets a room', async ()  => {
