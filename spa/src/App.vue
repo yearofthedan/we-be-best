@@ -1,17 +1,17 @@
 <template>
   <div id="app">
-    <HelloWorld />
+    <shared-board />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import HelloWorld from "./components/HelloWorld.vue";
+import SharedBoard from "./components/SharedBoard.vue";
 
 export default Vue.extend({
-  name: "App",
+  name: "app",
   components: {
-    HelloWorld
+    "shared-board": SharedBoard
   }
 });
 </script>

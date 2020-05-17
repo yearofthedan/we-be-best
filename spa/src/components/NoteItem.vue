@@ -5,64 +5,55 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "NoteItem",
+  name: 'note-item',
   props: {
-    msg: String
+    id: String,
+    xPos: Number,
+    yPos: Number,
+    moving: Boolean,
+  },
+  computed: {
+    styleObject: function() {
+      return {
+        left: `${this.xPos}px`,
+        top: `${this.yPos}px`,
+        color: 'yellow',
+      };
+    },
   },
   created: function() {
-    window.addEventListener("mousemove", event => {
+    window.addEventListener('mousemove', event => {
       if (this.moving) {
-        this.curr.left += event.movementX;
-        this.curr.top += event.movementY;
-
-        this.styleObject.left = `${this.curr.left}px`;
-        this.styleObject.top = `${this.curr.top}px`;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        const socket = this.$socket;
-        socket.send(
-          JSON.stringify({
-            type: "NOTE_MOVED",
-            by: "DAN",
-            newX: `${this.curr.left}px`,
-            newY: `${this.curr.top}px`
-          })
-        );
+        this.$emit('boardchange', {
+          id: this.id,
+          xPos: this.xPos + event.movementX,
+          yPos: this.yPos + event.movementY,
+          moving: this.moving,
+        });
       }
     });
-    window.addEventListener("mouseup", () => {
-      this.moving = false;
+    window.addEventListener('mouseup', () => {
+      this.$emit('boardchange', {
+        id: this.id,
+        xPos: this.xPos,
+        yPos: this.yPos,
+        moving: false,
+      });
     });
-  },
-  destroyed: function() {
-    //tbd
   },
   methods: {
     _onMouseDown: function(): void {
-      this.moving = true;
-    }
+      this.$emit('boardchange', {
+        id: this.id,
+        xPos: this.xPos,
+        yPos: this.yPos,
+        moving: true,
+      });
+    },
   },
-  data(): {
-    moving: boolean;
-    curr: { top: number; left: number };
-    styleObject: { top: string; left: string; color: string };
-  } {
-    return {
-      moving: false,
-      curr: {
-        top: 100,
-        left: 100
-      },
-      styleObject: {
-        top: "100px",
-        left: "100px",
-        color: "yellow"
-      }
-    };
-  }
 });
 </script>
 
