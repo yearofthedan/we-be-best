@@ -1,19 +1,19 @@
 <script lang="ts">
-import Vue from "vue";
-import { RoomQueryResponseData } from "@/components/RoomTypes";
-import {GET_ROOM_QUERY} from '@/components/roomGraphQLQuery';
+import Vue from 'vue';
+import { RoomQueryResponseData } from '@/components/RoomTypes';
+import { GET_ROOM_QUERY } from '@/components/roomGraphQLQuery';
 
 export default Vue.extend({
-  name: "joined-room",
+  name: 'joined-room',
   props: {
     roomId: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   data: function() {
     const data: { members: string[] } = {
-      members: []
+      members: [],
     };
     return data;
   },
@@ -22,13 +22,13 @@ export default Vue.extend({
       .query({
         query: GET_ROOM_QUERY,
         variables: {
-          id: "123"
-        }
+          id: '123',
+        },
       })
       .then((res: RoomQueryResponseData) => {
         this.members = res.data.room.members;
       });
-  }
+  },
 });
 </script>
 

@@ -5,14 +5,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import SharedBoard from "./components/SharedBoard.vue";
+import Vue from 'vue';
+import SharedBoard from './components/SharedBoard.vue';
 
 export default Vue.extend({
-  name: "app",
+  name: 'app',
   components: {
-    "shared-board": SharedBoard
-  }
+    'shared-board': SharedBoard,
+  },
 });
 </script>
 

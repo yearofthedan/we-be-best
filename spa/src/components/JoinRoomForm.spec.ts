@@ -1,4 +1,4 @@
-import {render} from '@testing-library/vue';
+import { render } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
 import JoinRoomForm from './JoinRoomForm.vue';
 
@@ -8,7 +8,9 @@ describe('<join-room-form />', () => {
 
     userEvent.click(getByText('New gathering'));
 
-    await expect(await findByText('you need to add a name')).toBeInTheDocument();
+    await expect(
+      await findByText('you need to add a name')
+    ).toBeInTheDocument();
   });
 
   it('emits a joined event when I have successfully joined with a name', async () => {
@@ -18,6 +20,6 @@ describe('<join-room-form />', () => {
     userEvent.click(getByText('New gathering'));
 
     expect(emitted().joined).not.toBeUndefined();
-    expect(emitted().joined[0]).toEqual([{ id: 'placeholder-id'}]);
+    expect(emitted().joined[0]).toEqual([{ id: 'placeholder-id' }]);
   });
 });

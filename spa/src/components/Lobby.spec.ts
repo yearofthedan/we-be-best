@@ -1,33 +1,36 @@
-import {render} from '@testing-library/vue';
+import { render } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
-import Lobby from "@/components/Lobby.vue";
+import Lobby from '@/components/Lobby.vue';
 import { createMockClient } from 'mock-apollo-client';
-import VueApollo from 'vue-apollo'
-import {GET_ROOM_QUERY} from '@/components/roomGraphQLQuery';
+import VueApollo from 'vue-apollo';
+import { GET_ROOM_QUERY } from '@/components/roomGraphQLQuery';
 
-describe("<Lobby />", () => {
-  it("creates a gathering when I input a valid name and continue", async () => {
+describe('<Lobby />', () => {
+  it('creates a gathering when I input a valid name and continue', async () => {
     const mockApolloClient = createMockClient();
-    mockApolloClient.setRequestHandler(
-      GET_ROOM_QUERY,
-      () => Promise.resolve({ data: { room: {} } })
+    mockApolloClient.setRequestHandler(GET_ROOM_QUERY, () =>
+      Promise.resolve({ data: { room: {} } })
     );
     const apolloProvider = new VueApollo({
       defaultClient: mockApolloClient,
     });
 
-    const { getByLabelText, getByText, findByText } = render(Lobby, {
-      apolloProvider
-    },
+    const { getByLabelText, getByText, findByText } = render(
+      Lobby,
+      {
+        apolloProvider,
+      },
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
-      vue => vue.use(VueApollo),
+      vue => vue.use(VueApollo)
     );
 
     await userEvent.type(getByLabelText('Your name'), 'yulu');
 
     userEvent.click(getByText('New gathering'));
 
-    await expect(await findByText('Room for placeholder-id')).toBeInTheDocument();
+    await expect(
+      await findByText('Room for placeholder-id')
+    ).toBeInTheDocument();
   });
 });

@@ -1,22 +1,22 @@
 <script lang="ts">
-import Vue from "vue";
-import JoinedRoom from "@/components/JoinedRoom.vue";
-import JoinRoomForm from "@/components/JoinRoomForm.vue";
+import Vue from 'vue';
+import JoinedRoom from '@/components/JoinedRoom.vue';
+import JoinRoomForm from '@/components/JoinRoomForm.vue';
 
 export default Vue.extend({
   components: {
-    "join-room-form": JoinRoomForm,
-    "joined-room": JoinedRoom
+    'join-room-form': JoinRoomForm,
+    'joined-room': JoinedRoom,
   },
-  name: "Lobby",
+  name: 'Lobby',
   data(): { roomId: string | null } {
     return { roomId: null };
   },
   methods: {
     _onJoined: function(room: { id: string }) {
       this.roomId = room.id;
-    }
-  }
+    },
+  },
 });
 </script>
 

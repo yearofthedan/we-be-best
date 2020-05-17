@@ -1,13 +1,13 @@
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "join-room-form",
-  data(): { errors: string[], name: string | null } {
+  name: 'join-room-form',
+  data(): { errors: string[]; name: string | null } {
     return {
       errors: [],
       name: null,
-    }
+    };
   },
   methods: {
     onFormSubmit(e: Event) {
@@ -19,11 +19,11 @@ export default Vue.extend({
         return false;
       }
 
-      this.$emit("joined", {
-        id: "placeholder-id"
+      this.$emit('joined', {
+        id: 'placeholder-id',
       });
-    }
-  }
+    },
+  },
 });
 </script>
 
@@ -38,7 +38,7 @@ export default Vue.extend({
       <div v-if="errors.length > 0">
         <h3>Please correct the following errors:</h3>
         <ul>
-          <li v-for="err in errors" :key="err" >{{err}}</li>
+          <li v-for="err in errors" :key="err">{{ err }}</li>
         </ul>
       </div>
       <label for="your-name">
