@@ -11,15 +11,15 @@ export default Vue.extend({
   name: 'note-item',
   props: {
     id: String,
-    xPos: Number,
-    yPos: Number,
+    posX: Number,
+    posY: Number,
     moving: Boolean,
   },
   computed: {
     styleObject: function() {
       return {
-        left: `${this.xPos}px`,
-        top: `${this.yPos}px`,
+        left: `${this.posX}px`,
+        top: `${this.posY}px`,
         color: 'yellow',
       };
     },
@@ -29,8 +29,8 @@ export default Vue.extend({
       if (this.moving) {
         this.$emit('boardchange', {
           id: this.id,
-          xPos: this.xPos + event.movementX,
-          yPos: this.yPos + event.movementY,
+          posX: this.posX + event.movementX,
+          posY: this.posY + event.movementY,
           moving: this.moving,
         });
       }
@@ -38,8 +38,8 @@ export default Vue.extend({
     window.addEventListener('mouseup', () => {
       this.$emit('boardchange', {
         id: this.id,
-        xPos: this.xPos,
-        yPos: this.yPos,
+        posX: this.posX,
+        posY: this.posY,
         moving: false,
       });
     });
@@ -48,8 +48,8 @@ export default Vue.extend({
     _onMouseDown: function(): void {
       this.$emit('boardchange', {
         id: this.id,
-        xPos: this.xPos,
-        yPos: this.yPos,
+        posX: this.posX,
+        posY: this.posY,
         moving: true,
       });
     },

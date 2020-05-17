@@ -8,3 +8,22 @@ export const GET_ROOM_QUERY = gql`
     }
   }
 `;
+
+interface NoteInput {
+  id: string;
+  posX: number;
+  posY: number;
+  moving: boolean;
+}
+
+export interface RoomChangedInput {
+  notes: [NoteInput]
+}
+
+export const ROOM_CHANGED_MUTATION = gql`  
+    mutation roomChanged($input: RoomChangedInput!) {
+        roomChanged(input: $input)  {
+            id
+        }
+    }
+`;

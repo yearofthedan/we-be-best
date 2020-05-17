@@ -1,9 +1,29 @@
 import gql from 'graphql-tag';
 
 const typeDefs = gql`
+    input NoteInput {
+        id: String!
+        posX: Int!
+        posY: Int!
+        moving: Boolean!
+    }
+
+    input RoomChangedInput {
+        id: ID!
+        notes: [NoteInput]!
+    }
+    
     type Room {
         id: ID!
-        members: [String]
+        members: [String!]!
+        notes: [Note!]!
+    }
+    
+    type Note {
+        id: String!
+        posX: Int!
+        posY: Int!
+        moving: Boolean!
     }
 
     type Query {
@@ -15,9 +35,8 @@ const typeDefs = gql`
     }
     
     type Mutation {
-        roomChanged: Room!
+        roomChanged(input: RoomChangedInput!): Room!
     }
-    
 `;
 
 export default typeDefs;

@@ -7,8 +7,8 @@ describe('<note-item />', () => {
     render(NoteItem, {
       propsData: {
         id: 'note123',
-        xPos: 2,
-        yPos: 1,
+        posX: 2,
+        posY: 1,
         moving: false,
       },
     });
@@ -23,8 +23,8 @@ describe('<note-item />', () => {
     const { emitted } = render(NoteItem, {
       propsData: {
         id: 'note123',
-        xPos: 2,
-        yPos: 1,
+        posX: 2,
+        posY: 1,
         moving: false,
       },
     });
@@ -36,8 +36,8 @@ describe('<note-item />', () => {
       {
         id: 'note123',
         moving: true,
-        xPos: 2,
-        yPos: 1,
+        posX: 2,
+        posY: 1,
       },
     ]);
   });
@@ -46,8 +46,8 @@ describe('<note-item />', () => {
     const { emitted } = render(NoteItem, {
       propsData: {
         id: 'note123',
-        xPos: 2,
-        yPos: 1,
+        posX: 2,
+        posY: 1,
         moving: true,
       },
     });
@@ -59,8 +59,8 @@ describe('<note-item />', () => {
       {
         id: 'note123',
         moving: false,
-        xPos: 2,
-        yPos: 1,
+        posX: 2,
+        posY: 1,
       },
     ]);
   });
@@ -69,8 +69,8 @@ describe('<note-item />', () => {
     const { emitted } = render(NoteItem, {
       propsData: {
         id: 'note123',
-        xPos: 2,
-        yPos: 1,
+        posX: 2,
+        posY: 1,
         moving: true,
       },
     });
@@ -88,8 +88,8 @@ describe('<note-item />', () => {
       {
         id: 'note123',
         moving: true,
-        xPos: 22,
-        yPos: 11,
+        posX: 22,
+        posY: 11,
       },
     ]);
   });
@@ -98,8 +98,8 @@ describe('<note-item />', () => {
     const { emitted } = render(NoteItem, {
       propsData: {
         id: 'note123',
-        xPos: 2,
-        yPos: 1,
+        posX: 2,
+        posY: 1,
         moving: false,
       },
     });

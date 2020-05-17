@@ -8,6 +8,7 @@ import { GET_ROOM_QUERY } from '@/components/roomGraphQLQuery';
 describe('<Lobby />', () => {
   it('creates a gathering when I input a valid name and continue', async () => {
     const mockApolloClient = createMockClient();
+
     mockApolloClient.setRequestHandler(GET_ROOM_QUERY, () =>
       Promise.resolve({ data: { room: {} } })
     );
