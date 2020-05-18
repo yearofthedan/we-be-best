@@ -1,37 +1,26 @@
-import { render } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
 import Lobby from '@/components/Lobby.vue';
-import { createMockClient } from 'mock-apollo-client';
-import VueApollo from 'vue-apollo';
 import { GET_ROOM_QUERY } from '@/components/roomGraphQLQuery';
+import { renderWithApollo, screen } from '@/testHelpers/renderer';
 
-describe('<Lobby />', () => {
+describe('<lobby />', () => {
   it('creates a gathering when I input a valid name and continue', async () => {
-    const mockApolloClient = createMockClient();
+    const stubQuery = {
+      query: GET_ROOM_QUERY,
+      successData: {
+        room: {
+          id: 'ROOM123',
+          members: []
+        },
+      }};
 
-    mockApolloClient.setRequestHandler(GET_ROOM_QUERY, () =>
-      Promise.resolve({ data: { room: {} } })
-    );
-    const apolloProvider = new VueApollo({
-      defaultClient: mockApolloClient,
-    });
+    renderWithApollo(Lobby, stubQuery);
 
-    const { getByLabelText, getByText, findByText } = render(
-      Lobby,
-      {
-        apolloProvider,
-      },
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
-      vue => vue.use(VueApollo)
-    );
-
-    await userEvent.type(getByLabelText('Your name'), 'yulu');
-
-    userEvent.click(getByText('New gathering'));
+    await userEvent.type(screen.getByLabelText('Your name'), 'yulu');
+    userEvent.click(screen.getByText('New gathering'));
 
     await expect(
-      await findByText('Room for placeholder-id')
+      await screen.findByText('Room for placeholder-id')
     ).toBeInTheDocument();
   });
 });

@@ -1,4 +1,4 @@
-import { render } from '@testing-library/vue';
+import { render } from '@/testHelpers/renderer';
 import userEvent from '@testing-library/user-event';
 import JoinRoomForm from './JoinRoomForm.vue';
 

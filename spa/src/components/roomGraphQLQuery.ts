@@ -1,12 +1,12 @@
 import gql from 'graphql-tag';
 
 export const GET_ROOM_QUERY = gql`
-  query room($id: ID!) {
-    room(id: $id) {
-      id
-      members
+    query room($id: ID!) {
+        room(id: $id) {
+            id
+            members
+        }
     }
-  }
 `;
 
 interface NoteInput {
@@ -20,7 +20,7 @@ export interface RoomChangedInput {
   notes: [NoteInput]
 }
 
-export const ROOM_CHANGED_MUTATION = gql`  
+export const ROOM_CHANGED_MUTATION = gql`
     mutation roomChanged($input: RoomChangedInput!) {
         roomChanged(input: $input)  {
             id

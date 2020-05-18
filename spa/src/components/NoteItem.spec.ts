@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/vue';
+import { fireEvent, render, screen } from '@/testHelpers/renderer';
 import NoteItem from '@/components/NoteItem.vue';
 import { MouseMoveEvent } from '@/testHelpers/jsdomFriendlyMouseEvents';
 

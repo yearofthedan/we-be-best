@@ -1,17 +1,17 @@
 <template>
-  <div id="app">
-    <shared-board />
-  </div>
+  <main id="app">
+    <joined-room room-id="ROOM123" />
+  </main>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import SharedBoard from './components/SharedBoard.vue';
+import JoinedRoom from '@/components/JoinedRoom.vue';
 
 export default Vue.extend({
   name: 'app',
   components: {
-    'shared-board': SharedBoard,
+    'joined-room': JoinedRoom,
   },
 });
 </script>
