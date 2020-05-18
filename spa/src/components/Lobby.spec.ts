@@ -10,7 +10,8 @@ describe('<lobby />', () => {
       successData: {
         room: {
           id: 'ROOM123',
-          members: []
+          members: [],
+          notes: [],
         },
       }};
 

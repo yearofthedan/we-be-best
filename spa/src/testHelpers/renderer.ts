@@ -25,7 +25,6 @@ const renderWithApollo = (
     })
   }
 
-
   mockApolloClient.setRequestHandler(querySpec.query, queryMock)
 
   const apolloProvider = new VueApollo({

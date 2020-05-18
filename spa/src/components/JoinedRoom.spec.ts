@@ -10,6 +10,7 @@ describe('<joined-room />', () => {
         room: {
           id: '123',
           members: ['my-name'],
+          notes: []
         },
       }
     };
