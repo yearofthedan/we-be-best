@@ -1,43 +1,45 @@
-import Vue from 'vue'
-import { ApolloClient } from 'apollo-client'
-import { HttpLink } from 'apollo-link-http'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import { split } from 'apollo-link'
-import { WebSocketLink } from 'apollo-link-ws'
-import { getMainDefinition } from 'apollo-utilities'
-import VueApollo from 'vue-apollo'
+import Vue from 'vue';
+import {ApolloClient} from 'apollo-client';
+import {HttpLink} from 'apollo-link-http';
+import {InMemoryCache} from 'apollo-cache-inmemory';
+import {split} from 'apollo-link';
+import {WebSocketLink} from 'apollo-link-ws';
+import {getMainDefinition} from 'apollo-utilities';
+import VueApollo from 'vue-apollo';
 import App from './App.vue';
 
-const HOST_NAME = window.location.host;
+const GRAPHQL_URI_HTTP = process.env.VUE_APP_GRAPHQL_URI_HTTP || window.location.host;
+const GRAPHQL_URI_WS = process.env.VUE_APP_GRAPHQL_URI_WS || window.location.host;
 
+console.log(process.env.VUE_APP_GRAPHQL_HOST)
 const httpLink = new HttpLink({
-  uri: `https://${HOST_NAME}/graphql`,
-})
+  uri: GRAPHQL_URI_HTTP || `https://${window.location.host}/graphql`,
+});
 
 const wsLink = new WebSocketLink({
-  uri: `ws://${HOST_NAME}/graphql`,
+  uri: GRAPHQL_URI_WS || `wss://${window.location.host}/graphql`,
   options: {
     reconnect: true,
   },
-})
+});
 Vue.config.productionTip = false;
 
 const link = split(
   // split based on operation type
-  ({ query }) => {
-    const definition = getMainDefinition(query)
+  ({query}) => {
+    const definition = getMainDefinition(query);
     return definition.kind === 'OperationDefinition' &&
-      definition.operation === 'subscription'
+      definition.operation === 'subscription';
   },
   wsLink,
-  httpLink
-)
+  httpLink,
+);
 
 const apolloClient = new ApolloClient({
   link,
   cache: new InMemoryCache(),
   connectToDevTools: true,
-})
+});
 
 const apolloProvider = new VueApollo({
   defaultClient: apolloClient,
