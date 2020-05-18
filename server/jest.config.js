@@ -15,7 +15,7 @@ module.exports = {
     'graphql-tag': '<rootDir>/node_modules/graphql-tag'
   },
   testMatch: [
-    '**/src/**/*.test.(ts|js)'
+    '**/src/**/*.(test|spec).(ts|js)'
   ],
   testEnvironment: 'node'
 };

@@ -5,6 +5,12 @@ export const GET_ROOM_QUERY = gql`
         room(id: $id) {
             id
             members
+            notes {
+                id
+                posX
+                posY
+                moving
+            }
         }
     }
 `;

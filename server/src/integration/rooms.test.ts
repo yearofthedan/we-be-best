@@ -13,7 +13,15 @@ describe('integration: rooms', () => {
 
     expect(res.data).toHaveProperty('room', {
       id: '123',
-      members: ['stub']
+      members: ['stub'],
+      notes: [
+        {
+          id: 'ROOM123',
+          moving: false,
+          posX: 0,
+          posY: 0,
+        }
+      ]
     });
   });
 });

@@ -1,7 +1,7 @@
 import { ApolloServer, PubSub } from 'apollo-server-express';
 import typeDefs from './typeDefs';
-import RoomDataSource from './RoomDataSource';
-import resolveRoom from './roomResolver';
+import RoomDataSource from './rooms/RoomDataSource';
+import resolveRoom from './rooms/roomResolver';
 
 export interface DataSources {
   Room: RoomDataSource;
@@ -23,10 +23,18 @@ const apolloServer = () => new ApolloServer({
     Mutation: {
       roomChanged: async () => {
         await pubsub.publish('room_changed_topic', { roomChanged: {
-          id: '123'
+            id: '123',
+            members: ['stub'],
+            notes: [
+              { id: 'ROOM123', posY: '0', posX: '0', moving: false }
+            ]
           } });
         return {
-          id: '123'
+          id: '123',
+          members: ['stub'],
+          notes: [
+            { id: 'ROOM123', posY: '0', posX: '0', moving: false }
+          ]
         };
       },
     }

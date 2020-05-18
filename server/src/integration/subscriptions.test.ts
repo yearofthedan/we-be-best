@@ -44,6 +44,12 @@ describe('integration: subscription', () => {
             subscription roomChanged {
                 roomChanged {
                     id
+                    notes {
+                        id
+                        posX
+                        posX
+                        moving
+                    }
                 }
             }`
       }).subscribe({
