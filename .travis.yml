@@ -3,7 +3,6 @@ services:
   - docker
 script:
   - docker build -t we-be-best/app .
-after_success:
   - ./deployment/pushToHeroku.sh
   - docker-compose -f deployment/docker-compose.yml up
 env:
