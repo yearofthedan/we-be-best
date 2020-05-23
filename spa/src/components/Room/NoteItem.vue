@@ -61,8 +61,8 @@ export default Vue.extend({
       if (this.moving) {
         this.$emit('boardchange', {
           id: this.id,
-          posX: this.posX + event.movementX,
-          posY: this.posY + event.movementY,
+          posX: Math.max(0, this.posX + event.movementX),
+          posY: Math.max(0, this.posY + event.movementY),
           moving: this.moving,
         });
       }
