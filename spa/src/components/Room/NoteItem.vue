@@ -1,5 +1,5 @@
 <template>
-  <li v-bind:style="styleObject" v-on:mousedown="_onMouseDown">
+  <li v-bind:style="styleObject" v-on:pointerdown="_onPointerDown">
     Test
   </li>
 </template>
@@ -37,11 +37,11 @@ export default Vue.extend({
     },
   },
   mounted() {
-    window.addEventListener('mousemove', this._onMouseMove);
-    window.addEventListener('mouseup', this._onMouseUp);
+    window.addEventListener('pointermove', this._onPointerMove);
+    window.addEventListener('pointerup', this._onPointerUp);
   },
   methods: {
-    _onMouseDown: function(): void {
+    _onPointerDown: function(): void {
       this.$emit('boardchange', {
         id: this.$props.id,
         posX: this.$props.posX,
@@ -49,7 +49,7 @@ export default Vue.extend({
         moving: true,
       });
     },
-    _onMouseUp: function(): void {
+    _onPointerUp: function(): void {
       this.$emit('boardchange', {
         id: this.$props.id,
         posX: this.$props.posX,
@@ -57,7 +57,7 @@ export default Vue.extend({
         moving: false,
       });
     },
-    _onMouseMove: function(event: MouseEvent): void {
+    _onPointerMove: function(event: PointerEvent): void {
       if (this.moving) {
         this.$emit('boardchange', {
           id: this.id,

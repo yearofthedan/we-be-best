@@ -1,6 +1,6 @@
 import { fireEvent, renderWithApollo, screen } from '@/testHelpers/renderer';
 import SharedBoard from '@/components/Room/SharedBoard.vue';
-import { MouseMoveEvent } from '@/testHelpers/jsdomFriendlyMouseEvents';
+import { PointerMoveEvent } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import { UPDATE_ROOM_NOTES_MUTATION } from '@/components/Room/roomGraphQLQuery';
 
 describe('<shared-board />', () => {
@@ -48,10 +48,10 @@ describe('<shared-board />', () => {
       propsData: { roomId: 'ROOM123', notes: [{ id: 'NOTE123', posX: 10, posY: 10, moving: false }] },
     });
 
-    await fireEvent.mouseDown(screen.getByRole('listitem'));
+    await fireEvent.pointerDown(screen.getByRole('listitem'));
     await fireEvent(
       screen.getByRole('listitem'),
-      new MouseMoveEvent({
+      new PointerMoveEvent({
         movementX: 20,
         movementY: 10,
       })

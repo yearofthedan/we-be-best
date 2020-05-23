@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@/testHelpers/renderer';
 import NoteItem from '@/components/Room/NoteItem.vue';
-import { MouseMoveEvent } from '@/testHelpers/jsdomFriendlyMouseEvents';
+import { PointerMoveEvent } from '@/testHelpers/jsdomFriendlyPointerEvents';
 
 describe('<note-item />', () => {
   it('renders the positioning based upon the x and y props', () => {
@@ -29,7 +29,7 @@ describe('<note-item />', () => {
       },
     });
 
-    await fireEvent.mouseDown(screen.getByRole('listitem'));
+    await fireEvent.pointerDown(screen.getByRole('listitem'));
 
     expect(emitted().boardchange).not.toBeUndefined();
     expect(emitted().boardchange[0]).toEqual([
@@ -52,7 +52,7 @@ describe('<note-item />', () => {
       },
     });
 
-    await fireEvent.mouseUp(screen.getByRole('listitem'));
+    await fireEvent.pointerUp(screen.getByRole('listitem'));
 
     expect(emitted().boardchange).not.toBeUndefined();
     expect(emitted().boardchange[0]).toEqual([
@@ -77,7 +77,7 @@ describe('<note-item />', () => {
 
     await fireEvent(
       screen.getByRole('listitem'),
-      new MouseMoveEvent({
+      new PointerMoveEvent({
         movementX: 20,
         movementY: 10,
       })
@@ -104,7 +104,7 @@ describe('<note-item />', () => {
       },
     });
 
-    await fireEvent.mouseMove(screen.getByRole('listitem'), {
+    await fireEvent.pointerMove(screen.getByRole('listitem'), {
       movementX: 20,
       movementY: 10,
     });

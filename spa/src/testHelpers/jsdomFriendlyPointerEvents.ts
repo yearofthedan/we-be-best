@@ -1,6 +1,6 @@
 //https://github.com/testing-library/react-testing-library/issues/268
 
-type FakeMouseEventInit = {
+type FakePointerEventInit = {
   bubbles?: boolean;
   cancelable?: boolean;
   composed?: boolean;
@@ -24,7 +24,7 @@ type FakeMouseEventInit = {
   y?: number;
 };
 
-export class FakeMouseEvent extends MouseEvent {
+export class FakePointerEvent extends MouseEvent {
   movementX: number;
   movementY: number;
   offsetX: number;
@@ -34,7 +34,7 @@ export class FakeMouseEvent extends MouseEvent {
   x: number;
   y: number;
 
-  constructor(type: string, values: FakeMouseEventInit) {
+  constructor(type: string, values: FakePointerEventInit) {
     const {
       pageX,
       pageY,
@@ -44,9 +44,9 @@ export class FakeMouseEvent extends MouseEvent {
       movementY,
       x,
       y,
-      ...mouseValues
+      ...pointerValues
     } = values;
-    super(type, mouseValues);
+    super(type, pointerValues);
 
     this.offsetX = offsetX || 0;
     this.offsetY = offsetY || 0;
@@ -59,9 +59,9 @@ export class FakeMouseEvent extends MouseEvent {
   }
 }
 
-export class MouseMoveEvent extends FakeMouseEvent {
-  constructor(values: FakeMouseEventInit) {
-    super('mousemove', {
+export class PointerMoveEvent extends FakePointerEvent {
+  constructor(values: FakePointerEventInit) {
+    super('pointermove', {
       bubbles: true,
       cancelable: true,
       ...values,
