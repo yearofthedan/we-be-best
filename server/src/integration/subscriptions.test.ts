@@ -1,12 +1,12 @@
 import * as http from 'http';
-import expressApp from '../expressServer';
-import initialiseApollo from '../app';
+import ws from 'ws';
 import { WebSocketLink } from 'apollo-link-ws';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import ApolloClient from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import gql from 'graphql-tag';
-import ws from 'ws';
+import expressApp from '../expressServer';
+import initialiseApollo from '../app';
 
 const GRAPHQL_ENDPOINT = 'ws://localhost:7575/graphql';
 
@@ -20,7 +20,6 @@ describe('integration: subscription', () => {
     const client = new SubscriptionClient(GRAPHQL_ENDPOINT, {
       reconnect: true
     }, ws);
-
     apolloClient = new ApolloClient({
       link: new WebSocketLink(client),
       cache: new InMemoryCache()
@@ -37,13 +36,13 @@ describe('integration: subscription', () => {
   });
 
   it('Subscription Test', async function() {
-    jest.setTimeout(10000);
     const subscriptionPromise = new Promise((resolve, reject) => {
       apolloClient.subscribe({
         query: gql`
-            subscription roomChanged {
-                roomChanged {
+            subscription roomUpdates($id: ID!) {
+                roomUpdates(id: $id) {
                     id
+                    members
                     notes {
                         id
                         posX
@@ -51,28 +50,28 @@ describe('integration: subscription', () => {
                         moving
                     }
                 }
-            }`
+            }`,
+        variables: { id: '123'}
       }).subscribe({
         next: resolve,
         error: reject
       });
     });
-
     //TODO work out an approach which doesn't require a timeout
     setTimeout(() => {
       apolloClient.mutate({
         mutation: gql`
-          mutation roomChanged($input: RoomChangedInput!) {
-            roomChanged(input: $input)  {
+          mutation updateRoomNotes($input: UpdateRoomNotesInput!) {
+            updateRoomNotes(input: $input)  {
               id
             }
           }`,
         variables: {
           input: {
-            id: 'ROOM123',
+            id: '123',
             notes: [
               {
-                id: 'NOTE123',
+                id: 'note123',
                 posX: 10,
                 posY: 10,
                 moving: true
@@ -84,7 +83,6 @@ describe('integration: subscription', () => {
     }, 1000);
 
     const result: any = await subscriptionPromise;
-
-    expect(result?.data?.roomChanged?.id).toEqual('123');
-  }, 10000);
+    expect(result?.data?.roomUpdates?.id).toEqual('123');
+  });
 });

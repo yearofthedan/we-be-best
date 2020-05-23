@@ -8,7 +8,7 @@ const typeDefs = gql`
         moving: Boolean!
     }
 
-    input RoomChangedInput {
+    input UpdateRoomNotesInput {
         id: ID!
         notes: [NoteInput]!
     }
@@ -31,11 +31,11 @@ const typeDefs = gql`
     }
 
     type Subscription {
-        roomChanged: Room!
+        roomUpdates(id: ID!): Room!
     }
     
     type Mutation {
-        roomChanged(input: RoomChangedInput!): Room!
+        updateRoomNotes(input: UpdateRoomNotesInput!): Room!
     }
 `;
 
