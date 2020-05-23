@@ -1,6 +1,6 @@
 import {createTestClient} from 'apollo-server-testing';
 import server from '../apolloServer';
-import {GET_ROOM_QUERY} from '../../../spa/src/components/roomGraphQLQuery';
+import {GET_ROOM_QUERY} from '../../../spa/src/components/Room/roomGraphQLQuery';
 
 const { query } = createTestClient(server());
 

@@ -14,7 +14,10 @@
 <script lang="ts">
 import Vue from 'vue';
 import NoteItem from './NoteItem.vue';
-import { ROOM_CHANGED_MUTATION } from './roomGraphQLQuery';
+import {
+  UPDATE_ROOM_NOTES_MUTATION,
+  UpdateRoomNotesInput,
+} from './roomGraphQLQuery';
 
 interface Note {
   id: string;
@@ -29,22 +32,14 @@ export default Vue.extend({
     'note-item': NoteItem,
   },
   props: {
-    roomId: String,
-  },
-  data: () => {
-    const data: {
-      notes: Note[];
-    } = {
-      notes: [
-        {
-          id: 'NOTE123',
-          posX: 10,
-          posY: 10,
-          moving: false,
-        },
-      ],
-    };
-    return data;
+    roomId: {
+      type: String,
+      required: true,
+    },
+    notes: {
+      type: Array,
+      required: true,
+    },
   },
   methods: {
     _onBoardChange: function(note: {
@@ -55,7 +50,7 @@ export default Vue.extend({
     }) {
       const index = this.notes.findIndex(el => el.id === note.id);
 
-      this.notes = [
+      const updated: Note[] = [
         ...this.notes.slice(0, index),
         {
           id: note.id,
@@ -66,14 +61,16 @@ export default Vue.extend({
         ...this.notes.slice(index + 1),
       ];
 
+      const payload: UpdateRoomNotesInput = {
+        id: this.roomId,
+        notes: updated,
+      };
+
       this.$apollo
         .mutate({
-          mutation: ROOM_CHANGED_MUTATION,
+          mutation: UPDATE_ROOM_NOTES_MUTATION,
           variables: {
-            input: {
-              id: this.roomId,
-              notes: this.notes,
-            },
+            input: payload,
           },
         })
         .catch(error => {

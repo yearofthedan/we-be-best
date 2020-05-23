@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
-import JoinedRoom from '@/components/JoinedRoom.vue';
-import JoinRoomForm from '@/components/JoinRoomForm.vue';
+import JoinedRoom from '@/components/Room/JoinedRoom.vue';
+import JoinRoomForm from '@/components/Lobby/JoinRoomForm.vue';
 
 export default Vue.extend({
   components: {

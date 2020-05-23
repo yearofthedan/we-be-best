@@ -1,31 +1,40 @@
-import {VueConstructor} from 'vue';
-import {DocumentNode} from 'graphql';
-import {createMockClient} from 'mock-apollo-client';
+import { VueConstructor } from 'vue';
+import { DocumentNode } from 'graphql';
+import { createMockClient } from 'mock-apollo-client';
 import VueApollo from 'vue-apollo';
 import { render } from '@testing-library/vue';
-import {when} from 'jest-when';
+import { when } from 'jest-when';
+
+interface QuerySpec {
+  query: DocumentNode;
+  successData: object;
+  variables?: object;
+}
 
 const renderWithApollo = (
   component: VueConstructor<Vue>,
-  querySpec: { query: DocumentNode, successData: object, variables?: object },
+  querySpec: QuerySpec | QuerySpec[],
   options: { [id: string]: any } = {}
 ) => {
   const mockApolloClient = createMockClient();
-  const queryMock = jest.fn();
+  const specs: QuerySpec[] = Array.isArray(querySpec) ? querySpec : [querySpec];
 
-  if (querySpec.variables) {
-    when(queryMock)
-      .calledWith(querySpec.variables)
-      .mockResolvedValue({
-        data: querySpec.successData
+  const queryMocks = specs.map(spec => {
+    const queryMock = jest.fn();
+    if (spec.variables) {
+      when(queryMock)
+        .calledWith(spec.variables)
+        .mockResolvedValue({
+          data: spec.successData,
+        });
+    } else {
+      queryMock.mockResolvedValue({
+        data: spec.successData,
       });
-  } else {
-    queryMock.mockResolvedValue({
-      data: querySpec.successData
-    })
-  }
-
-  mockApolloClient.setRequestHandler(querySpec.query, queryMock)
+    }
+    mockApolloClient.setRequestHandler(spec.query, queryMock);
+    return queryMock;
+  });
 
   const apolloProvider = new VueApollo({
     defaultClient: mockApolloClient,
@@ -35,21 +44,18 @@ const renderWithApollo = (
     component,
     {
       ...options,
-      apolloProvider
+      apolloProvider,
     },
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     vue => vue.use(VueApollo)
-  )
+  );
 
   return {
     ...result,
-    queryMock
-  }
-}
+    queryMocks,
+  };
+};
 
 export * from '@testing-library/vue';
-export {
-  renderWithApollo
-}
-
+export { renderWithApollo };

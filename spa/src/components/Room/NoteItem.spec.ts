@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@/testHelpers/renderer';
-import NoteItem from '@/components/NoteItem.vue';
+import NoteItem from '@/components/Room/NoteItem.vue';
 import { MouseMoveEvent } from '@/testHelpers/jsdomFriendlyMouseEvents';
 
 describe('<note-item />', () => {

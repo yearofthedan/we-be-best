@@ -1,12 +1,12 @@
 <template>
   <main id="app">
-    <joined-room room-id="ROOM123" />
+    <joined-room room-id="123" />
   </main>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import JoinedRoom from '@/components/JoinedRoom.vue';
+import JoinedRoom from '@/components/Room/JoinedRoom.vue';
 
 export default Vue.extend({
   name: 'app',
