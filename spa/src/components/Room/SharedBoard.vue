@@ -37,7 +37,7 @@ export default Vue.extend({
       required: true,
     },
     notes: {
-      type: Array,
+      type: Array as () => Note[],
       required: true,
     },
   },
