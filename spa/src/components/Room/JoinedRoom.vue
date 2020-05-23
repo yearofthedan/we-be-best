@@ -19,7 +19,10 @@
               {{ member }}
             </li>
           </ul>
-          <shared-board v-bind:room-id="roomId" v-bind:notes="data.room.notes" />
+          <shared-board
+            v-bind:room-id="roomId"
+            v-bind:notes="data.room.notes"
+          />
         </div>
       </template>
     </apollo-query>

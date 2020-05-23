@@ -11,7 +11,10 @@ describe('<shared-board />', () => {
     };
 
     renderWithApollo(SharedBoard, stubQuery, {
-      propsData: { roomId: 'ROOM123', notes: [{ id: 'NOTE123', posX: 10, posY: 10, moving: false }] },
+      propsData: {
+        roomId: 'ROOM123',
+        notes: [{ id: 'NOTE123', posX: 10, posY: 10, moving: false }],
+      },
     });
 
     expect(screen.getByRole('listitem')).toHaveStyle(`
@@ -33,7 +36,7 @@ describe('<shared-board />', () => {
           },
         ],
       },
-    }
+    };
     const stubQuerySpec = {
       query: UPDATE_ROOM_NOTES_MUTATION,
       variables: expectedMutationVars,
@@ -45,7 +48,10 @@ describe('<shared-board />', () => {
     };
 
     const { queryMocks } = renderWithApollo(SharedBoard, stubQuerySpec, {
-      propsData: { roomId: 'ROOM123', notes: [{ id: 'NOTE123', posX: 10, posY: 10, moving: false }] },
+      propsData: {
+        roomId: 'ROOM123',
+        notes: [{ id: 'NOTE123', posX: 10, posY: 10, moving: false }],
+      },
     });
 
     await fireEvent.pointerDown(screen.getByRole('listitem'));

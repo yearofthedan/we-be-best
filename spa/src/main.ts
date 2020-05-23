@@ -9,16 +9,17 @@ import VueApollo from 'vue-apollo';
 import App from './components/App.vue';
 
 const GRAPHQL_URI_HTTP =
-  process.env.VUE_APP_GRAPHQL_URI_HTTP || window.location.host;
+  process.env.VUE_APP_GRAPHQL_URI_HTTP ||
+  `https://${window.location.host}/graphql`;
 const GRAPHQL_URI_WS =
-  process.env.VUE_APP_GRAPHQL_URI_WS || window.location.host;
+  process.env.VUE_APP_GRAPHQL_URI_WS || `wss://${window.location.host}/graphql`;
 
 const httpLink = new HttpLink({
-  uri: GRAPHQL_URI_HTTP || `https://${window.location.host}/graphql`,
+  uri: GRAPHQL_URI_HTTP,
 });
 
 const wsLink = new WebSocketLink({
-  uri: GRAPHQL_URI_WS || `wss://${window.location.host}/graphql`,
+  uri: GRAPHQL_URI_WS,
   options: {
     reconnect: true,
   },
