@@ -43,6 +43,7 @@ describe('<shared-board />', () => {
       successData: {
         updateRoomNotes: {
           id: '123',
+          notes: []
         },
       },
     };

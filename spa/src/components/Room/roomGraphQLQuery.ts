@@ -57,6 +57,12 @@ export const UPDATE_ROOM_NOTES_MUTATION = gql`
   mutation updateRoomNotes($input: UpdateRoomNotesInput!) {
     updateRoomNotes(input: $input) {
       id
+      notes {
+          id
+          posX
+          posY
+          moving
+      }
     }
   }
 `;

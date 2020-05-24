@@ -72,6 +72,17 @@ export default Vue.extend({
           variables: {
             input: payload,
           },
+          optimisticResponse: {
+            __typename: 'Mutation',
+            updateRoomNotes: {
+              __typename: 'Room',
+              id: this.roomId,
+              notes: updated.map(note => ({
+                __typename: 'Note',
+                ...note,
+              })),
+            },
+          },
         })
         .catch(error => {
           console.error(error);
