@@ -1,5 +1,5 @@
 <template>
-  <li v-bind:style="styleObject" v-on:pointerdown="_onPointerDown">
+  <li v-bind:style="styleObject" v-on:pointerdown="_onPointerDown" v-bind:moving="moving">
     Test
   </li>
 </template>
@@ -72,11 +72,18 @@ export default Vue.extend({
 </script>
 
 <style scoped>
+li[moving] {
+  box-shadow: 0px 1px 3px 1px blue;
+  cursor: none;
+}
 li {
   position: fixed;
-  border: red solid;
+  border: grey solid;
+  width: 80px;
+  height: 80px;
   display: inline-block;
   margin: 0 10px;
   cursor: grab;
+  user-select: none;
 }
 </style>
