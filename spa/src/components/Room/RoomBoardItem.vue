@@ -2,14 +2,15 @@
   <li
     v-bind:style="styleObject"
     v-on:pointerdown="_onPointerDown"
-    v-bind:moving="moving"
+    v-bind:data-moving="moving"
   >
-    Test
+    {{ id }}
   </li>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { ActionType } from '@/components/Room/RoomBoardTypes';
 
 export default Vue.extend({
   name: 'room-board-item',
@@ -36,47 +37,23 @@ export default Vue.extend({
       return {
         left: `${this.posX}px`,
         top: `${this.posY}px`,
-        color: 'yellow',
       };
     },
   },
-  mounted() {
-    window.addEventListener('pointermove', this._onPointerMove);
-    window.addEventListener('pointerup', this._onPointerUp);
-  },
   methods: {
-    _onPointerDown: function(): void {
-      this.$emit('roomboardchange', {
-        id: this.$props.id,
-        posX: this.$props.posX,
-        posY: this.$props.posY,
-        moving: true,
+    _onPointerDown: function(event: PointerEvent): void {
+      this.$emit('interactionstart', {
+        itemId: this.$props.id,
+        interactionId: event.pointerId,
+        action: ActionType.MOVING,
       });
-    },
-    _onPointerUp: function(): void {
-      this.$emit('roomboardchange', {
-        id: this.$props.id,
-        posX: this.$props.posX,
-        posY: this.$props.posY,
-        moving: false,
-      });
-    },
-    _onPointerMove: function(event: PointerEvent): void {
-      if (this.moving) {
-        this.$emit('roomboardchange', {
-          id: this.id,
-          posX: Math.max(0, this.posX + event.movementX),
-          posY: Math.max(0, this.posY + event.movementY),
-          moving: this.moving,
-        });
-      }
     },
   },
 });
 </script>
 
 <style scoped>
-li[moving] {
+li[data-moving] {
   box-shadow: 0px 1px 3px 1px blue;
   cursor: none;
 }

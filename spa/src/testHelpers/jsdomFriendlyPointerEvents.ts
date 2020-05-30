@@ -17,6 +17,7 @@ type FakePointerEventInit = {
   offsetY?: number;
   pageX?: number;
   pageY?: number;
+  pointerId?: number;
   screenX?: number;
   screenY?: number;
   shiftKey?: boolean;
@@ -27,6 +28,7 @@ type FakePointerEventInit = {
 export class FakePointerEvent extends MouseEvent {
   movementX: number;
   movementY: number;
+  pointerId: number;
   offsetX: number;
   offsetY: number;
   pageX: number;
@@ -42,6 +44,7 @@ export class FakePointerEvent extends MouseEvent {
       offsetY,
       movementX,
       movementY,
+      pointerId,
       x,
       y,
       ...pointerValues
@@ -54,6 +57,7 @@ export class FakePointerEvent extends MouseEvent {
     this.movementY = movementY || 0;
     this.pageX = pageX || 0;
     this.pageY = pageY || 0;
+    this.pointerId = pointerId || 0;
     this.x = x || 0;
     this.y = y || 0;
   }
@@ -62,6 +66,26 @@ export class FakePointerEvent extends MouseEvent {
 export class PointerMoveEvent extends FakePointerEvent {
   constructor(values: FakePointerEventInit) {
     super('pointermove', {
+      bubbles: true,
+      cancelable: true,
+      ...values,
+    });
+  }
+}
+
+export class PointerDownEvent extends FakePointerEvent {
+  constructor(values: FakePointerEventInit) {
+    super('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+      ...values,
+    });
+  }
+}
+
+export class PointerUpEvent extends FakePointerEvent {
+  constructor(values: FakePointerEventInit) {
+    super('pointerup', {
       bubbles: true,
       cancelable: true,
       ...values,

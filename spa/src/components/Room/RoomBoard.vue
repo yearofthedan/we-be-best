@@ -2,10 +2,11 @@
   <section>
     <ul>
       <room-board-item
-        v-for="item in this.itemsData"
+        v-for="item in itemsData"
         v-bind="item"
+        v-bind:moving="movingItemIds.includes(item.id)"
+        v-on:interactionstart="_onBoardItemInteractionStart"
         :key="item.id"
-        v-on:roomboardchange="_onRoomBoardChange"
       />
     </ul>
   </section>
@@ -18,12 +19,17 @@ import {
   UPDATE_ROOM_BOARD_ITEM_MUTATION,
   UpdateRoomBoardItemsInput,
 } from './roomGraphQLQuery';
+import {
+  InteractionStartEventPayload,
+  InteractionEndEventPayload,
+  InteractionMovedEventPayload,
+  Interaction,
+} from '@/components/Room/RoomBoardTypes';
 
 interface Item {
   id: string;
   posX: number;
   posY: number;
-  moving: boolean;
 }
 
 export default Vue.extend({
@@ -43,52 +49,90 @@ export default Vue.extend({
   },
   data: function(): {
     itemsData: Item[];
+    interactions: { [interactionId: string]: Interaction };
+    movingItemIds: string[];
   } {
     return {
-      itemsData: this.$props.items
+      itemsData: this.$props.items,
+      interactions: {},
+      movingItemIds: [],
     };
   },
+  mounted() {
+    window.addEventListener('pointermove', this._onPointerMove);
+    window.addEventListener('pointerup', this._onPointerUp);
+  },
   methods: {
-    _onRoomBoardChange: function(item: {
-      id: string;
-      posX: number;
-      posY: number;
-      moving: boolean;
-    }) {
-      const index = this.items.findIndex(el => el.id === item.id);
+    _onPointerUp: function({ pointerId }: PointerEvent): void {
+      this._onBoardItemInteractionFinish({
+        interactionId: pointerId.toString(),
+      });
+    },
+    _onPointerMove: function({
+      pointerId,
+      movementX,
+      movementY,
+    }: PointerEvent): void {
+      this._onBoardItemInteractionMoved({
+        interactionId: pointerId.toString(),
+        movementX,
+        movementY,
+      });
+    },
+    _onBoardItemInteractionFinish: function({
+      interactionId,
+    }: InteractionEndEventPayload): void {
+      if (this.interactions[interactionId]) {
+        this.movingItemIds = this.movingItemIds.filter(
+          id => id !== this.interactions[interactionId].itemId
+        );
+        this.interactions = {};
+      }
+    },
+    _onBoardItemInteractionStart: function(
+      payload: InteractionStartEventPayload
+    ) {
+      this.interactions[payload.interactionId] = {
+        itemId: payload.itemId,
+        action: payload.action,
+      };
+      this.movingItemIds = [...this.movingItemIds, payload.itemId];
+    },
+    _onBoardItemInteractionMoved: function({
+      interactionId,
+      movementX,
+      movementY,
+    }: InteractionMovedEventPayload) {
+      const interaction = this.interactions[interactionId];
+      if (!interaction) {
+        return;
+      }
 
+      const index = this.itemsData.findIndex(e => e.id === interaction.itemId);
       const updated: Item[] = [
-        ...this.items.slice(0, index),
+        ...this.itemsData.slice(0, index),
         {
-          id: item.id,
-          posX: item.posX,
-          posY: item.posY,
-          moving: item.moving,
+          ...this.itemsData[index],
+          posX: Math.max(0, this.itemsData[index].posX + movementX),
+          posY: Math.max(0, this.itemsData[index].posY + movementY),
         },
-        ...this.items.slice(index + 1),
+        ...this.itemsData.slice(index + 1),
       ];
 
-      const payload: UpdateRoomBoardItemsInput = {
-        id: this.roomId,
-        items: updated,
-      };
+      this.itemsData = updated;
 
+      const mutationPayload: UpdateRoomBoardItemsInput = {
+        id: this.roomId,
+        items: updated.map(item => ({
+          ...item,
+          moving: this.movingItemIds.includes(item.id),
+        })),
+      };
       this.$apollo
         .mutate({
           mutation: UPDATE_ROOM_BOARD_ITEM_MUTATION,
           variables: {
-            input: payload,
-          },
-          optimisticResponse: {
-            __typename: 'Mutation',
-            updateRoomBoardItems: {
-              __typename: 'Room',
-              id: this.roomId,
-              items: updated.map(item => ({
-                __typename: 'Item',
-                ...item,
-              })),
-            },
+            input: mutationPayload,
           },
         })
         .catch(error => {
@@ -103,10 +147,12 @@ export default Vue.extend({
 h3 {
   margin: 40px 0 0;
 }
+
 ul {
   list-style-type: none;
   padding: 0;
 }
+
 li {
   position: fixed;
   border: red solid;
@@ -114,6 +160,7 @@ li {
   margin: 0 10px;
   cursor: grab;
 }
+
 a {
   color: #42b983;
 }
