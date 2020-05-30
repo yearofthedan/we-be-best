@@ -12,7 +12,12 @@ const typeDefs = gql`
         id: ID!
         items: [ItemInput]!
     }
-    
+
+    input JoinRoomInput {
+        roomName: ID!
+        memberName: String!
+    }
+
     type Room {
         id: ID!
         members: [String!]!
@@ -35,6 +40,7 @@ const typeDefs = gql`
     }
     
     type Mutation {
+        joinRoom(input: JoinRoomInput!): Room!
         updateRoomBoardItems(input: UpdateRoomBoardItemsInput!): Room!
     }
 `;

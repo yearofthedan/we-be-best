@@ -66,3 +66,23 @@ export const UPDATE_ROOM_BOARD_ITEM_MUTATION = gql`
     }
   }
 `;
+
+export interface JoinRoomInput {
+  roomName: string;
+  memberName: string;
+}
+
+export const JOIN_ROOM_MUTATION = gql`
+  mutation joinRoom($input: JoinRoomInput!) {
+    joinRoom(input: $input) {
+      id
+      members
+      items {
+        id
+        posX
+        posY
+        lockedBy
+      }
+    }
+  }
+`;

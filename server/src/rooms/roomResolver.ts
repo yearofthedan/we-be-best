@@ -1,6 +1,6 @@
 import {DataSources, ROOM_CHANGED_TOPIC} from '../apolloServer';
 import {PubSub} from 'apollo-server-express';
-import {UpdateRoomBoardItemsInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
+import {JoinRoomInput, UpdateRoomBoardItemsInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
 
 interface Room {
   id: string;
@@ -25,6 +25,14 @@ const resolveRoom = async (
   { dataSources }: { dataSources: Pick<DataSources, 'Room'> }
 ): Promise<Room | undefined> => {
   return dataSources.Room.getRoom(id);
+};
+
+export const joinRoom = async (
+  _: unknown,
+  { input }: { input: JoinRoomInput },
+  { dataSources }: { dataSources: Pick<DataSources, 'Room'> }
+): Promise<Room | undefined> => {
+  return dataSources.Room.addMember(input.roomName, input.memberName);
 };
 
 export default resolveRoom;

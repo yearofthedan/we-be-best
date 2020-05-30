@@ -9,12 +9,15 @@ export default Vue.extend({
     room: Room,
   },
   name: 'Lobby',
-  data(): { roomId: string | null } {
-    return { roomId: null };
+  data(): { roomId: string | null; memberName: string | null } {
+    return {
+      roomId: null,
+      memberName: null,
+    };
   },
   methods: {
-    _onJoined: function(room: { id: string }) {
-      this.roomId = room.id;
+    _onJoined: function(room: { roomName: string; memberName: string }) {
+      this.roomId = room.roomName;
     },
   },
 });

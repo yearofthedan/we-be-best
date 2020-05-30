@@ -32,6 +32,7 @@ const renderWithApollo = (
         data: spec.successData,
       });
     }
+
     mockApolloClient.setRequestHandler(spec.query, queryMock);
     return queryMock;
   });

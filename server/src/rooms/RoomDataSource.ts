@@ -24,6 +24,20 @@ roomsData.set('123', {
 });
 
 class RoomDataSource extends DataSource {
+  addMember(id: string, member: string): Room {
+    if (!roomsData.get(id)) {
+      this.createRoom(id);
+    }
+
+    const room = {
+      ...roomsData.get(id),
+      members: [...this.getRoom(id).members, member]
+    };
+
+    roomsData.set(id, room);
+    return room;
+  }
+
   updateItems(update: UpdateRoomBoardItemsInput): Room {
     const room = {
       ...roomsData.get(update.id),
@@ -36,6 +50,10 @@ class RoomDataSource extends DataSource {
 
   getRoom(id: string): Room {
     return roomsData.get(id);
+  }
+
+  private createRoom(id: string): Room {
+    return roomsData.set(id, { id, members: [], items: [] }).get(id);
   }
 
   clear() {

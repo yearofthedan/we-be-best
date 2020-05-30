@@ -1,7 +1,7 @@
 import { ApolloServer, PubSub } from 'apollo-server-express';
 import typeDefs from './typeDefs';
 import RoomDataSource from './rooms/RoomDataSource';
-import resolveRoom, {updateRoomBoardItems} from './rooms/roomResolver';
+import resolveRoom, {joinRoom, updateRoomBoardItems} from './rooms/roomResolver';
 
 export interface DataSources {
   Room: RoomDataSource;
@@ -23,6 +23,7 @@ const apolloServer = () => new ApolloServer({
       }
     },
     Mutation: {
+      joinRoom: joinRoom,
       updateRoomBoardItems: updateRoomBoardItems,
     }
   },
