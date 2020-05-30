@@ -5,7 +5,7 @@ const typeDefs = gql`
         id: String!
         posX: Int!
         posY: Int!
-        moving: Boolean!
+        lockedBy: String
     }
 
     input UpdateRoomBoardItemsInput {
@@ -23,7 +23,7 @@ const typeDefs = gql`
         id: String!
         posX: Int!
         posY: Int!
-        moving: Boolean!
+        lockedBy: String
     }
 
     type Query {

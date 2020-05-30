@@ -8,7 +8,7 @@ export interface Room {
     id: string;
     posY: number;
     posX: number;
-    moving: boolean;
+    lockedBy?: string;
   }[];
 }
 
@@ -20,7 +20,6 @@ roomsData.set('123', {
     id: 'item1',
     posY: 0,
     posX: 0,
-    moving: false
   }]
 });
 
@@ -37,6 +36,10 @@ class RoomDataSource extends DataSource {
 
   getRoom(id: string): Room {
     return roomsData.get(id);
+  }
+
+  clear() {
+    roomsData.clear();
   }
 }
 

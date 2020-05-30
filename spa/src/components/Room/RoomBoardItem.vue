@@ -3,6 +3,7 @@
     v-bind:style="styleObject"
     v-on:pointerdown="_onPointerDown"
     v-bind:data-moving="moving"
+    v-bind:data-locked-by="lockedBy"
   >
     {{ id }}
   </li>
@@ -31,6 +32,9 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
+    lockedBy: {
+      type: String,
+    },
   },
   computed: {
     styleObject: function() {
@@ -42,6 +46,10 @@ export default Vue.extend({
   },
   methods: {
     _onPointerDown: function(event: PointerEvent): void {
+      if (this.lockedBy) {
+        return;
+      }
+
       this.$emit('interactionstart', {
         itemId: this.$props.id,
         interactionId: event.pointerId,
@@ -57,6 +65,17 @@ li[data-moving] {
   box-shadow: 0px 1px 3px 1px blue;
   cursor: none;
 }
+li[data-locked-by]::before {
+  content: attr(data-locked-by);
+  background: white;
+  border: solid 1px;
+  border-radius: 100%;
+  padding: 4px;
+  position: absolute;
+  top: calc(100% - 20px);
+  left: calc(100% - 20px);
+}
+
 li {
   position: fixed;
   border: grey solid;

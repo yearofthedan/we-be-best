@@ -68,26 +68,29 @@ export class PointerMoveEvent extends FakePointerEvent {
     super('pointermove', {
       bubbles: true,
       cancelable: true,
+      pointerId: 1000,
       ...values,
     });
   }
 }
 
 export class PointerDownEvent extends FakePointerEvent {
-  constructor(values: FakePointerEventInit) {
+  constructor(values: FakePointerEventInit = {}) {
     super('pointerdown', {
       bubbles: true,
       cancelable: true,
+      pointerId: 1000,
       ...values,
     });
   }
 }
 
 export class PointerUpEvent extends FakePointerEvent {
-  constructor(values: FakePointerEventInit) {
+  constructor(values: FakePointerEventInit = {}) {
     super('pointerup', {
       bubbles: true,
       cancelable: true,
+      pointerId: 1000,
       ...values,
     });
   }

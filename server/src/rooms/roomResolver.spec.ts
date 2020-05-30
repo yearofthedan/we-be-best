@@ -4,6 +4,10 @@ import RoomDataSource from './RoomDataSource';
 import {ROOM_CHANGED_TOPIC} from '../apolloServer';
 
 describe('roomResolver', () => {
+  beforeEach(() => {
+    new RoomDataSource().clear();
+  });
+
   describe('updateRoomBoardItems', () => {
     it('updates the room items and announces the change', async () => {
       const publishStub = jest.fn();
@@ -15,8 +19,8 @@ describe('roomResolver', () => {
             id: '123',
             items: [
               {
-                id: 'item2',
-                moving: false,
+                id: 'item1',
+                lockedBy: 'me',
                 posX: 0,
                 posY: 0,
               },
@@ -32,16 +36,14 @@ describe('roomResolver', () => {
       );
 
       const expected = {
-        id: '123',
         items: [
           {
-            id: 'item2',
-            moving: false,
+            id: 'item1',
+            lockedBy: 'me',
             posX: 0,
             posY: 0,
           },
         ],
-        members: ['person123'],
       };
 
       expect(result).toEqual(expected);
@@ -53,23 +55,31 @@ describe('roomResolver', () => {
 
   describe('resolveRoom', () => {
     it('gets the room', async () => {
+      const roomDataSource = new RoomDataSource();
+      roomDataSource.updateItems({
+        id: '123',
+        items: [
+          {
+            id: 'item1',
+            lockedBy: 'me',
+            posX: 0,
+            posY: 0,
+          },
+        ]
+      });
       const result = await resolveRoom(
         undefined,
         {id: '123'},
-        {dataSources: {Room: new RoomDataSource()}},
+        {dataSources: {Room: roomDataSource}},
       );
 
       expect(result).toEqual({
-        'id': '123',
-        'members': [
-          'person123',
-        ],
         'items': [
           {
-            'id': 'item2',
-            'moving': false,
-            'posX': 0,
-            'posY': 0,
+            id: 'item1',
+            lockedBy: 'me',
+            posX: 0,
+            posY: 0,
           },
         ],
       });

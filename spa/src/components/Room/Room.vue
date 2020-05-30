@@ -19,7 +19,7 @@
               {{ member }}
             </li>
           </ul>
-          <room-board v-bind:room-id="roomId" v-bind:items="data.room.items" />
+          <room-board my-id="PERSON123" v-bind:room-id="roomId" v-bind:items="data.room.items" />
         </div>
       </template>
     </apollo-query>

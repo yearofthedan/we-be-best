@@ -4,6 +4,7 @@
       <room-board-item
         v-for="item in itemsData"
         v-bind="item"
+        v-bind:locked-by="item.lockedBy !== myId ? item.lockedBy : undefined"
         v-bind:moving="movingItemIds.includes(item.id)"
         v-on:interactionstart="_onBoardItemInteractionStart"
         :key="item.id"
@@ -30,6 +31,7 @@ interface Item {
   id: string;
   posX: number;
   posY: number;
+  lockedBy?: string;
 }
 
 export default Vue.extend({
@@ -38,6 +40,10 @@ export default Vue.extend({
     'room-board-item': RoomBoardItem,
   },
   props: {
+    myId: {
+      type: String,
+      required: true,
+    },
     roomId: {
       type: String,
       required: true,
@@ -115,6 +121,7 @@ export default Vue.extend({
           ...this.itemsData[index],
           posX: Math.max(0, this.itemsData[index].posX + movementX),
           posY: Math.max(0, this.itemsData[index].posY + movementY),
+          lockedBy: this.myId,
         },
         ...this.itemsData.slice(index + 1),
       ];
@@ -123,10 +130,7 @@ export default Vue.extend({
 
       const mutationPayload: UpdateRoomBoardItemsInput = {
         id: this.roomId,
-        items: updated.map(item => ({
-          ...item,
-          moving: this.movingItemIds.includes(item.id),
-        })),
+        items: updated,
       };
       this.$apollo
         .mutate({

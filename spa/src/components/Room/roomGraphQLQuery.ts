@@ -7,7 +7,7 @@ export interface RoomData {
     id: string;
     posX: number;
     posY: number;
-    moving: boolean;
+    lockedBy?: string;
   }[];
 }
 
@@ -20,7 +20,7 @@ export const ROOM_UPDATES_SUBSCRIPTION = gql`
         id
         posX
         posY
-        moving
+        lockedBy
       }
     }
   }
@@ -35,7 +35,7 @@ export const GET_ROOM_QUERY = gql`
         id
         posX
         posY
-        moving
+        lockedBy
       }
     }
   }
@@ -45,7 +45,7 @@ export interface ItemInput {
   id: string;
   posX: number;
   posY: number;
-  moving: boolean;
+  lockedBy?: string;
 }
 
 export interface UpdateRoomBoardItemsInput {
@@ -61,7 +61,7 @@ export const UPDATE_ROOM_BOARD_ITEM_MUTATION = gql`
         id
         posX
         posY
-        moving
+        lockedBy
       }
     }
   }

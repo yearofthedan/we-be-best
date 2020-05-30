@@ -47,7 +47,7 @@ describe('integration: subscription', () => {
                         id
                         posX
                         posX
-                        moving
+                        lockedBy
                     }
                 }
             }`,
@@ -74,13 +74,14 @@ describe('integration: subscription', () => {
                 id: 'item123',
                 posX: 10,
                 posY: 10,
-                moving: true
+                lockedBy: 'me',
               }
             ]
           }
         }
       });
     }, 1000);
+
 
     const result: any = await subscriptionPromise;
     expect(result?.data?.roomUpdates?.id).toEqual('123');

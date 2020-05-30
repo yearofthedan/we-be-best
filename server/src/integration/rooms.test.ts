@@ -17,9 +17,9 @@ describe('integration: rooms', () => {
       items: [
         {
           id: 'item1',
-          moving: false,
           posX: 0,
           posY: 0,
+          lockedBy: null,
         }
       ]
     });
