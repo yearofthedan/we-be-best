@@ -27,7 +27,7 @@ interface Note {
 }
 
 export default Vue.extend({
-  name: 'shared-board',
+  name: 'board',
   components: {
     'note-item': NoteItem,
   },
