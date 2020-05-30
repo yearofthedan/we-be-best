@@ -2,7 +2,7 @@
   <section>
     <ul>
       <room-board-item
-        v-for="item in this.items"
+        v-for="item in this.itemsData"
         v-bind="item"
         :key="item.id"
         v-on:roomboardchange="_onRoomBoardChange"
@@ -40,6 +40,13 @@ export default Vue.extend({
       type: Array as () => Item[],
       required: true,
     },
+  },
+  data: function(): {
+    itemsData: Item[];
+  } {
+    return {
+      itemsData: this.$props.items
+    };
   },
   methods: {
     _onRoomBoardChange: function(item: {
