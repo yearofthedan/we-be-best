@@ -1,11 +1,11 @@
 <template>
   <section>
     <ul>
-      <note-item
-        v-for="note in this.notes"
-        v-bind="note"
-        :key="note.id"
-        v-on:boardchange="_onBoardChange"
+      <room-board-item
+        v-for="item in this.items"
+        v-bind="item"
+        :key="item.id"
+        v-on:roomboardchange="_onRoomBoardChange"
       />
     </ul>
   </section>
@@ -13,13 +13,13 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import NoteItem from './NoteItem.vue';
+import RoomBoardItem from './RoomBoardItem.vue';
 import {
-  UPDATE_ROOM_NOTES_MUTATION,
-  UpdateRoomNotesInput,
+  UPDATE_ROOM_BOARD_ITEM_MUTATION,
+  UpdateRoomBoardItemsInput,
 } from './roomGraphQLQuery';
 
-interface Note {
+interface Item {
   id: string;
   posX: number;
   posY: number;
@@ -29,57 +29,57 @@ interface Note {
 export default Vue.extend({
   name: 'board',
   components: {
-    'note-item': NoteItem,
+    'room-board-item': RoomBoardItem,
   },
   props: {
     roomId: {
       type: String,
       required: true,
     },
-    notes: {
-      type: Array as () => Note[],
+    items: {
+      type: Array as () => Item[],
       required: true,
     },
   },
   methods: {
-    _onBoardChange: function(note: {
+    _onRoomBoardChange: function(item: {
       id: string;
       posX: number;
       posY: number;
       moving: boolean;
     }) {
-      const index = this.notes.findIndex(el => el.id === note.id);
+      const index = this.items.findIndex(el => el.id === item.id);
 
-      const updated: Note[] = [
-        ...this.notes.slice(0, index),
+      const updated: Item[] = [
+        ...this.items.slice(0, index),
         {
-          id: note.id,
-          posX: note.posX,
-          posY: note.posY,
-          moving: note.moving,
+          id: item.id,
+          posX: item.posX,
+          posY: item.posY,
+          moving: item.moving,
         },
-        ...this.notes.slice(index + 1),
+        ...this.items.slice(index + 1),
       ];
 
-      const payload: UpdateRoomNotesInput = {
+      const payload: UpdateRoomBoardItemsInput = {
         id: this.roomId,
-        notes: updated,
+        items: updated,
       };
 
       this.$apollo
         .mutate({
-          mutation: UPDATE_ROOM_NOTES_MUTATION,
+          mutation: UPDATE_ROOM_BOARD_ITEM_MUTATION,
           variables: {
             input: payload,
           },
           optimisticResponse: {
             __typename: 'Mutation',
-            updateRoomNotes: {
+            updateRoomBoardItems: {
               __typename: 'Room',
               id: this.roomId,
-              notes: updated.map(note => ({
-                __typename: 'Note',
-                ...note,
+              items: updated.map(item => ({
+                __typename: 'Item',
+                ...item,
               })),
             },
           },

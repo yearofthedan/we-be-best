@@ -1,11 +1,11 @@
-import JoinedRoom from '@/components/Room/JoinedRoom.vue';
+import Room from '@/components/Room/Room.vue';
 import {
   GET_ROOM_QUERY,
   ROOM_UPDATES_SUBSCRIPTION,
 } from '@/components/Room/roomGraphQLQuery';
 import { renderWithApollo, screen } from '@/testHelpers/renderer';
 
-describe('<joined-room />', () => {
+describe('<room />', () => {
   it('queries and subscribes to the room details', async () => {
     const stubQuery = {
       query: GET_ROOM_QUERY,
@@ -13,7 +13,7 @@ describe('<joined-room />', () => {
         room: {
           id: '123',
           members: ['my-name'],
-          notes: [],
+          items: [],
         },
       },
     };
@@ -24,12 +24,12 @@ describe('<joined-room />', () => {
         roomUpdates: {
           id: '123',
           members: ['my-name2'],
-          notes: [],
+          items: [],
         },
       },
     };
 
-    renderWithApollo(JoinedRoom, [stubQuery, stubSubscription], {
+    renderWithApollo(Room, [stubQuery, stubSubscription], {
       propsData: { roomId: '123' },
     });
 

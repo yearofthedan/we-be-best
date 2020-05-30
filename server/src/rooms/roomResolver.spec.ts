@@ -1,21 +1,21 @@
 import {PubSub} from 'graphql-subscriptions';
-import resolveRoom, {updateRoomNotes} from './roomResolver';
+import resolveRoom, {updateRoomBoardItems} from './roomResolver';
 import RoomDataSource from './RoomDataSource';
 import {ROOM_CHANGED_TOPIC} from '../apolloServer';
 
 describe('roomResolver', () => {
-  describe('updateRoomNotes', () => {
-    it('updates the room notes and announces the change', async () => {
+  describe('updateRoomBoardItems', () => {
+    it('updates the room items and announces the change', async () => {
       const publishStub = jest.fn();
 
-      const result = await updateRoomNotes(
+      const result = await updateRoomBoardItems(
         undefined,
         {
           input: {
             id: '123',
-            notes: [
+            items: [
               {
-                id: 'note2',
+                id: 'item2',
                 moving: false,
                 posX: 0,
                 posY: 0,
@@ -33,9 +33,9 @@ describe('roomResolver', () => {
 
       const expected = {
         id: '123',
-        notes: [
+        items: [
           {
-            id: 'note2',
+            id: 'item2',
             moving: false,
             posX: 0,
             posY: 0,
@@ -64,9 +64,9 @@ describe('roomResolver', () => {
         'members': [
           'person123',
         ],
-        'notes': [
+        'items': [
           {
-            'id': 'note2',
+            'id': 'item2',
             'moving': false,
             'posX': 0,
             'posY': 0,

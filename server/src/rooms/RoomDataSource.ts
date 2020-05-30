@@ -1,10 +1,10 @@
 import {DataSource} from 'apollo-datasource';
-import {UpdateRoomNotesInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
+import {UpdateRoomBoardItemsInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
 
 export interface Room {
   id: string;
   members: string[];
-  notes: {
+  items: {
     id: string;
     posY: number;
     posX: number;
@@ -16,8 +16,8 @@ const roomsData = new Map<string, Room>();
 roomsData.set('123', {
   id: '123',
   members: ['person123'],
-  notes: [{
-    id: 'note1',
+  items: [{
+    id: 'item1',
     posY: 0,
     posX: 0,
     moving: false
@@ -25,10 +25,10 @@ roomsData.set('123', {
 });
 
 class RoomDataSource extends DataSource {
-  updateNotes(update: UpdateRoomNotesInput): Room {
+  updateItems(update: UpdateRoomBoardItemsInput): Room {
     const room = {
       ...roomsData.get(update.id),
-      notes: update.notes
+      items: update.items
     };
 
     roomsData.set(update.id, room);

@@ -1,12 +1,12 @@
 import { fireEvent, render, screen } from '@/testHelpers/renderer';
-import NoteItem from '@/components/Room/NoteItem.vue';
+import RoomBoardItem from '@/components/Room/RoomBoardItem.vue';
 import { PointerMoveEvent } from '@/testHelpers/jsdomFriendlyPointerEvents';
 
-describe('<note-item />', () => {
+describe('<room-board-item />', () => {
   it('renders the positioning based upon the x and y props', () => {
-    render(NoteItem, {
+    render(RoomBoardItem, {
       propsData: {
-        id: 'note123',
+        id: 'item123',
         posX: 2,
         posY: 1,
         moving: false,
@@ -19,10 +19,10 @@ describe('<note-item />', () => {
     `);
   });
 
-  it('fires a board change event when starting to move the item', async () => {
-    const { emitted } = render(NoteItem, {
+  it('fires a room board change event when starting to move the item', async () => {
+    const { emitted } = render(RoomBoardItem, {
       propsData: {
-        id: 'note123',
+        id: 'item123',
         posX: 2,
         posY: 1,
         moving: false,
@@ -31,10 +31,10 @@ describe('<note-item />', () => {
 
     await fireEvent.pointerDown(screen.getByRole('listitem'));
 
-    expect(emitted().boardchange).not.toBeUndefined();
-    expect(emitted().boardchange[0]).toEqual([
+    expect(emitted().roomboardchange).not.toBeUndefined();
+    expect(emitted().roomboardchange[0]).toEqual([
       {
-        id: 'note123',
+        id: 'item123',
         moving: true,
         posX: 2,
         posY: 1,
@@ -42,10 +42,10 @@ describe('<note-item />', () => {
     ]);
   });
 
-  it('fires a board change event when stopping moving the item', async () => {
-    const { emitted } = render(NoteItem, {
+  it('fires a room board change event when stopping moving the item', async () => {
+    const { emitted } = render(RoomBoardItem, {
       propsData: {
-        id: 'note123',
+        id: 'item123',
         posX: 2,
         posY: 1,
         moving: true,
@@ -54,10 +54,10 @@ describe('<note-item />', () => {
 
     await fireEvent.pointerUp(screen.getByRole('listitem'));
 
-    expect(emitted().boardchange).not.toBeUndefined();
-    expect(emitted().boardchange[0]).toEqual([
+    expect(emitted().roomboardchange).not.toBeUndefined();
+    expect(emitted().roomboardchange[0]).toEqual([
       {
-        id: 'note123',
+        id: 'item123',
         moving: false,
         posX: 2,
         posY: 1,
@@ -65,10 +65,10 @@ describe('<note-item />', () => {
     ]);
   });
 
-  it('fires a board change event when moving the item', async () => {
-    const { emitted } = render(NoteItem, {
+  it('fires a room board change event when moving the item', async () => {
+    const { emitted } = render(RoomBoardItem, {
       propsData: {
-        id: 'note123',
+        id: 'item123',
         posX: 2,
         posY: 1,
         moving: true,
@@ -83,10 +83,10 @@ describe('<note-item />', () => {
       })
     );
 
-    expect(emitted().boardchange).not.toBeUndefined();
-    expect(emitted().boardchange[0]).toEqual([
+    expect(emitted().roomboardchange).not.toBeUndefined();
+    expect(emitted().roomboardchange[0]).toEqual([
       {
-        id: 'note123',
+        id: 'item123',
         moving: true,
         posX: 22,
         posY: 11,
@@ -95,9 +95,9 @@ describe('<note-item />', () => {
   });
 
   it('does not fire an event when moving the item if not selected', async () => {
-    const { emitted } = render(NoteItem, {
+    const { emitted } = render(RoomBoardItem, {
       propsData: {
-        id: 'note123',
+        id: 'item123',
         posX: 2,
         posY: 1,
         moving: false,
@@ -109,6 +109,6 @@ describe('<note-item />', () => {
       movementY: 10,
     });
 
-    expect(emitted().boardchange).toBeUndefined();
+    expect(emitted().roomboardchange).toBeUndefined();
   });
 });

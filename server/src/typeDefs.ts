@@ -1,25 +1,25 @@
 import gql from 'graphql-tag';
 
 const typeDefs = gql`
-    input NoteInput {
+    input ItemInput {
         id: String!
         posX: Int!
         posY: Int!
         moving: Boolean!
     }
 
-    input UpdateRoomNotesInput {
+    input UpdateRoomBoardItemsInput {
         id: ID!
-        notes: [NoteInput]!
+        items: [ItemInput]!
     }
     
     type Room {
         id: ID!
         members: [String!]!
-        notes: [Note!]!
+        items: [Item!]!
     }
     
-    type Note {
+    type Item {
         id: String!
         posX: Int!
         posY: Int!
@@ -35,7 +35,7 @@ const typeDefs = gql`
     }
     
     type Mutation {
-        updateRoomNotes(input: UpdateRoomNotesInput!): Room!
+        updateRoomBoardItems(input: UpdateRoomBoardItemsInput!): Room!
     }
 `;
 

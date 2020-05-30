@@ -6,7 +6,7 @@ describe('<lobby />', () => {
   it('creates a gathering when I input a valid name and continue', async () => {
     render(Lobby, {
       stubs: {
-        JoinedRoom: {
+        Room: {
           props: ['room-id'],
           template: '<div>Room for {{roomId}}</div>',
         },

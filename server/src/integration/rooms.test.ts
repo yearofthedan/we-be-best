@@ -14,9 +14,9 @@ describe('integration: rooms', () => {
     expect(res.data).toHaveProperty('room', {
       id: '123',
       members: ['person123'],
-      notes: [
+      items: [
         {
-          id: 'note1',
+          id: 'item1',
           moving: false,
           posX: 0,
           posY: 0,

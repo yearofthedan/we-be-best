@@ -19,7 +19,7 @@
               {{ member }}
             </li>
           </ul>
-          <board v-bind:room-id="roomId" v-bind:notes="data.room.notes" />
+          <room-board v-bind:room-id="roomId" v-bind:items="data.room.items" />
         </div>
       </template>
     </apollo-query>
@@ -33,12 +33,12 @@ import {
   ROOM_UPDATES_SUBSCRIPTION,
   RoomData,
 } from '@/components/Room/roomGraphQLQuery';
-import Board from '@/components/Room/Board.vue';
+import RoomBoard from '@/components/Room/RoomBoard.vue';
 
 export default Vue.extend({
-  name: 'joined-room',
+  name: 'room',
   components: {
-    board: Board,
+    'room-board': RoomBoard,
   },
   props: {
     roomId: {

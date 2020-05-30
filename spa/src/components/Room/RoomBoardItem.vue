@@ -1,5 +1,9 @@
 <template>
-  <li v-bind:style="styleObject" v-on:pointerdown="_onPointerDown" v-bind:moving="moving">
+  <li
+    v-bind:style="styleObject"
+    v-on:pointerdown="_onPointerDown"
+    v-bind:moving="moving"
+  >
     Test
   </li>
 </template>
@@ -8,7 +12,7 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'note-item',
+  name: 'room-board-item',
   props: {
     id: {
       type: String,
@@ -42,7 +46,7 @@ export default Vue.extend({
   },
   methods: {
     _onPointerDown: function(): void {
-      this.$emit('boardchange', {
+      this.$emit('roomboardchange', {
         id: this.$props.id,
         posX: this.$props.posX,
         posY: this.$props.posY,
@@ -50,7 +54,7 @@ export default Vue.extend({
       });
     },
     _onPointerUp: function(): void {
-      this.$emit('boardchange', {
+      this.$emit('roomboardchange', {
         id: this.$props.id,
         posX: this.$props.posX,
         posY: this.$props.posY,
@@ -59,7 +63,7 @@ export default Vue.extend({
     },
     _onPointerMove: function(event: PointerEvent): void {
       if (this.moving) {
-        this.$emit('boardchange', {
+        this.$emit('roomboardchange', {
           id: this.id,
           posX: Math.max(0, this.posX + event.movementX),
           posY: Math.max(0, this.posY + event.movementY),

@@ -1,18 +1,18 @@
 import {DataSources, ROOM_CHANGED_TOPIC} from '../apolloServer';
 import {PubSub} from 'apollo-server-express';
-import {UpdateRoomNotesInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
+import {UpdateRoomBoardItemsInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
 
 interface Room {
   id: string;
   members: string[];
 }
 
-export const updateRoomNotes = async (
+export const updateRoomBoardItems = async (
   _: unknown,
-  { input }: { input: UpdateRoomNotesInput },
+  { input }: { input: UpdateRoomBoardItemsInput },
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Room'>; pubSub: PubSub }
 ): Promise<Room> => {
-  const result = await dataSources.Room.updateNotes(input);
+  const result = await dataSources.Room.updateItems(input);
   await pubSub.publish(ROOM_CHANGED_TOPIC, {
     roomUpdates: result
   });

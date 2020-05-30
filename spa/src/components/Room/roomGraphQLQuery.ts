@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 export interface RoomData {
   id: string;
   members: string[];
-  notes: {
+  items: {
     id: string;
     posX: number;
     posY: number;
@@ -16,7 +16,7 @@ export const ROOM_UPDATES_SUBSCRIPTION = gql`
     roomUpdates(id: $id) {
       id
       members
-      notes {
+      items {
         id
         posX
         posY
@@ -31,7 +31,7 @@ export const GET_ROOM_QUERY = gql`
     room(id: $id) {
       id
       members
-      notes {
+      items {
         id
         posX
         posY
@@ -41,27 +41,27 @@ export const GET_ROOM_QUERY = gql`
   }
 `;
 
-export interface NoteInput {
+export interface ItemInput {
   id: string;
   posX: number;
   posY: number;
   moving: boolean;
 }
 
-export interface UpdateRoomNotesInput {
+export interface UpdateRoomBoardItemsInput {
   id: string;
-  notes: NoteInput[];
+  items: ItemInput[];
 }
 
-export const UPDATE_ROOM_NOTES_MUTATION = gql`
-  mutation updateRoomNotes($input: UpdateRoomNotesInput!) {
-    updateRoomNotes(input: $input) {
+export const UPDATE_ROOM_BOARD_ITEM_MUTATION = gql`
+  mutation updateRoomBoardItems($input: UpdateRoomBoardItemsInput!) {
+    updateRoomBoardItems(input: $input) {
       id
-      notes {
-          id
-          posX
-          posY
-          moving
+      items {
+        id
+        posX
+        posY
+        moving
       }
     }
   }

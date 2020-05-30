@@ -43,7 +43,7 @@ describe('integration: subscription', () => {
                 roomUpdates(id: $id) {
                     id
                     members
-                    notes {
+                    items {
                         id
                         posX
                         posX
@@ -61,17 +61,17 @@ describe('integration: subscription', () => {
     setTimeout(() => {
       apolloClient.mutate({
         mutation: gql`
-          mutation updateRoomNotes($input: UpdateRoomNotesInput!) {
-            updateRoomNotes(input: $input)  {
+          mutation updateRoomBoardItems($input: UpdateRoomBoardItemsInput!) {
+            updateRoomBoardItems(input: $input)  {
               id
             }
           }`,
         variables: {
           input: {
             id: '123',
-            notes: [
+            items: [
               {
-                id: 'note123',
+                id: 'item123',
                 posX: 10,
                 posY: 10,
                 moving: true
