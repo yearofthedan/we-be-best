@@ -130,7 +130,12 @@ export default Vue.extend({
 
       const mutationPayload: UpdateRoomBoardItemsInput = {
         id: this.roomId,
-        items: updated,
+        items: updated.map(entry => ({
+          id: entry.id,
+          lockedBy: entry.lockedBy,
+          posX: entry.posX,
+          posY: entry.posY,
+        })),
       };
       this.$apollo
         .mutate({
