@@ -53,6 +53,11 @@ export default Vue.extend({
       required: true,
     },
   },
+  watch: {
+    items: function(newVal) {
+      this.itemsData = newVal;
+    },
+  },
   data: function(): {
     itemsData: Item[];
     interactions: { [interactionId: string]: Interaction };

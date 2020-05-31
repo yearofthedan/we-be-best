@@ -113,7 +113,6 @@ describe('<room-board />', () => {
       `);
     });
   });
-
   describe('when moving', () => {
     it('assigns the data-moving property item (vue-jest / jsdom do not support style tags)', async () => {
       renderWithApollo(RoomBoard, [makeHappyPathMutationStub()], {
@@ -220,5 +219,32 @@ describe('<room-board />', () => {
 
       expect(screen.getByRole('listitem')).not.toHaveAttribute('data-moving');
     });
+  });
+  describe('when props change', () => {
+    it('updates based upon the new props', async () => {
+      const {updateProps} = renderWithApollo(RoomBoard, makeHappyPathMutationStub(), {
+        propsData: {
+          myId: 'me',
+          roomId: 'ROOM123',
+          items: [{ id: 'ITEM123', posX: 10, posY: 10 }],
+        },
+      });
+
+      expect(screen.getByRole('listitem')).toHaveStyle(`
+      top:  10px;
+      left: 10px;
+    `);
+
+      await updateProps({
+        myId: 'me',
+        roomId: 'ROOM123',
+        items: [{ id: 'ITEM123', posX: 20, posY: 20 }],
+      });
+
+      expect(screen.getByRole('listitem')).toHaveStyle(`
+        top:  20px;
+        left: 20px;
+      `);
+    })
   });
 });
