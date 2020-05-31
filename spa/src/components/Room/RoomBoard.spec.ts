@@ -279,89 +279,6 @@ describe('<room-board />', () => {
         left: 30px;
       `);
     });
-
-    it('sends a mutation', async () => {
-      const { queryMocks } = renderWithApollo(
-        RoomBoard,
-        [
-          makeHappyLockRoomBoardItemMutationStub({
-            meId: MY_ID,
-            itemId: ITEM_ID,
-            roomId: ROOM_ID,
-          }),
-          makeHappyUpdateRoomBoardItemMutationStub(),
-          makeHappyUnlockRoomBoardItemMutationStub({
-            meId: MY_ID,
-            itemId: ITEM_ID,
-            roomId: ROOM_ID,
-          }),
-        ],
-        {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-          },
-        }
-      );
-
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-
-      await fireEvent(
-        screen.getByRole('listitem'),
-        new PointerMoveEvent({
-          movementX: 20,
-          movementY: 10,
-        })
-      );
-
-      const expectedMutationVars = {
-        input: {
-          id: ROOM_ID,
-          items: [
-            {
-              id: ITEM_ID,
-              posX: 30,
-              posY: 20,
-              lockedBy: MY_ID,
-            },
-          ],
-        },
-      };
-
-      expect(await queryMocks[1]).toHaveBeenCalledWith(expectedMutationVars);
-
-      expect(screen.getByRole('listitem')).toHaveStyle(`
-        top:  20px;
-        left: 30px;
-      `);
-    });
-
-    it('does not mutate if the position did not change', async () => {
-      const { queryMocks } = renderWithApollo(
-        RoomBoard,
-        [makeHappyUpdateRoomBoardItemMutationStub()],
-        {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-          },
-        }
-      );
-
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-
-      await fireEvent(
-        screen.getByRole('listitem'),
-        new PointerMoveEvent({
-          movementX: 0,
-          movementY: 0,
-        })
-      );
-
-      expect(await queryMocks[0]).not.toHaveBeenCalled();
-    });
   });
   describe('after moving', () => {
     it('unlocks the item', async () => {
@@ -396,6 +313,60 @@ describe('<room-board />', () => {
       };
 
       expect(await queryMocks[0]).toHaveBeenCalledWith(expectedMutationVars);
+      expect(await queryMocks[1]).toHaveBeenCalledWith(expectedMutationVars);
+    });
+
+    it('mutates the item position', async () => {
+      const { queryMocks } = renderWithApollo(
+        RoomBoard,
+        [
+          makeHappyLockRoomBoardItemMutationStub({
+            meId: MY_ID,
+            itemId: ITEM_ID,
+            roomId: ROOM_ID,
+          }),
+          makeHappyUpdateRoomBoardItemMutationStub(),
+          makeHappyUnlockRoomBoardItemMutationStub({
+            meId: MY_ID,
+            itemId: ITEM_ID,
+            roomId: ROOM_ID,
+          }),
+        ],
+        {
+          propsData: {
+            myId: MY_ID,
+            roomId: ROOM_ID,
+            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
+          },
+        }
+      );
+
+      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+
+      await fireEvent(
+        screen.getByRole('listitem'),
+        new PointerMoveEvent({
+          movementX: 20,
+          movementY: 10,
+        })
+      );
+
+      await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
+
+      const expectedMutationVars = {
+        input: {
+          id: ROOM_ID,
+          items: [
+            {
+              id: ITEM_ID,
+              posX: 30,
+              posY: 20,
+              lockedBy: MY_ID,
+            },
+          ],
+        },
+      };
+
       expect(await queryMocks[1]).toHaveBeenCalledWith(expectedMutationVars);
     });
 

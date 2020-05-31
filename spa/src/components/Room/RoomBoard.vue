@@ -25,10 +25,10 @@ import {
   UpdateRoomBoardItemsInput,
 } from './roomGraphQLQuery';
 import {
-  InteractionStartEventPayload,
+  Interaction,
   InteractionEndEventPayload,
   InteractionMovedEventPayload,
-  Interaction,
+  InteractionStartEventPayload,
   Item,
 } from '@/components/Room/RoomBoardTypes';
 
@@ -127,7 +127,7 @@ export default Vue.extend({
       }
 
       const index = this.itemsData.findIndex(e => e.id === interaction.itemId);
-      const updated: Item[] = [
+      this.itemsData = [
         ...this.itemsData.slice(0, index),
         {
           ...this.itemsData[index],
@@ -137,27 +137,6 @@ export default Vue.extend({
         },
         ...this.itemsData.slice(index + 1),
       ];
-      this.itemsData = updated;
-
-      const mutationPayload: UpdateRoomBoardItemsInput = {
-        id: this.roomId,
-        items: updated.map(entry => ({
-          id: entry.id,
-          lockedBy: entry.lockedBy,
-          posX: entry.posX,
-          posY: entry.posY,
-        })),
-      };
-      this.$apollo
-        .mutate({
-          mutation: UPDATE_ROOM_BOARD_ITEM_MUTATION,
-          variables: {
-            input: mutationPayload,
-          },
-        })
-        .catch(error => {
-          console.error(error);
-        });
     },
     _onBoardItemInteractionFinish: function({
       interactionId,
@@ -174,6 +153,34 @@ export default Vue.extend({
         return;
       }
 
+      if (this.interactions[interactionId]) {
+        this.movingItemIds = this.movingItemIds.filter(
+          id => id !== this.interactions[interactionId].itemId
+        );
+        this.interactions = {};
+      }
+
+      //TODO just update the single item
+      const updateRoomBoardItemsPayload: UpdateRoomBoardItemsInput = {
+        id: this.roomId,
+        items: this.itemsData.map(entry => ({
+          id: entry.id,
+          lockedBy: entry.lockedBy,
+          posX: entry.posX,
+          posY: entry.posY,
+        })),
+      };
+      this.$apollo
+        .mutate({
+          mutation: UPDATE_ROOM_BOARD_ITEM_MUTATION,
+          variables: {
+            input: updateRoomBoardItemsPayload,
+          },
+        })
+        .catch(error => {
+          console.error(error);
+        });
+
       const mutationPayload: UnlockRoomBoardItemInput = {
         roomId: this.roomId,
         itemId: item.id,
@@ -189,13 +196,6 @@ export default Vue.extend({
         .catch(error => {
           console.error(error);
         });
-
-      if (this.interactions[interactionId]) {
-        this.movingItemIds = this.movingItemIds.filter(
-          id => id !== this.interactions[interactionId].itemId
-        );
-        this.interactions = {};
-      }
     },
   },
 });
