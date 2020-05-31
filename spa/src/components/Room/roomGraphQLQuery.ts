@@ -76,7 +76,46 @@ export const JOIN_ROOM_MUTATION = gql`
   mutation joinRoom($input: JoinRoomInput!) {
     joinRoom(input: $input) {
       id
-      members
+      items {
+        id
+        posX
+        posY
+        lockedBy
+      }
+    }
+  }
+`;
+
+export interface LockRoomBoardItemInput {
+  roomId: string;
+  itemId: string;
+  meId: string;
+}
+
+export const LOCK_ROOM_BOARD_ITEM_MUTATION = gql`
+  mutation lockRoomBoardItem($input: LockRoomBoardItemInput!) {
+    lockRoomBoardItem(input: $input) {
+      id
+      items {
+        id
+        posX
+        posY
+        lockedBy
+      }
+    }
+  }
+`;
+
+export interface UnlockRoomBoardItemInput {
+  roomId: string;
+  itemId: string;
+  meId: string;
+}
+
+export const UNLOCK_ROOM_BOARD_ITEM_MUTATION = gql`
+  mutation unlockRoomBoardItem($input: UnlockRoomBoardItemInput!) {
+    unlockRoomBoardItem(input: $input) {
+      id
       items {
         id
         posX

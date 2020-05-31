@@ -1,7 +1,12 @@
 import { ApolloServer, PubSub } from 'apollo-server-express';
 import typeDefs from './typeDefs';
 import RoomDataSource from './rooms/RoomDataSource';
-import resolveRoom, {joinRoom, updateRoomBoardItems} from './rooms/roomResolver';
+import resolveRoom, {
+  joinRoom,
+  lockRoomBoardItem,
+  unlockRoomBoardItem,
+  updateRoomBoardItems,
+} from './rooms/roomResolver';
 
 export interface DataSources {
   Room: RoomDataSource;
@@ -24,6 +29,8 @@ const apolloServer = () => new ApolloServer({
     },
     Mutation: {
       joinRoom: joinRoom,
+      lockRoomBoardItem: lockRoomBoardItem,
+      unlockRoomBoardItem: unlockRoomBoardItem,
       updateRoomBoardItems: updateRoomBoardItems,
     }
   },
@@ -44,7 +51,5 @@ const apolloServer = () => new ApolloServer({
     };
   }
 });
-
-
 
 export default apolloServer;

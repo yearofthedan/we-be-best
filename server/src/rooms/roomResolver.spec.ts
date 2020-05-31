@@ -1,5 +1,5 @@
 import {PubSub} from 'graphql-subscriptions';
-import resolveRoom, {joinRoom, updateRoomBoardItems} from './roomResolver';
+import resolveRoom, {joinRoom, lockRoomBoardItem, unlockRoomBoardItem, updateRoomBoardItems} from './roomResolver';
 import RoomDataSource from './RoomDataSource';
 import {ROOM_CHANGED_TOPIC} from '../apolloServer';
 
@@ -7,6 +7,107 @@ describe('roomResolver', () => {
   beforeEach(() => {
     new RoomDataSource().clear();
   });
+
+  describe('lockRoomBoardItem', () => {
+    it('locks the item and publishes the update', async () => {
+      const roomDataSource = new RoomDataSource();
+      roomDataSource.addMember('123', 'me');
+      roomDataSource.updateItems({ id: '123', items: [{
+          id: 'item1',
+          posX: 0,
+          posY: 0,
+        }]});
+
+      const publishStub = jest.fn();
+
+      const result = await lockRoomBoardItem(
+        undefined,
+        {
+          input: {
+            roomId: '123',
+            itemId: 'item1',
+            meId: 'me',
+          },
+        },
+        {
+          pubSub: {
+            publish: publishStub,
+            dataSource: {Room: new RoomDataSource()},
+          } as unknown as PubSub,
+          dataSources: {Room: new RoomDataSource()},
+        },
+      );
+
+      const expected = {
+        id: '123',
+        items: [
+          {
+            id: 'item1',
+            lockedBy: 'me',
+            posX: 0,
+            posY: 0,
+          },
+        ],
+        members: ['me']
+      };
+
+      expect(result).toEqual(expected);
+      expect(publishStub).toHaveBeenCalledWith(ROOM_CHANGED_TOPIC, {
+        roomUpdates: expected,
+      });
+    });
+  });
+
+  describe('unlockRoomBoardItem', () => {
+    it('unlocks the item and publishes the update', async () => {
+      const roomDataSource = new RoomDataSource();
+      roomDataSource.addMember('123', 'me');
+      roomDataSource.updateItems({ id: '123', items: [{
+          id: 'item1',
+          posX: 0,
+          posY: 0,
+          lockedBy: 'me',
+        }]});
+
+      const publishStub = jest.fn();
+
+      const result = await unlockRoomBoardItem(
+        undefined,
+        {
+          input: {
+            roomId: '123',
+            itemId: 'item1',
+            meId: 'me',
+          },
+        },
+        {
+          pubSub: {
+            publish: publishStub,
+            dataSource: {Room: new RoomDataSource()},
+          } as unknown as PubSub,
+          dataSources: {Room: new RoomDataSource()},
+        },
+      );
+
+      const expected = {
+        id: '123',
+        items: [
+          {
+            id: 'item1',
+            posX: 0,
+            posY: 0,
+          },
+        ],
+        members: ['me']
+      };
+
+      expect(result).toEqual(expected);
+      expect(publishStub).toHaveBeenCalledWith(ROOM_CHANGED_TOPIC, {
+        roomUpdates: expected,
+      });
+    });
+  });
+
 
   describe('updateRoomBoardItems', () => {
     it('updates the room items and announces the change', async () => {
@@ -30,9 +131,10 @@ describe('roomResolver', () => {
         {
           pubSub: {
             publish: publishStub,
-            dataSource: { Room: new RoomDataSource() }
+            dataSource: {Room: new RoomDataSource()},
           } as unknown as PubSub,
-          dataSources: {Room: new RoomDataSource()}},
+          dataSources: {Room: new RoomDataSource()},
+        },
       );
 
       const expected = {
@@ -48,7 +150,7 @@ describe('roomResolver', () => {
 
       expect(result).toEqual(expected);
       expect(publishStub).toHaveBeenCalledWith(ROOM_CHANGED_TOPIC, {
-        roomUpdates: expected
+        roomUpdates: expected,
       });
     });
   });
@@ -59,7 +161,7 @@ describe('roomResolver', () => {
 
       const result = await joinRoom(
         undefined,
-        { input: { roomName: 'my-room', memberName: 'me' } },
+        {input: {roomName: 'my-room', memberName: 'me'}},
         {dataSources: {Room: roomDataSource}},
       );
 
@@ -80,12 +182,12 @@ describe('roomResolver', () => {
           lockedBy: 'my-mother',
           posX: 0,
           posY: 0,
-        }]
+        }],
       });
 
       const result = await joinRoom(
         undefined,
-        { input: { roomName: 'my-room', memberName: 'me' } },
+        {input: {roomName: 'my-room', memberName: 'me'}},
         {dataSources: {Room: roomDataSource}},
       );
 
@@ -97,7 +199,7 @@ describe('roomResolver', () => {
           lockedBy: 'my-mother',
           posX: 0,
           posY: 0,
-        },],
+        }],
       });
     });
   });
@@ -114,7 +216,7 @@ describe('roomResolver', () => {
             posX: 0,
             posY: 0,
           },
-        ]
+        ],
       });
       const result = await resolveRoom(
         undefined,

@@ -13,6 +13,18 @@ const typeDefs = gql`
         items: [ItemInput]!
     }
 
+    input LockRoomBoardItemInput {
+        roomId: ID!
+        itemId: ID!
+        meId: ID!
+    }
+    
+    input UnlockRoomBoardItemInput {
+        roomId: ID!
+        itemId: ID!
+        meId: ID!
+    }
+
     input JoinRoomInput {
         roomName: ID!
         memberName: String!
@@ -42,6 +54,8 @@ const typeDefs = gql`
     type Mutation {
         joinRoom(input: JoinRoomInput!): Room!
         updateRoomBoardItems(input: UpdateRoomBoardItemsInput!): Room!
+        lockRoomBoardItem(input: LockRoomBoardItemInput!): Room!
+        unlockRoomBoardItem(input: UnlockRoomBoardItemInput!): Room!
     }
 `;
 

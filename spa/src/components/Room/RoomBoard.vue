@@ -17,6 +17,10 @@
 import Vue from 'vue';
 import RoomBoardItem from './RoomBoardItem.vue';
 import {
+  LOCK_ROOM_BOARD_ITEM_MUTATION,
+  LockRoomBoardItemInput,
+  UNLOCK_ROOM_BOARD_ITEM_MUTATION,
+  UnlockRoomBoardItemInput,
   UPDATE_ROOM_BOARD_ITEM_MUTATION,
   UpdateRoomBoardItemsInput,
 } from './roomGraphQLQuery';
@@ -25,14 +29,8 @@ import {
   InteractionEndEventPayload,
   InteractionMovedEventPayload,
   Interaction,
+  Item,
 } from '@/components/Room/RoomBoardTypes';
-
-interface Item {
-  id: string;
-  posX: number;
-  posY: number;
-  lockedBy?: string;
-}
 
 export default Vue.extend({
   name: 'board',
@@ -90,24 +88,33 @@ export default Vue.extend({
         movementY,
       });
     },
-    _onBoardItemInteractionFinish: function({
-      interactionId,
-    }: InteractionEndEventPayload): void {
-      if (this.interactions[interactionId]) {
-        this.movingItemIds = this.movingItemIds.filter(
-          id => id !== this.interactions[interactionId].itemId
-        );
-        this.interactions = {};
-      }
-    },
     _onBoardItemInteractionStart: function(
       payload: InteractionStartEventPayload
     ) {
-      this.interactions[payload.interactionId] = {
-        itemId: payload.itemId,
-        action: payload.action,
+      this.interactions = {
+        ...this.interactions,
+        [payload.interactionId]: {
+          itemId: payload.itemId,
+          action: payload.action,
+        },
       };
+
       this.movingItemIds = [...this.movingItemIds, payload.itemId];
+      const mutationPayload: LockRoomBoardItemInput = {
+        roomId: this.roomId,
+        itemId: payload.itemId,
+        meId: this.myId,
+      };
+      this.$apollo
+        .mutate({
+          mutation: LOCK_ROOM_BOARD_ITEM_MUTATION,
+          variables: {
+            input: mutationPayload,
+          },
+        })
+        .catch(error => {
+          console.error(error);
+        });
     },
     _onBoardItemInteractionMoved: function({
       interactionId,
@@ -151,6 +158,44 @@ export default Vue.extend({
         .catch(error => {
           console.error(error);
         });
+    },
+    _onBoardItemInteractionFinish: function({
+      interactionId,
+    }: InteractionEndEventPayload): void {
+      const interaction = this.interactions[interactionId];
+
+      if (!interaction) {
+        return;
+      }
+
+      const item = this.itemsData.find(i => i.id === interaction.itemId);
+
+      if (!item) {
+        return;
+      }
+
+      const mutationPayload: UnlockRoomBoardItemInput = {
+        roomId: this.roomId,
+        itemId: item.id,
+        meId: this.myId,
+      };
+      this.$apollo
+        .mutate({
+          mutation: UNLOCK_ROOM_BOARD_ITEM_MUTATION,
+          variables: {
+            input: mutationPayload,
+          },
+        })
+        .catch(error => {
+          console.error(error);
+        });
+
+      if (this.interactions[interactionId]) {
+        this.movingItemIds = this.movingItemIds.filter(
+          id => id !== this.interactions[interactionId].itemId
+        );
+        this.interactions = {};
+      }
     },
   },
 });

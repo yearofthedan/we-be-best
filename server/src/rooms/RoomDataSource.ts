@@ -1,5 +1,5 @@
 import {DataSource} from 'apollo-datasource';
-import {UpdateRoomBoardItemsInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
+import {LockRoomBoardItemInput, UpdateRoomBoardItemsInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
 
 export interface Room {
   id: string;
@@ -35,6 +35,46 @@ class RoomDataSource extends DataSource {
     };
 
     roomsData.set(id, room);
+    return room;
+  }
+
+  lockItem(input: LockRoomBoardItemInput): Room {
+    const items = roomsData.get(input.roomId).items;
+    const itemIndex = roomsData.get(input.roomId).items.findIndex((i => i.id === input.itemId));
+
+    const room = {
+      ...roomsData.get(input.roomId),
+      items: [
+          ...items.slice(0, itemIndex),
+          {
+            ...items[itemIndex],
+            lockedBy: input.meId,
+          },
+          ...items.slice(itemIndex + 1),
+        ]
+    };
+
+    roomsData.set(input.roomId, room);
+    return room;
+  }
+
+  unlockItem(input: LockRoomBoardItemInput): Room {
+    const items = roomsData.get(input.roomId).items;
+    const itemIndex = roomsData.get(input.roomId).items.findIndex((i => i.id === input.itemId));
+
+    const room = {
+      ...roomsData.get(input.roomId),
+      items: [
+        ...items.slice(0, itemIndex),
+        {
+          ...items[itemIndex],
+          lockedBy: undefined,
+        },
+        ...items.slice(itemIndex + 1),
+      ]
+    };
+
+    roomsData.set(input.roomId, room);
     return room;
   }
 

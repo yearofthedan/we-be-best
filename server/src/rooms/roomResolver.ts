@@ -1,11 +1,39 @@
 import {DataSources, ROOM_CHANGED_TOPIC} from '../apolloServer';
 import {PubSub} from 'apollo-server-express';
-import {JoinRoomInput, UpdateRoomBoardItemsInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
+import {
+  JoinRoomInput,
+  LockRoomBoardItemInput, UnlockRoomBoardItemInput,
+  UpdateRoomBoardItemsInput,
+} from '../../../spa/src/components/Room/roomGraphQLQuery';
 
 interface Room {
   id: string;
   members: string[];
 }
+
+export const lockRoomBoardItem = async (
+  _: unknown,
+  { input }: { input: LockRoomBoardItemInput },
+  { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Room'>; pubSub: PubSub }
+): Promise<Room> => {
+  const result = await dataSources.Room.lockItem(input);
+  await pubSub.publish(ROOM_CHANGED_TOPIC, {
+    roomUpdates: result
+  });
+  return result;
+};
+
+export const unlockRoomBoardItem = async (
+  _: unknown,
+  { input }: { input: UnlockRoomBoardItemInput },
+  { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Room'>; pubSub: PubSub }
+): Promise<Room> => {
+  const result = await dataSources.Room.unlockItem(input);
+  await pubSub.publish(ROOM_CHANGED_TOPIC, {
+    roomUpdates: result
+  });
+  return result;
+};
 
 export const updateRoomBoardItems = async (
   _: unknown,
