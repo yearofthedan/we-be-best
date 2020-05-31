@@ -115,7 +115,7 @@ export default Vue.extend({
       movementY,
     }: InteractionMovedEventPayload) {
       const interaction = this.interactions[interactionId];
-      if (!interaction) {
+      if (!interaction || (movementX === 0 && movementY === 0)) {
         return;
       }
 
@@ -130,7 +130,6 @@ export default Vue.extend({
         },
         ...this.itemsData.slice(index + 1),
       ];
-
       this.itemsData = updated;
 
       const mutationPayload: UpdateRoomBoardItemsInput = {

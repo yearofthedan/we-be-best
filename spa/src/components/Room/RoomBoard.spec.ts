@@ -7,10 +7,14 @@ import {
 } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import { UPDATE_ROOM_BOARD_ITEM_MUTATION } from '@/components/Room/roomGraphQLQuery';
 
+const ITEM_ID = 'ITEM123';
+const ROOM_ID = 'ROOM123';
+const MY_ID = 'me';
+
 function makeHappyPathMutationStub() {
   const successData = {
     updateRoomBoardItems: {
-      id: '123',
+      id: ITEM_ID,
       items: [],
     },
   };
@@ -18,13 +22,13 @@ function makeHappyPathMutationStub() {
     query: UPDATE_ROOM_BOARD_ITEM_MUTATION,
     variables: {
       input: {
-        id: 'ROOM123',
+        id: ROOM_ID,
         items: [
           {
-            id: 'ITEM123',
-            posX: 30,
+            id: ITEM_ID,
+            lockedBy: MY_ID,
             posY: 20,
-            lockedBy: 'me',
+            posX: 30,
           },
         ],
       },
@@ -37,9 +41,9 @@ describe('<room-board />', () => {
   it('renders a item defaulting at 10px by 10px', () => {
     renderWithApollo(RoomBoard, [makeHappyPathMutationStub()], {
       propsData: {
-        myId: 'me',
-        roomId: 'ROOM123',
-        items: [{ id: 'ITEM123', posX: 10, posY: 10 }],
+        myId: MY_ID,
+        roomId: ROOM_ID,
+        items: [{ id: ITEM_ID, posX: 10, posY: 10 }],
       },
     });
 
@@ -53,9 +57,9 @@ describe('<room-board />', () => {
     it('allows moving a locked item if i locked it', async () => {
       renderWithApollo(RoomBoard, [makeHappyPathMutationStub()], {
         propsData: {
-          myId: 'me',
-          roomId: 'ROOM123',
-          items: [{ id: 'ITEM123', posX: 10, posY: 10, lockedBy: 'me' }],
+          myId: MY_ID,
+          roomId: ROOM_ID,
+          items: [{ id: ITEM_ID, posX: 10, posY: 10, lockedBy: MY_ID }],
         },
       });
 
@@ -83,10 +87,10 @@ describe('<room-board />', () => {
     it('does not register the interaction if it has been locked by somebody else', async () => {
       renderWithApollo(RoomBoard, [], {
         propsData: {
-          myId: 'me',
-          roomId: 'ROOM123',
+          myId: MY_ID,
+          roomId: ROOM_ID,
           items: [
-            { id: 'ITEM123', posX: 10, posY: 10, lockedBy: 'other-person' },
+            { id: ITEM_ID, posX: 10, posY: 10, lockedBy: 'other-person' },
           ],
         },
       });
@@ -117,9 +121,9 @@ describe('<room-board />', () => {
     it('assigns the data-moving property item (vue-jest / jsdom do not support style tags)', async () => {
       renderWithApollo(RoomBoard, [makeHappyPathMutationStub()], {
         propsData: {
-          myId: 'me',
-          roomId: 'ROOM123',
-          items: [{ id: 'ITEM123', posX: 10, posY: 10 }],
+          myId: MY_ID,
+          roomId: ROOM_ID,
+          items: [{ id: ITEM_ID, posX: 10, posY: 10 }],
         },
       });
 
@@ -136,9 +140,9 @@ describe('<room-board />', () => {
     it('updates the position', async () => {
       renderWithApollo(RoomBoard, [makeHappyPathMutationStub()], {
         propsData: {
-          myId: 'me',
-          roomId: 'ROOM123',
-          items: [{ id: 'ITEM123', posX: 10, posY: 10 }],
+          myId: MY_ID,
+          roomId: ROOM_ID,
+          items: [{ id: ITEM_ID, posX: 10, posY: 10 }],
         },
       });
 
@@ -164,9 +168,9 @@ describe('<room-board />', () => {
         [makeHappyPathMutationStub()],
         {
           propsData: {
-            myId: 'me',
-            roomId: 'ROOM123',
-            items: [{ id: 'ITEM123', posX: 10, posY: 10 }],
+            myId: MY_ID,
+            roomId: ROOM_ID,
+            items: [{ id: ITEM_ID, posX: 10, posY: 10 }],
           },
         }
       );
@@ -183,13 +187,13 @@ describe('<room-board />', () => {
 
       const expectedMutationVars = {
         input: {
-          id: 'ROOM123',
+          id: ROOM_ID,
           items: [
             {
-              id: 'ITEM123',
+              id: ITEM_ID,
               posX: 30,
               posY: 20,
-              lockedBy: 'me',
+              lockedBy: MY_ID,
             },
           ],
         },
@@ -202,14 +206,40 @@ describe('<room-board />', () => {
         left: 30px;
       `);
     });
+
+    it('does not mutate if the position did not change', async () => {
+      const { queryMocks } = renderWithApollo(
+        RoomBoard,
+        [makeHappyPathMutationStub()],
+        {
+          propsData: {
+            myId: MY_ID,
+            roomId: ROOM_ID,
+            items: [{ id: ITEM_ID, posX: 10, posY: 10 }],
+          },
+        }
+      );
+
+      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+
+      await fireEvent(
+        screen.getByRole('listitem'),
+        new PointerMoveEvent({
+          movementX: 0,
+          movementY: 0,
+        })
+      );
+
+      expect(await queryMocks[0]).not.toHaveBeenCalled();
+    });
   });
   describe('after moving', () => {
     it('the item no longer has the data-moving attribute (vue-jest / jsdom do not support style tags)', async () => {
       renderWithApollo(RoomBoard, makeHappyPathMutationStub(), {
         propsData: {
-          myId: 'me',
-          roomId: 'ROOM123',
-          items: [{ id: 'ITEM123', posX: 10, posY: 10 }],
+          myId: MY_ID,
+          roomId: ROOM_ID,
+          items: [{ id: ITEM_ID, posX: 10, posY: 10 }],
         },
       });
 
@@ -222,13 +252,17 @@ describe('<room-board />', () => {
   });
   describe('when props change', () => {
     it('updates based upon the new props', async () => {
-      const {updateProps} = renderWithApollo(RoomBoard, makeHappyPathMutationStub(), {
-        propsData: {
-          myId: 'me',
-          roomId: 'ROOM123',
-          items: [{ id: 'ITEM123', posX: 10, posY: 10 }],
-        },
-      });
+      const { updateProps } = renderWithApollo(
+        RoomBoard,
+        makeHappyPathMutationStub(),
+        {
+          propsData: {
+            myId: MY_ID,
+            roomId: ROOM_ID,
+            items: [{ id: ITEM_ID, posX: 10, posY: 10 }],
+          },
+        }
+      );
 
       expect(screen.getByRole('listitem')).toHaveStyle(`
       top:  10px;
@@ -236,15 +270,15 @@ describe('<room-board />', () => {
     `);
 
       await updateProps({
-        myId: 'me',
-        roomId: 'ROOM123',
-        items: [{ id: 'ITEM123', posX: 20, posY: 20 }],
+        myId: MY_ID,
+        roomId: ROOM_ID,
+        items: [{ id: ITEM_ID, posX: 20, posY: 20 }],
       });
 
       expect(screen.getByRole('listitem')).toHaveStyle(`
         top:  20px;
         left: 20px;
       `);
-    })
+    });
   });
 });
