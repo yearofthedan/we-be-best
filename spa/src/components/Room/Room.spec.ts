@@ -30,7 +30,7 @@ describe('<room />', () => {
     };
 
     renderWithApollo(Room, [stubQuery, stubSubscription], {
-      propsData: { roomId: '123' },
+      propsData: { roomId: '123', myId: 'me' },
     });
 
     expect(await screen.findByText('my-name2')).toBeInTheDocument();

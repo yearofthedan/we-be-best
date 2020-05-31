@@ -13,14 +13,14 @@
           {{ error }}
         </div>
         <div v-else-if="data" class="result apollo">
-          <h1>Room for {{ roomId }}</h1>
+          <h1>Room: {{ roomId }} (welcome {{ myId }})</h1>
           <ul>
             <li v-for="member in data.room.members" :key="member">
               {{ member }}
             </li>
           </ul>
           <room-board
-            my-id="PERSON123"
+            v-bind:my-id="myId"
             v-bind:room-id="roomId"
             v-bind:items="data.room.items"
           />
@@ -45,6 +45,10 @@ export default Vue.extend({
     'room-board': RoomBoard,
   },
   props: {
+    myId: {
+      type: String,
+      required: true,
+    },
     roomId: {
       type: String,
       required: true,

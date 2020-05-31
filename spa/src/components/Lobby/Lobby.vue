@@ -16,8 +16,9 @@ export default Vue.extend({
     };
   },
   methods: {
-    _onJoined: function(room: { roomName: string; memberName: string }) {
-      this.roomId = room.roomName;
+    _onJoined: function(params: { roomName: string; memberName: string }) {
+      this.roomId = params.roomName;
+      this.memberName = params.memberName;
     },
   },
 });
@@ -28,7 +29,7 @@ export default Vue.extend({
     <header>
       <h1>We be best</h1>
     </header>
-    <room v-if="roomId" v-bind:room-id="roomId" />
+    <room v-if="roomId" v-bind:room-id="roomId" v-bind:my-id="memberName" />
     <join-room-form v-else v-on:joined="_onJoined" />
   </article>
 </template>
