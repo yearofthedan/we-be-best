@@ -221,9 +221,7 @@ describe('<room-board />', () => {
         input: { meId: MY_ID, itemId: ITEM_ID, roomId: ROOM_ID },
       };
 
-      await waitFor(async () => {
-        expect(await queryMocks[0]).toHaveBeenCalledWith(expectedMutationVars);
-      });
+      await waitFor(() => expect(queryMocks[0]).toHaveBeenCalledWith(expectedMutationVars));
     });
   });
 
