@@ -10,6 +10,7 @@
         :key="item.id"
       />
     </ul>
+    <button v-on:click="_onAddItem" aria-label="Add" type="button">+</button>
   </section>
 </template>
 
@@ -23,14 +24,16 @@ import {
   UnlockRoomBoardItemInput,
   UPDATE_ROOM_BOARD_ITEM_MUTATION,
   UpdateRoomBoardItemsInput,
+  ADD_ROOM_BOARD_ITEM_MUTATION,
+  AddRoomBoardItemInput,
 } from './roomGraphQLQuery';
 import {
   Interaction,
   InteractionEndEventPayload,
   InteractionMovedEventPayload,
   InteractionStartEventPayload,
-  Item,
 } from '@/components/Room/RoomBoardTypes';
+import buildItem, { Item } from '@/components/Room/itemBuilder';
 
 export default Vue.extend({
   name: 'board',
@@ -72,6 +75,27 @@ export default Vue.extend({
     window.addEventListener('pointerup', this._onPointerUp);
   },
   methods: {
+    _onAddItem: function(): void {
+      const newItem = buildItem();
+      this.itemsData = [...this.itemsData, newItem];
+
+      const mutationPayload: AddRoomBoardItemInput = {
+        posY: newItem.posY,
+        posX: newItem.posX,
+        roomId: this.roomId,
+        itemId: newItem.id,
+      };
+      this.$apollo
+        .mutate({
+          mutation: ADD_ROOM_BOARD_ITEM_MUTATION,
+          variables: {
+            input: mutationPayload,
+          },
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
     _onPointerUp: function({ pointerId }: PointerEvent): void {
       this._onBoardItemInteractionFinish({
         interactionId: pointerId.toString(),

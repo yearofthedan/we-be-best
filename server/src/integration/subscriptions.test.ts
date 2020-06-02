@@ -58,8 +58,23 @@ describe('integration: subscription', () => {
       });
     });
     //TODO work out an approach which doesn't require a timeout
-    setTimeout(() => {
-      apolloClient.mutate({
+    setTimeout(async () => {
+      await apolloClient.mutate({
+        mutation: gql`
+            mutation joinRoom($input: JoinRoomInput!) {
+                joinRoom(input: $input)  {
+                    id
+                }
+            }`,
+        variables: {
+          input: {
+            roomName: '123',
+            memberName: 'me'
+          }
+        }
+      });
+
+      await apolloClient.mutate({
         mutation: gql`
           mutation updateRoomBoardItems($input: UpdateRoomBoardItemsInput!) {
             updateRoomBoardItems(input: $input)  {

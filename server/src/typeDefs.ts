@@ -24,6 +24,13 @@ const typeDefs = gql`
         itemId: ID!
         meId: ID!
     }
+    
+    input AddRoomBoardItemInput {
+        roomId: ID!
+        itemId: String!
+        posX: Int!
+        posY: Int!
+    }
 
     input JoinRoomInput {
         roomName: ID!
@@ -56,6 +63,7 @@ const typeDefs = gql`
         updateRoomBoardItems(input: UpdateRoomBoardItemsInput!): Room!
         lockRoomBoardItem(input: LockRoomBoardItemInput!): Room!
         unlockRoomBoardItem(input: UnlockRoomBoardItemInput!): Room!
+        addRoomBoardItem(input: AddRoomBoardItemInput!): Room!
     }
 `;
 

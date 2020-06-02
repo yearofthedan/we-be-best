@@ -2,6 +2,7 @@ import { ApolloServer, PubSub } from 'apollo-server-express';
 import typeDefs from './typeDefs';
 import RoomDataSource from './rooms/RoomDataSource';
 import resolveRoom, {
+  addRoomBoardItem,
   joinRoom,
   lockRoomBoardItem,
   unlockRoomBoardItem,
@@ -32,6 +33,7 @@ const apolloServer = () => new ApolloServer({
       lockRoomBoardItem: lockRoomBoardItem,
       unlockRoomBoardItem: unlockRoomBoardItem,
       updateRoomBoardItems: updateRoomBoardItems,
+      addRoomBoardItem: addRoomBoardItem
     }
   },
   dataSources: () => ({

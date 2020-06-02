@@ -1,5 +1,10 @@
 import {DataSource} from 'apollo-datasource';
-import {LockRoomBoardItemInput, UpdateRoomBoardItemsInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
+import {
+  AddRoomBoardItemInput,
+  LockRoomBoardItemInput,
+  UpdateRoomBoardItemsInput,
+} from '../../../spa/src/components/Room/roomGraphQLQuery';
+import buildItem from './itemBuilder';
 
 export interface Room {
   id: string;
@@ -13,17 +18,25 @@ export interface Room {
 }
 
 const roomsData = new Map<string, Room>();
-roomsData.set('123', {
-  id: '123',
-  members: ['person123'],
-  items: [{
-    id: 'item1',
-    posY: 0,
-    posX: 0,
-  }]
-});
 
 class RoomDataSource extends DataSource {
+  getRoom(id: string): Room {
+    if (!roomsData.get(id)) {
+      throw new Error('No room found');
+    }
+    return roomsData.get(id);
+  }
+
+  addItem({ itemId, roomId, posY, posX}: AddRoomBoardItemInput): Room {
+    return this.updateItems({
+      id: roomId,
+      items: [
+        ...this.getRoom(roomId).items,
+        buildItem({id: itemId, posY, posX})
+      ]
+    });
+  }
+
   addMember(id: string, member: string): Room {
     if (!roomsData.get(id)) {
       this.createRoom(id);
@@ -86,10 +99,6 @@ class RoomDataSource extends DataSource {
 
     roomsData.set(update.id, room);
     return room;
-  }
-
-  getRoom(id: string): Room {
-    return roomsData.get(id);
   }
 
   private createRoom(id: string): Room {

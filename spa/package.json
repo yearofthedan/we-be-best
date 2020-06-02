@@ -21,6 +21,7 @@
     "graphql": "^14.0.0",
     "graphql-tag": "^2.10.3",
     "subscriptions-transport-ws": "^0.9.16",
+    "uuid": "^8.1.0",
     "vue": "^2.6.11",
     "vue-apollo": "^3.0.3"
   },
@@ -32,6 +33,7 @@
     "@types/jest": "^24.0.19",
     "@types/jest-when": "^2.7.1",
     "@types/testing-library__jest-dom": "^5.0.3",
+    "@types/uuid": "^8.0.0",
     "@types/ws": "^7.2.4",
     "@typescript-eslint/eslint-plugin": "^2.26.0",
     "@typescript-eslint/parser": "^2.26.0",

@@ -125,3 +125,24 @@ export const UNLOCK_ROOM_BOARD_ITEM_MUTATION = gql`
     }
   }
 `;
+
+export interface AddRoomBoardItemInput {
+  roomId: string;
+  itemId: string;
+  posX: number;
+  posY: number;
+}
+
+export const ADD_ROOM_BOARD_ITEM_MUTATION = gql`
+  mutation addRoomBoardItem($input: AddRoomBoardItemInput!) {
+    addRoomBoardItem(input: $input) {
+      id
+      items {
+        id
+        posX
+        posY
+        lockedBy
+      }
+    }
+  }
+`;

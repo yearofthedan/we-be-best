@@ -7,12 +7,12 @@
         :updateQuery="onRoomUpdate"
       />
       <template v-slot="{ result: { loading, error, data } }">
-        <div v-if="loading" class="loading apollo">Loading...</div>
-        <div v-else-if="error" class="error apollo">
+        <section v-if="loading" class="loading apollo">Loading...</section>
+        <section v-else-if="error" class="error apollo">
           An error occurred
           {{ error }}
-        </div>
-        <div v-else-if="data" class="result apollo">
+        </section>
+        <section v-else-if="data" class="result apollo">
           <h1>Room: {{ roomId }} (welcome {{ myId }})</h1>
           <ul>
             <li v-for="member in data.room.members" :key="member">
@@ -24,7 +24,7 @@
             v-bind:room-id="roomId"
             v-bind:items="data.room.items"
           />
-        </div>
+        </section>
       </template>
     </apollo-query>
   </section>
@@ -76,3 +76,9 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style scoped>
+h3 {
+  margin: 40px 0 0;
+}
+</style>

@@ -1,6 +1,7 @@
 import {DataSources, ROOM_CHANGED_TOPIC} from '../apolloServer';
 import {PubSub} from 'apollo-server-express';
 import {
+  AddRoomBoardItemInput,
   JoinRoomInput,
   LockRoomBoardItemInput, UnlockRoomBoardItemInput,
   UpdateRoomBoardItemsInput,
@@ -10,6 +11,18 @@ interface Room {
   id: string;
   members: string[];
 }
+
+export const addRoomBoardItem = async (
+  _: unknown,
+  { input }: { input: AddRoomBoardItemInput },
+  { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Room'>; pubSub: PubSub }
+): Promise<Room> => {
+  const result = await dataSources.Room.addItem(input);
+  await pubSub.publish(ROOM_CHANGED_TOPIC, {
+    roomUpdates: result
+  });
+  return result;
+};
 
 export const lockRoomBoardItem = async (
   _: unknown,

@@ -1,4 +1,4 @@
-import {Item} from '@/components/Room/RoomBoardTypes';
+import {Item} from '@/components/Room/itemBuilder';
 
 export const makeItem = (overrides: Partial<Item>) => ({
     id: 'ITEM123',

@@ -1,11 +1,62 @@
 import {PubSub} from 'graphql-subscriptions';
-import resolveRoom, {joinRoom, lockRoomBoardItem, unlockRoomBoardItem, updateRoomBoardItems} from './roomResolver';
+import resolveRoom, {
+  addRoomBoardItem,
+  joinRoom,
+  lockRoomBoardItem,
+  unlockRoomBoardItem,
+  updateRoomBoardItems,
+} from './roomResolver';
 import RoomDataSource from './RoomDataSource';
 import {ROOM_CHANGED_TOPIC} from '../apolloServer';
 
+const ROOM_123 = '123';
 describe('roomResolver', () => {
   beforeEach(() => {
     new RoomDataSource().clear();
+  });
+
+  describe('addRoomBoardItem', () => {
+    it('adds the item and publishes the update', async () => {
+      const roomDataSource = new RoomDataSource();
+      roomDataSource.addMember(ROOM_123, 'me');
+      const publishStub = jest.fn();
+
+      const result = await addRoomBoardItem(
+        undefined,
+        {
+          input: {
+            roomId: ROOM_123,
+            itemId: 'item1',
+            posX: 0,
+            posY: 0,
+          },
+        },
+        {
+          pubSub: {
+            publish: publishStub,
+            dataSource: {Room: new RoomDataSource()},
+          } as unknown as PubSub,
+          dataSources: {Room: new RoomDataSource()},
+        },
+      );
+
+      const expected = {
+        id: ROOM_123,
+        items: [
+          {
+            id: 'item1',
+            posX: 0,
+            posY: 0,
+          },
+        ],
+        members: ['me']
+      };
+
+      expect(result).toEqual(expected);
+      expect(publishStub).toHaveBeenCalledWith(ROOM_CHANGED_TOPIC, {
+        roomUpdates: expected,
+      });
+    });
   });
 
   describe('lockRoomBoardItem', () => {
@@ -57,7 +108,6 @@ describe('roomResolver', () => {
       });
     });
   });
-
   describe('unlockRoomBoardItem', () => {
     it('unlocks the item and publishes the update', async () => {
       const roomDataSource = new RoomDataSource();
@@ -107,8 +157,6 @@ describe('roomResolver', () => {
       });
     });
   });
-
-
   describe('updateRoomBoardItems', () => {
     it('updates the room items and announces the change', async () => {
       const publishStub = jest.fn();
@@ -154,7 +202,6 @@ describe('roomResolver', () => {
       });
     });
   });
-
   describe('joinRoom', () => {
     it('creates a room if it does not exist', async () => {
       const roomDataSource = new RoomDataSource();
@@ -203,7 +250,6 @@ describe('roomResolver', () => {
       });
     });
   });
-
   describe('resolveRoom', () => {
     it('gets the room', async () => {
       const roomDataSource = new RoomDataSource();
@@ -236,5 +282,4 @@ describe('roomResolver', () => {
       });
     });
   });
-})
-;
+});

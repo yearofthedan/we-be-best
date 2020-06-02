@@ -11,12 +11,15 @@ import {
   PointerUpEvent,
 } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import {
+  ADD_ROOM_BOARD_ITEM_MUTATION,
+  AddRoomBoardItemInput,
   LOCK_ROOM_BOARD_ITEM_MUTATION,
   UNLOCK_ROOM_BOARD_ITEM_MUTATION,
   UPDATE_ROOM_BOARD_ITEM_MUTATION,
 } from '@/components/Room/roomGraphQLQuery';
-import { Item } from '@/components/Room/RoomBoardTypes';
 import { makeItem } from '@/testHelpers/testData';
+import userEvent from '@testing-library/user-event';
+import buildItem, { Item } from '@/components/Room/itemBuilder';
 
 const ITEM_ID = 'ITEM123';
 const ROOM_ID = 'ROOM123';
@@ -70,6 +73,35 @@ function makeHappyLockRoomBoardItemMutationStub(
   };
 }
 
+function makeHappyAddRoomBoardItemMutationStub(
+  overrides?: Partial<AddRoomBoardItemInput>
+) {
+  const successData = {
+    addRoomBoardItem: {
+      id: ROOM_ID,
+      items: [
+        {
+          id: ITEM_ID,
+          posX: 0,
+          posY: 0,
+        },
+      ],
+    },
+  };
+  return {
+    query: ADD_ROOM_BOARD_ITEM_MUTATION,
+    variables: {
+      input: {
+        ...buildItem(),
+        itemId: ITEM_ID,
+        roomId: ROOM_ID,
+        ...overrides,
+      },
+    },
+    successData,
+  };
+}
+
 function makeHappyUnlockRoomBoardItemMutationStub(
   overrides = {
     roomId: '123',
@@ -108,6 +140,47 @@ describe('<room-board />', () => {
     `);
   });
 
+  describe('when adding an item', () => {
+    it('lets me add an item', async () => {
+      renderWithApollo(RoomBoard, [], {
+        propsData: { myId: MY_ID, roomId: ROOM_ID, items: [] },
+      });
+
+      expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
+      await userEvent.click(screen.getByRole('button', { name: /add/i }));
+
+      expect(await screen.findAllByRole('listitem')).toHaveLength(1);
+    });
+
+    it('sends an update when an item is created', async () => {
+      const { queryMocks } = renderWithApollo(
+        RoomBoard,
+        [makeHappyAddRoomBoardItemMutationStub()],
+        {
+          propsData: {
+            myId: MY_ID,
+            roomId: ROOM_ID,
+            items: [],
+          },
+        }
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: /add/i }));
+
+      const expectedMutationVars: { input: AddRoomBoardItemInput } = {
+        input: {
+          roomId: ROOM_ID,
+          itemId: expect.any(String),
+          posX: 0,
+          posY: 0,
+        },
+      };
+
+      await waitFor(() =>
+        expect(queryMocks[0]).toHaveBeenCalledWith(expectedMutationVars)
+      );
+    });
+  });
   describe('when locked', () => {
     it('allows moving a locked item if i locked it', async () => {
       renderWithApollo(
@@ -193,7 +266,6 @@ describe('<room-board />', () => {
       `);
     });
   });
-
   describe('when starting to move', () => {
     it('locks the item', async () => {
       const item = makeItem({ id: ITEM_ID, posX: 10, posY: 10 });
@@ -221,10 +293,11 @@ describe('<room-board />', () => {
         input: { meId: MY_ID, itemId: ITEM_ID, roomId: ROOM_ID },
       };
 
-      await waitFor(() => expect(queryMocks[0]).toHaveBeenCalledWith(expectedMutationVars));
+      await waitFor(() =>
+        expect(queryMocks[0]).toHaveBeenCalledWith(expectedMutationVars)
+      );
     });
   });
-
   describe('when moving', () => {
     it('assigns the data-moving property item (vue-jest / jsdom do not support style tags)', async () => {
       renderWithApollo(
@@ -410,7 +483,6 @@ describe('<room-board />', () => {
       );
     });
   });
-
   describe('when props change', () => {
     it('updates based upon the new props', async () => {
       const { updateProps } = renderWithApollo(
