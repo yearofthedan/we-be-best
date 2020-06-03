@@ -8,30 +8,30 @@ import {
 export default Vue.extend({
   name: 'join-room-form',
   data(): {
-    errors: string[];
+    errors: { name?: string; roomName?: string };
     memberName: string | null;
     roomName: string | null;
   } {
     return {
-      errors: [],
+      errors: {},
       memberName: null,
       roomName: null,
     };
   },
   methods: {
     async onFormSubmit(e: Event) {
-      this.errors = [];
+      this.errors = {};
       e.preventDefault();
 
       if (!this.memberName) {
-        this.errors.push('you need to add a name');
+        this.errors.name = 'you need a name!';
       }
 
       if (!this.roomName) {
-        this.errors.push('you need to enter a room name');
+        this.errors.roomName = 'you need a room!';
       }
 
-      if (this.errors.length > 0) {
+      if (Object.keys(this.errors).length > 0) {
         return false;
       }
 
@@ -77,10 +77,16 @@ export default Vue.extend({
       <label for="your-name">
         Your name
         <input id="your-name" type="text" v-model="memberName" />
+        <span role="alert" v-if="errors.name">
+          {{ this.errors.name }}
+        </span>
       </label>
       <label for="room-name">
         Room name
         <input id="room-name" type="text" v-model="roomName" />
+        <span role="alert" v-if="errors.roomName">
+          {{ this.errors.roomName }}
+        </span>
       </label>
       <button type="submit">join room</button>
     </form>
@@ -94,6 +100,16 @@ form {
   grid-template-rows: auto;
   grid-row-gap: calc(4 * var(--unit-base-rem));
 }
+
+span[role='alert'] {
+  display: block;
+  color: var(--colour-warning);
+  text-transform: uppercase;
+  text-align: right;
+  font-size: var(--font-size-aside);
+  font-weight: bold;
+}
+
 section {
   display: flex;
   justify-content: center;

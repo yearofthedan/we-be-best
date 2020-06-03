@@ -35,21 +35,17 @@ describe('<join-room-form />', () => {
   it('shows an error message when I try to submit without a name', async () => {
     render(JoinRoomForm);
 
-    userEvent.click(screen.getByRole('button'));
+    await userEvent.click(screen.getByRole('button', { name: /join room/i }));
 
-    await expect(
-      await screen.findByText('you need to add a name')
-    ).toBeInTheDocument();
+    expect(await screen.findByText('you need a name!')).toBeInTheDocument();
   });
 
   it('shows an error message when I try to submit without a room name', async () => {
     render(JoinRoomForm);
 
-    userEvent.click(screen.getByRole('button'));
+    await userEvent.click(screen.getByRole('button', { name: /join room/i }));
 
-    await expect(
-      await screen.findByText('you need to enter a room name')
-    ).toBeInTheDocument();
+    expect(await screen.findByText('you need a room!')).toBeInTheDocument();
   });
 
   it('joins the room and emits a joined event', async () => {
@@ -59,7 +55,7 @@ describe('<join-room-form />', () => {
 
     await userEvent.type(screen.getByLabelText('Your name'), MEMBER_NAME);
     await userEvent.type(screen.getByLabelText('Room name'), ROOM_NAME);
-    await userEvent.click(screen.getByRole('button'));
+    await userEvent.click(screen.getByRole('button', { name: /join room/i }));
 
     expect(queryMocks[0]).toHaveBeenCalledWith({
       input: {

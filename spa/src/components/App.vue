@@ -39,15 +39,18 @@ section {
   --light-blue: hsla(215, 19%, 95%, 1);
   --black: hsla(218, 73%, 6%, 1);
   --blue: hsla(215, 57%, 74%, 1);
+  --red: hsl(343, 79%, 55%);
   --grey: hsla(180, 2%, 49%, 1);
 
   --colour-primary: var(--light-blue);
   --colour-background: var(--mint);
+  --colour-warning: var(--red);
 
   --unit-base-px: 4px;
   --unit-base-rem: calc(1rem / 4);
 
   --font-size-interactive: calc(4 * var(--unit-base-rem));
   --font-size-label: calc(4 * var(--unit-base-rem));
+  --font-size-aside: calc(3 * var(--unit-base-rem));
 }
 </style>
