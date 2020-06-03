@@ -67,6 +67,7 @@ export default Vue.extend({
       action="https://vuejs.org/"
       method="post"
     >
+      <h2>Join others</h2>
       <div v-if="errors.length > 0">
         <h3>Please correct the following errors:</h3>
         <ul>
@@ -81,24 +82,43 @@ export default Vue.extend({
         Room name
         <input id="room-name" type="text" v-model="roomName" />
       </label>
-      <button type="submit">That's me</button>
+      <button type="submit">join room</button>
     </form>
   </section>
 </template>
 
 <style scoped>
 form {
+  justify-content: center;
+  display: grid;
+  grid-template-rows: auto;
+  grid-row-gap: calc(4 * var(--unit-base-rem));
+}
+section {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
+  align-items: baseline;
 }
 label {
-  display: block;
+  font-size: var(--font-size-label);
+  max-width: 100%;
 }
 input {
   display: block;
+  font-size: var(--font-size-interactive);
+  padding: calc(2 * var(--unit-base-rem));
+  max-width: 100%;
+}
+form {
+  width: calc(16 * var(--unit-base-rem));
+  padding-top: calc(8 * var(--unit-base-rem));
 }
 button {
-  margin-top: 12px;
+  max-width: 100%;
+  margin: calc(2 * var(--unit-base-rem));
+  padding: calc(2 * var(--unit-base-rem));
+  border-radius: calc(1 * var(--unit-base-rem));
+  font-size: var(--font-size-interactive);
+  text-transform: uppercase;
 }
 </style>

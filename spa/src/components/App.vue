@@ -17,12 +17,37 @@ export default Vue.extend({
 </script>
 
 <style>
+body,
+main {
+  min-height: 100vh;
+}
+
+body,
+h1,
+h2 {
+  margin: 0;
+}
+
+section {
+  background-color: var(--colour-background);
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+
+  --mint: hsla(107, 4%, 97%, 1);
+  --light-blue: hsla(215, 19%, 95%, 1);
+  --black: hsla(218, 73%, 6%, 1);
+  --blue: hsla(215, 57%, 74%, 1);
+  --grey: hsla(180, 2%, 49%, 1);
+
+  --colour-primary: var(--light-blue);
+  --colour-background: var(--mint);
+
+  --unit-base-px: 4px;
+  --unit-base-rem: calc(1rem / 4);
+
+  --font-size-interactive: calc(4 * var(--unit-base-rem));
+  --font-size-label: calc(4 * var(--unit-base-rem));
 }
 </style>

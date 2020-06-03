@@ -1,33 +1,31 @@
 <template>
-  <section>
-    <apollo-query :query="this.roomQuery" :variables="{ id: this.roomId }">
-      <apollo-subscribe-to-more
-        :document="this.roomSubscription"
-        :variables="{ id: this.roomId }"
-        :updateQuery="onRoomUpdate"
-      />
-      <template v-slot="{ result: { loading, error, data } }">
-        <section v-if="loading" class="loading apollo">Loading...</section>
-        <section v-else-if="error" class="error apollo">
-          An error occurred
-          {{ error }}
-        </section>
-        <section v-else-if="data" class="result apollo">
-          <h1>Room: {{ roomId }} (welcome {{ myId }})</h1>
-          <ul>
-            <li v-for="member in data.room.members" :key="member">
-              {{ member }}
-            </li>
-          </ul>
-          <room-board
-            v-bind:my-id="myId"
-            v-bind:room-id="roomId"
-            v-bind:items="data.room.items"
-          />
-        </section>
-      </template>
-    </apollo-query>
-  </section>
+  <apollo-query :query="this.roomQuery" :variables="{ id: this.roomId }">
+    <apollo-subscribe-to-more
+      :document="this.roomSubscription"
+      :variables="{ id: this.roomId }"
+      :updateQuery="onRoomUpdate"
+    />
+    <template v-slot="{ result: { loading, error, data } }">
+      <section v-if="loading" class="loading apollo">Loading...</section>
+      <section v-else-if="error" class="error apollo">
+        An error occurred
+        {{ error }}
+      </section>
+      <section v-else-if="data" class="result apollo">
+        <h1>Room: {{ roomId }} (welcome {{ myId }})</h1>
+        <ul>
+          <li v-for="member in data.room.members" :key="member">
+            {{ member }}
+          </li>
+        </ul>
+        <room-board
+          v-bind:my-id="myId"
+          v-bind:room-id="roomId"
+          v-bind:items="data.room.items"
+        />
+      </section>
+    </template>
+  </apollo-query>
 </template>
 
 <script lang="ts">
@@ -78,7 +76,7 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+section {
+  background-color: var(--colour-background);
 }
 </style>

@@ -35,7 +35,14 @@ export default Vue.extend({
 </template>
 
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+article {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+header {
+  padding: var(--unit-base-rem);
+  background-color: var(--colour-primary);
 }
 </style>
