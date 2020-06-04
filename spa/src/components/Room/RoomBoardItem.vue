@@ -5,7 +5,7 @@
     v-bind:data-moving="moving"
     v-bind:data-locked-by="lockedBy"
   >
-    {{ id }}
+    {{ text }}
   </li>
 </template>
 
@@ -31,6 +31,10 @@ export default Vue.extend({
     moving: {
       type: Boolean,
       required: true,
+    },
+    text: {
+      type: String,
+      default: 'placeholder text',
     },
     lockedBy: {
       type: String,
@@ -62,13 +66,11 @@ export default Vue.extend({
 
 <style scoped>
 li[data-moving] {
-  box-shadow: 0px 1px 3px 1px blue;
+  box-shadow: 0px 1px 3px 1px var(--colour-primary-emphasis);
   cursor: none;
 }
 li[data-locked-by]::before {
   content: attr(data-locked-by);
-  background: white;
-  border: solid 1px;
   border-radius: 100%;
   padding: 4px;
   position: absolute;
@@ -77,13 +79,17 @@ li[data-locked-by]::before {
 }
 
 li {
-  position: fixed;
-  border: grey solid;
+  background: var(--colour-primary);
+  position: absolute;
+  border: calc(2 * var(--unit-base-rem)) var(--colour-primary) solid;
+  padding: calc(2 * var(--unit-base-rem));
   width: 80px;
   height: 80px;
   display: inline-block;
   margin: 0 10px;
   cursor: grab;
   user-select: none;
+  word-wrap: break-spaces;
+  text-overflow: ellipsis;
 }
 </style>
