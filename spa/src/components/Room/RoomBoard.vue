@@ -247,6 +247,17 @@ a {
   color: #42b983;
 }
 
+button {
+  position: absolute;
+  width: calc(16 * var(--unit-base-rem));
+  height: calc(16 * var(--unit-base-rem));
+  bottom: calc(8 * var(--unit-base-rem));
+  right: calc(8 * var(--unit-base-rem));
+  border-radius: 100%;
+  border-width: var(--unit-base-rem);
+  font-size: var(--font-size-interactive);
+}
+
 section section {
   display: block;
 }
