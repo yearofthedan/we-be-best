@@ -9,8 +9,8 @@ export interface Item {
 
 const buildItem = (): Item => ({
   id: v4(),
-  posX: 0,
-  posY: 0,
+  posX: 100,
+  posY: 100,
 });
 
 export default buildItem;
