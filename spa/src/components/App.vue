@@ -36,13 +36,15 @@ section {
   font-family: Avenir, Helvetica, Arial, sans-serif;
 
   --mint: hsla(107, 4%, 97%, 1);
-  --light-blue: hsla(215, 19%, 95%, 1);
+  --light-blue: hsla(215, 100%, 96%, 1);
   --black: hsla(218, 73%, 6%, 1);
   --blue: hsla(215, 57%, 74%, 1);
   --red: hsl(343, 79%, 55%);
   --grey: hsla(180, 2%, 49%, 1);
 
   --colour-primary: var(--light-blue);
+  --colour-primary-emphasis: var(--blue);
+  --colour-secondary: var(--grey);
   --colour-background: var(--mint);
   --colour-warning: var(--red);
 

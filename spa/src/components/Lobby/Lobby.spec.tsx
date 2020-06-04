@@ -35,7 +35,7 @@ describe('<lobby />', () => {
         stubs: {
           Room: {
             props: ['room-id'],
-            template: '<div>Room for {{roomId}}</div>',
+            template: '<div>{{roomId}}</div>',
           },
         },
       }
@@ -51,8 +51,6 @@ describe('<lobby />', () => {
       },
     });
 
-    expect(
-      await screen.findByText(`Room for ${ROOM_NAME}`)
-    ).toBeInTheDocument();
+    expect(await screen.findByText(`${ROOM_NAME}`)).toBeInTheDocument();
   });
 });

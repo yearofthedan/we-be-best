@@ -1,29 +1,35 @@
 <template>
-  <apollo-query :query="this.roomQuery" :variables="{ id: this.roomId }">
+  <apollo-query
+    :query="this.roomQuery"
+    :variables="{ id: this.roomId }"
+    tag="section"
+  >
     <apollo-subscribe-to-more
       :document="this.roomSubscription"
       :variables="{ id: this.roomId }"
       :updateQuery="onRoomUpdate"
     />
     <template v-slot="{ result: { loading, error, data } }">
-      <section v-if="loading" class="loading apollo">Loading...</section>
-      <section v-else-if="error" class="error apollo">
+      <template v-if="loading" class="loading apollo">Loading...</template>
+      <template v-else-if="error" class="error apollo">
         An error occurred
         {{ error }}
-      </section>
-      <section v-else-if="data" class="result apollo">
-        <h1>Room: {{ roomId }} (welcome {{ myId }})</h1>
-        <ul>
-          <li v-for="member in data.room.members" :key="member">
-            {{ member }}
-          </li>
-        </ul>
+      </template>
+      <template v-else-if="data" class="result apollo">
         <room-board
           v-bind:my-id="myId"
           v-bind:room-id="roomId"
           v-bind:items="data.room.items"
         />
-      </section>
+        <div>
+          <span>{{ roomId }}</span>
+          <ul>
+            <li v-for="member in data.room.members" :key="member">
+              {{ member }}
+            </li>
+          </ul>
+        </div>
+      </template>
     </template>
   </apollo-query>
 </template>
@@ -78,5 +84,18 @@ export default Vue.extend({
 <style scoped>
 section {
   background-color: var(--colour-background);
+  display: grid;
+  grid-template-columns: 1fr max-content;
+}
+
+section > div {
+  background-color: var(--colour-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+ul {
+  list-style: none;
+  padding: 0 calc(2 * var(--unit-base-rem));
 }
 </style>

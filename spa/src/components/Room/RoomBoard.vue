@@ -246,4 +246,8 @@ li {
 a {
   color: #42b983;
 }
+
+section section {
+  display: block;
+}
 </style>
