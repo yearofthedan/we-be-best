@@ -19,7 +19,7 @@ import {
 } from '@/components/Room/roomGraphQLQuery';
 import { makeItem } from '@/testHelpers/testData';
 import userEvent from '@testing-library/user-event';
-import buildItem, { Item } from '@/components/Room/itemBuilder';
+import buildItem, {DEFAULT_X, DEFAULT_Y, Item} from '@/components/Room/itemBuilder';
 
 const ITEM_ID = 'ITEM123';
 const ROOM_ID = 'ROOM123';
@@ -171,8 +171,8 @@ describe('<room-board />', () => {
         input: {
           roomId: ROOM_ID,
           itemId: expect.any(String),
-          posX: 0,
-          posY: 0,
+          posX: DEFAULT_X,
+          posY: DEFAULT_Y,
         },
       };
 
