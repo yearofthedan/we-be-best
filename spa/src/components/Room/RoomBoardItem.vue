@@ -91,5 +91,6 @@ li {
   user-select: none;
   word-wrap: break-spaces;
   text-overflow: ellipsis;
+  touch-action: none;
 }
 </style>
