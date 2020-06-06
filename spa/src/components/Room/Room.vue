@@ -23,11 +23,7 @@
         />
         <div>
           <span>{{ roomId }}</span>
-          <ul>
-            <li v-for="member in data.room.members" :key="member">
-              {{ member }}
-            </li>
-          </ul>
+          <room-members v-bind:members="data.room.members" />
         </div>
       </template>
     </template>
@@ -42,11 +38,13 @@ import {
   RoomData,
 } from '@/components/Room/roomGraphQLQuery';
 import RoomBoard from '@/components/Room/RoomBoard.vue';
+import RoomMembers from '@/components/Room/RoomMembers.vue';
 
 export default Vue.extend({
   name: 'room',
   components: {
     'room-board': RoomBoard,
+    'room-members': RoomMembers,
   },
   props: {
     myId: {
@@ -92,10 +90,5 @@ section > div {
   background-color: var(--colour-primary);
   display: flex;
   flex-direction: column;
-}
-
-ul {
-  list-style: none;
-  padding: 0 calc(2 * var(--unit-base-rem));
 }
 </style>
