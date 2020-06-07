@@ -29,10 +29,16 @@ describe('<room />', () => {
       },
     };
 
-    renderWithApollo(Room, [stubQuery, stubSubscription], {
-      propsData: { roomId: '123', myId: 'me' },
-    });
+    const { queryMocks } = renderWithApollo(
+      Room,
+      [stubQuery, stubSubscription],
+      {
+        propsData: { roomId: '123', myId: 'me' },
+      }
+    );
 
+    await Promise.all(queryMocks);
+    expect(queryMocks[0]).toHaveBeenCalled();
     expect(await screen.findByText('my-name2')).toBeInTheDocument();
   });
 });

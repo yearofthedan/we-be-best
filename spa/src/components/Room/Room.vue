@@ -1,33 +1,19 @@
 <template>
-  <apollo-query
-    :query="this.roomQuery"
-    :variables="{ id: this.roomId }"
-    tag="section"
-  >
-    <apollo-subscribe-to-more
-      :document="this.roomSubscription"
-      :variables="{ id: this.roomId }"
-      :updateQuery="onRoomUpdate"
-    />
-    <template v-slot="{ result: { loading, error, data } }">
-      <template v-if="loading" class="loading apollo">Loading...</template>
-      <template v-else-if="error" class="error apollo">
-        An error occurred
-        {{ error }}
-      </template>
-      <template v-else-if="data" class="result apollo">
-        <room-board
-          v-bind:my-id="myId"
-          v-bind:room-id="roomId"
-          v-bind:items="data.room.items"
-        />
-        <div>
-          <span>{{ roomId }}</span>
-          <room-members v-bind:members="data.room.members" />
-        </div>
-      </template>
+  <section>
+    <template v-if="loading">Loading...</template>
+    <template v-else-if="error">An error occurred {{ error }}</template>
+    <template v-else-if="room">
+      <room-board
+        v-bind:my-id="myId"
+        v-bind:room-id="roomId"
+        v-bind:items="room.items"
+      />
+      <div>
+        <span>{{ roomId }}</span>
+        <room-members v-bind:members="room.members" />
+      </div>
     </template>
-  </apollo-query>
+  </section>
 </template>
 
 <script lang="ts">
@@ -39,9 +25,20 @@ import {
 } from '@/components/Room/roomGraphQLQuery';
 import RoomBoard from '@/components/Room/RoomBoard.vue';
 import RoomMembers from '@/components/Room/RoomMembers.vue';
+import { ApolloError } from 'apollo-client';
+
+interface RoomComponentProps {
+  roomId: string;
+}
+
+interface RoomComponentData {
+  loading?: boolean | null;
+  error?: ApolloError | Error | null;
+  room?: RoomData | null;
+}
 
 export default Vue.extend({
-  name: 'room',
+  name: 'room' as string,
   components: {
     'room-board': RoomBoard,
     'room-members': RoomMembers,
@@ -56,24 +53,46 @@ export default Vue.extend({
       required: true,
     },
   },
-  methods: {
-    onRoomUpdate(
-      previousResult: RoomData,
-      {
-        subscriptionData,
-      }: { subscriptionData: { data: { roomUpdates: RoomData } } }
-    ) {
-      return {
-        room: subscriptionData.data.roomUpdates,
-      };
-    },
+  data: function(): RoomComponentData {
+    return {
+      loading: null,
+      error: null,
+      room: null,
+    };
   },
-  computed: {
-    roomQuery: function() {
-      return GET_ROOM_QUERY;
-    },
-    roomSubscription: function() {
-      return ROOM_UPDATES_SUBSCRIPTION;
+  apollo: {
+    room: {
+      query: GET_ROOM_QUERY,
+      variables(): { id: string } {
+        return { id: this.roomId };
+      },
+      subscribeToMore: [
+        {
+          document: ROOM_UPDATES_SUBSCRIPTION,
+          variables: function(): { id: string } {
+            return { id: ((this as unknown) as RoomComponentProps).roomId };
+          },
+          onError(error: ApolloError) {
+            ((this as unknown) as RoomComponentData).error = error;
+          },
+          updateQuery(
+            previousResult: RoomData,
+            {
+              subscriptionData,
+            }: { subscriptionData: { data: { roomUpdates: RoomData } } }
+          ) {
+            return {
+              room: subscriptionData.data.roomUpdates,
+            };
+          },
+        },
+      ],
+      error(error: ApolloError) {
+        this.error = error;
+      },
+      watchLoading(isLoading: boolean) {
+        this.loading = isLoading;
+      },
     },
   },
 });
