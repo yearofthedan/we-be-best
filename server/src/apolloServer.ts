@@ -1,6 +1,6 @@
 import {ApolloServer, PubSub, withFilter} from 'apollo-server-express';
 import typeDefs from './typeDefs';
-import RoomDataSource, { Room } from './rooms/RoomDataSource';
+import RoomDataSource from './rooms/RoomDataSource';
 import resolveRoom, {
   addRoomBoardItem,
   joinRoom,

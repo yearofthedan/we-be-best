@@ -3,7 +3,7 @@ import {
   AddRoomBoardItemInput,
   LockRoomBoardItemInput,
   UpdateRoomBoardItemsInput,
-} from '../../../spa/src/components/Room/roomGraphQLQuery';
+} from '../../../spa/src/components/Room/boardItemsGraphQL';
 import buildItem from './itemBuilder';
 
 export interface Room {

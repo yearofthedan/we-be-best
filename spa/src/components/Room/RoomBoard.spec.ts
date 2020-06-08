@@ -16,7 +16,7 @@ import {
   LOCK_ROOM_BOARD_ITEM_MUTATION,
   UNLOCK_ROOM_BOARD_ITEM_MUTATION,
   UPDATE_ROOM_BOARD_ITEM_MUTATION,
-} from '@/components/Room/roomGraphQLQuery';
+} from '@/components/Room/boardItemsGraphQL';
 import { makeItem } from '@/testHelpers/testData';
 import userEvent from '@testing-library/user-event';
 import buildItem, {

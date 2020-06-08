@@ -2,11 +2,12 @@ import {DataSources, ROOM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apo
 import {PubSub} from 'apollo-server-express';
 import {
   AddRoomBoardItemInput,
-  JoinRoomInput,
   LockRoomBoardItemInput, UnlockRoomBoardItemInput,
   UpdateRoomBoardItemsInput,
+} from '../../../spa/src/components/Room/boardItemsGraphQL';
+import {
+  JoinRoomInput,
 } from '../../../spa/src/components/Room/roomGraphQLQuery';
-
 interface Room {
   id: string;
   members: string[];

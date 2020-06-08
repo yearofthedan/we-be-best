@@ -26,7 +26,7 @@ import {
   UpdateRoomBoardItemsInput,
   ADD_ROOM_BOARD_ITEM_MUTATION,
   AddRoomBoardItemInput,
-} from './roomGraphQLQuery';
+} from './boardItemsGraphQL';
 import {
   Interaction,
   InteractionEndEventPayload,
