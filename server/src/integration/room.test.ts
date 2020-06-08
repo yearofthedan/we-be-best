@@ -1,41 +1,19 @@
-import * as http from 'http';
-import ws from 'ws';
-import { WebSocketLink } from 'apollo-link-ws';
-import { SubscriptionClient } from 'subscriptions-transport-ws';
 import ApolloClient from 'apollo-client';
-import { InMemoryCache } from 'apollo-cache-inmemory';
 import gql from 'graphql-tag';
-import expressApp from '../expressServer';
-import initialiseApollo from '../app';
-import {AddressInfo} from 'net';
+import testApolloServerAndClient from '../testHelpers/testApolloServerAndClient';
 
 describe('room updates subscription', () => {
-  let server: http.Server = undefined;
   let apolloClient: ApolloClient<any>;
+  let stop: () => void;
 
-  beforeEach(function(done) {
-    server = http.createServer(expressApp);
-    initialiseApollo(server, expressApp);
-    server.listen(0, () => {
-      const address = server.address() as AddressInfo;
-
-      const client = new SubscriptionClient(
-        `ws://localhost:${address.port}/graphql`,
-        { reconnect: true },
-        ws
-      );
-      apolloClient = new ApolloClient({
-        link: new WebSocketLink(client),
-        cache: new InMemoryCache()
-      });
-
-      done();
-    });
+  beforeEach(async () => {
+    const serverAndClient = await testApolloServerAndClient();
+    apolloClient = serverAndClient.client;
+    stop = serverAndClient.stop;
   });
 
   afterEach(() => {
-    apolloClient.stop();
-    server.close();
+    stop();
   });
 
   it('Subscription Test', async function() {
