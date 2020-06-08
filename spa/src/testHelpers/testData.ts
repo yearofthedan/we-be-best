@@ -7,3 +7,5 @@ export const makeItem = (overrides: Partial<Item>) => ({
     posX: 30,
     ...overrides,
 });
+
+export const makeRoomMember = (overrides: String) => overrides || 'PERSON';

@@ -11,6 +11,23 @@ export interface RoomData {
   }[];
 }
 
+export interface RoomMemberUpdatesSubscriptionData {
+  roomMemberUpdates: Pick<RoomData, 'id' | 'members'>;
+}
+
+export interface GetRoomQueryData {
+  room: RoomData;
+}
+
+export const ROOM_MEMBER_UPDATES_SUBSCRIPTION = gql`
+  subscription roomMemberUpdates($id: ID!) {
+    roomMemberUpdates(id: $id) {
+      id
+      members
+    }
+  }
+`;
+
 export const ROOM_UPDATES_SUBSCRIPTION = gql`
   subscription roomUpdates($id: ID!) {
     roomUpdates(id: $id) {

@@ -56,6 +56,7 @@ const typeDefs = gql`
 
     type Subscription {
         roomUpdates(id: ID!): Room!
+        roomMemberUpdates(id: ID!): Room!
     }
     
     type Mutation {

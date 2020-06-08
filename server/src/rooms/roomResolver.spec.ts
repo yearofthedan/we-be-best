@@ -7,7 +7,7 @@ import resolveRoom, {
   updateRoomBoardItems,
 } from './roomResolver';
 import RoomDataSource from './RoomDataSource';
-import {ROOM_CHANGED_TOPIC} from '../apolloServer';
+import {ROOM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
 
 const ROOM_123 = '123';
 describe('roomResolver', () => {
@@ -58,7 +58,6 @@ describe('roomResolver', () => {
       });
     });
   });
-
   describe('lockRoomBoardItem', () => {
     it('locks the item and publishes the update', async () => {
       const roomDataSource = new RoomDataSource();
@@ -209,7 +208,13 @@ describe('roomResolver', () => {
       const result = await joinRoom(
         undefined,
         {input: {roomName: 'my-room', memberName: 'me'}},
-        {dataSources: {Room: roomDataSource}},
+        {
+          pubSub: {
+            publish: jest.fn(),
+            dataSource: {Room: new RoomDataSource()},
+          } as unknown as PubSub,
+          dataSources: {Room: roomDataSource}
+        },
       );
 
       expect(result).toEqual({
@@ -235,7 +240,13 @@ describe('roomResolver', () => {
       const result = await joinRoom(
         undefined,
         {input: {roomName: 'my-room', memberName: 'me'}},
-        {dataSources: {Room: roomDataSource}},
+        {
+          pubSub: {
+            publish: jest.fn(),
+            dataSource: {Room: new RoomDataSource()},
+          } as unknown as PubSub,
+          dataSources: {Room: roomDataSource}
+        },
       );
 
       expect(result).toEqual({
@@ -248,6 +259,32 @@ describe('roomResolver', () => {
           posY: 0,
         }],
       });
+    });
+
+    it('publishes an update after joining a room', async () => {
+      const publishStub = jest.fn();
+      const roomDataSource = new RoomDataSource();
+      roomDataSource.addMember('my-room', 'my-mother');
+
+      await joinRoom(
+        undefined,
+        {input: {roomName: 'my-room', memberName: 'me'}},
+        {
+          pubSub: {
+            publish: publishStub,
+            dataSource: {Room: new RoomDataSource()},
+          } as unknown as PubSub,
+          dataSources: {Room: roomDataSource}
+        },
+      );
+
+      const expected = {
+        id: 'my-room',
+        members: ['my-mother', 'me'],
+        items: [] as string[]
+      };
+
+      expect(publishStub).toHaveBeenCalledWith(ROOM_MEMBER_CHANGED_TOPIC, expected);
     });
   });
   describe('resolveRoom', () => {

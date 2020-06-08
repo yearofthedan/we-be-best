@@ -7,25 +7,28 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import gql from 'graphql-tag';
 import expressApp from '../expressServer';
 import initialiseApollo from '../app';
+import {AddressInfo} from 'net';
 
-const GRAPHQL_ENDPOINT = 'ws://localhost:7575/graphql';
-
-describe('integration: subscription', () => {
+describe('room updates subscription', () => {
   let server: http.Server = undefined;
   let apolloClient: ApolloClient<any>;
 
   beforeEach(function(done) {
     server = http.createServer(expressApp);
     initialiseApollo(server, expressApp);
-    const client = new SubscriptionClient(GRAPHQL_ENDPOINT, {
-      reconnect: true
-    }, ws);
-    apolloClient = new ApolloClient({
-      link: new WebSocketLink(client),
-      cache: new InMemoryCache()
-    });
+    server.listen(0, () => {
+      const address = server.address() as AddressInfo;
 
-    server.listen(7575, () => {
+      const client = new SubscriptionClient(
+        `ws://localhost:${address.port}/graphql`,
+        { reconnect: true },
+        ws
+      );
+      apolloClient = new ApolloClient({
+        link: new WebSocketLink(client),
+        cache: new InMemoryCache()
+      });
+
       done();
     });
   });

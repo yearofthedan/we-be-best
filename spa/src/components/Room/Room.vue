@@ -20,8 +20,11 @@
 import Vue from 'vue';
 import {
   GET_ROOM_QUERY,
+  GetRoomQueryData,
+  ROOM_MEMBER_UPDATES_SUBSCRIPTION,
   ROOM_UPDATES_SUBSCRIPTION,
   RoomData,
+  RoomMemberUpdatesSubscriptionData,
 } from '@/components/Room/roomGraphQLQuery';
 import RoomBoard from '@/components/Room/RoomBoard.vue';
 import RoomMembers from '@/components/Room/RoomMembers.vue';
@@ -76,13 +79,35 @@ export default Vue.extend({
             ((this as unknown) as RoomComponentData).error = error;
           },
           updateQuery(
-            previousResult: RoomData,
+            previousResult: GetRoomQueryData,
             {
               subscriptionData,
             }: { subscriptionData: { data: { roomUpdates: RoomData } } }
           ) {
             return {
               room: subscriptionData.data.roomUpdates,
+            };
+          },
+        },
+        {
+          document: ROOM_MEMBER_UPDATES_SUBSCRIPTION,
+          variables: function(): { id: string } {
+            return { id: ((this as unknown) as RoomComponentProps).roomId };
+          },
+          onError(error: ApolloError) {
+            ((this as unknown) as RoomComponentData).error = error;
+          },
+          updateQuery(
+            previousResult: GetRoomQueryData,
+            {
+              subscriptionData,
+            }: { subscriptionData: { data: RoomMemberUpdatesSubscriptionData } }
+          ) {
+            return {
+              room: {
+                ...((this as unknown) as RoomComponentData).room,
+                members: subscriptionData.data.roomMemberUpdates.members,
+              },
             };
           },
         },

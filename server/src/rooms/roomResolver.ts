@@ -1,4 +1,4 @@
-import {DataSources, ROOM_CHANGED_TOPIC} from '../apolloServer';
+import {DataSources, ROOM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
 import {PubSub} from 'apollo-server-express';
 import {
   AddRoomBoardItemInput,
@@ -71,9 +71,13 @@ const resolveRoom = async (
 export const joinRoom = async (
   _: unknown,
   { input }: { input: JoinRoomInput },
-  { dataSources }: { dataSources: Pick<DataSources, 'Room'> }
+  { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Room'>; pubSub: PubSub }
+
 ): Promise<Room | undefined> => {
-  return dataSources.Room.addMember(input.roomName, input.memberName);
+  const result = await dataSources.Room.addMember(input.roomName, input.memberName);
+  await pubSub.publish(ROOM_MEMBER_CHANGED_TOPIC, result);
+
+  return result;
 };
 
 export default resolveRoom;

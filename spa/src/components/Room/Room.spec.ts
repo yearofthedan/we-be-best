@@ -1,9 +1,11 @@
 import Room from '@/components/Room/Room.vue';
 import {
   GET_ROOM_QUERY,
+  ROOM_MEMBER_UPDATES_SUBSCRIPTION,
   ROOM_UPDATES_SUBSCRIPTION,
 } from '@/components/Room/roomGraphQLQuery';
 import { renderWithApollo, screen } from '@/testHelpers/renderer';
+import { makeItem, makeRoomMember } from '@/testHelpers/testData';
 
 describe('<room />', () => {
   it('queries and subscribes to the room details', async () => {
@@ -12,33 +14,43 @@ describe('<room />', () => {
       successData: {
         room: {
           id: '123',
-          members: ['my-name'],
-          items: [],
+          members: [makeRoomMember('my-name')],
+          items: [makeItem({ id: 'ITEM123' })],
         },
       },
     };
 
-    const stubSubscription = {
+    const stubRoomUpdateSubscription = {
       query: ROOM_UPDATES_SUBSCRIPTION,
       successData: {
         roomUpdates: {
           id: '123',
-          members: ['my-name2'],
-          items: [],
+          members: [makeRoomMember('my-name')],
+          items: [makeItem({ id: 'ITEM123' }), makeItem({ id: 'ITEM124' })],
         },
       },
     };
 
-    const { queryMocks } = renderWithApollo(
+    const stubRoomMemberUpdateSubscription = {
+      query: ROOM_MEMBER_UPDATES_SUBSCRIPTION,
+      successData: {
+        roomMemberUpdates: {
+          id: '123',
+          members: [makeRoomMember('my-name'), makeRoomMember('my-name2')],
+        },
+      },
+    };
+
+    renderWithApollo(
       Room,
-      [stubQuery, stubSubscription],
+      [stubQuery, stubRoomUpdateSubscription, stubRoomMemberUpdateSubscription],
       {
         propsData: { roomId: '123', myId: 'me' },
       }
     );
 
-    await Promise.all(queryMocks);
-    expect(queryMocks[0]).toHaveBeenCalled();
-    expect(await screen.findByText('my-name2')).toBeInTheDocument();
+    expect(await screen.findByText('my-name')).toBeInTheDocument();
+    expect(screen.getByText('my-name2')).toBeInTheDocument();
+    expect(screen.getAllByText('placeholder text')).toHaveLength(2);
   });
 });
