@@ -32,12 +32,11 @@ describe('roomResolver', () => {
     connection = await MongoClient.connect(await new MongoMemoryServer().getUri());
     const db = await connection.db();
     roomsCollection = await db.createCollection(ROOMS_COLLECTION);
+    await roomsCollection.createIndex({'items.id': 1});
   });
-
   afterAll(async () => {
     await connection.close();
   });
-
   beforeEach(async () => {
     await roomsCollection.deleteMany({});
     rooms = new Rooms(roomsCollection);
@@ -68,7 +67,6 @@ describe('roomResolver', () => {
       });
     });
   });
-
   describe('lockRoomBoardItem', () => {
     it('locks the item and publishes the update', async () => {
       const publishStub = jest.fn();
@@ -79,7 +77,7 @@ describe('roomResolver', () => {
       const result = await lockRoomBoardItem(
         undefined,
         {
-          input: buildLockItemInput({roomId: 'ROOM_123', itemId: 'item-id', meId: 'me' })
+          input: buildLockItemInput({id: 'item-id', lockedBy: 'me' })
         },
         {
           pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
@@ -99,7 +97,6 @@ describe('roomResolver', () => {
       });
     });
   });
-
   describe('unlockRoomBoardItem', () => {
     it('unlocks the item', async () => {
       const roomItemData = buildItemData({ id: 'item-id', lockedBy: 'me'});
@@ -195,7 +192,6 @@ describe('roomResolver', () => {
       });
     });
   });
-
   describe('joinRoom', () => {
     it('creates a room if it does not exist', async () => {
       const publishStub = jest.fn();

@@ -22,11 +22,14 @@ export const ROOM_MEMBER_CHANGED_TOPIC = 'room_member_changed_topic';
 
 const pubSub = new PubSub();
 
+const ROOMS_COLLECTION = 'rooms';
 const initMongo = async () => {
   const mongod = new MongoMemoryServer();
   const uri = await mongod.getUri();
   const client = new MongoClient(uri);
   await client.connect();
+  await client.db().collection(ROOMS_COLLECTION).createIndex({'items.id': 1});
+
   return client;
 };
 
@@ -60,13 +63,13 @@ const apolloServer = async () => {
       }
     },
     dataSources: () => ({
-      Rooms: new Rooms(mongoClient.db().collection('rooms'))
+      Rooms: new Rooms(mongoClient.db().collection(ROOMS_COLLECTION))
     }),
     context: ({req, connection}) => {
       if (connection) {
         return {
           dataSources: {
-            Rooms: new Rooms(mongoClient.db().collection('rooms'))
+            Rooms: new Rooms(mongoClient.db().collection(ROOMS_COLLECTION))
           },
           pubSub
         };

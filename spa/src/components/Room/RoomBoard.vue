@@ -125,9 +125,8 @@ export default Vue.extend({
 
       this.movingItemIds = [...this.movingItemIds, payload.itemId];
       const mutationPayload: LockRoomBoardItemInput = {
-        roomId: this.roomId,
-        itemId: payload.itemId,
-        meId: this.myId,
+        id: payload.itemId,
+        lockedBy: this.myId,
       };
       this.$apollo
         .mutate({

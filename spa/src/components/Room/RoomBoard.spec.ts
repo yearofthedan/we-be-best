@@ -57,9 +57,8 @@ function makeHappyUpdateRoomBoardItemMutationStub(items?: Item[]) {
 
 function makeHappyLockRoomBoardItemMutationStub(
   overrides = {
-    roomId: '123',
-    itemId: 'item1',
-    meId: 'me',
+    id: 'item1',
+    lockedBy: 'me',
   }
 ) {
   const successData = {
@@ -146,7 +145,7 @@ describe('<room-board />', () => {
 
   describe('when adding an item', () => {
     it('lets me add an item', async () => {
-      renderWithApollo(RoomBoard, [], {
+      renderWithApollo(RoomBoard, [makeHappyAddRoomBoardItemMutationStub()], {
         propsData: { myId: MY_ID, roomId: ROOM_ID, items: [] },
       });
 
@@ -191,9 +190,8 @@ describe('<room-board />', () => {
         RoomBoard,
         [
           makeHappyLockRoomBoardItemMutationStub({
-            meId: MY_ID,
-            itemId: ITEM_ID,
-            roomId: ROOM_ID,
+            lockedBy: MY_ID,
+            id: ITEM_ID,
           }),
           makeHappyUpdateRoomBoardItemMutationStub(),
           makeHappyUnlockRoomBoardItemMutationStub({
@@ -277,9 +275,8 @@ describe('<room-board />', () => {
         RoomBoard,
         [
           makeHappyLockRoomBoardItemMutationStub({
-            meId: MY_ID,
-            itemId: ITEM_ID,
-            roomId: ROOM_ID,
+            lockedBy: MY_ID,
+            id: ITEM_ID,
           }),
         ],
         {
@@ -294,7 +291,7 @@ describe('<room-board />', () => {
       await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
 
       const expectedMutationVars = {
-        input: { meId: MY_ID, itemId: ITEM_ID, roomId: ROOM_ID },
+        input: { lockedBy: MY_ID, id: ITEM_ID },
       };
 
       await waitFor(() =>
@@ -361,9 +358,8 @@ describe('<room-board />', () => {
         RoomBoard,
         [
           makeHappyLockRoomBoardItemMutationStub({
-            meId: MY_ID,
-            itemId: ITEM_ID,
-            roomId: ROOM_ID,
+            lockedBy: MY_ID,
+            id: ITEM_ID,
           }),
           makeHappyUnlockRoomBoardItemMutationStub({
             meId: MY_ID,
@@ -383,12 +379,12 @@ describe('<room-board />', () => {
       await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
 
-      const expectedMutationVars = {
+      expect(await queryMocks[0]).toHaveBeenCalledWith({
+        input: { lockedBy: MY_ID, id: ITEM_ID },
+      });
+      expect(await queryMocks[1]).toHaveBeenCalledWith({
         input: { meId: MY_ID, itemId: ITEM_ID, roomId: ROOM_ID },
-      };
-
-      expect(await queryMocks[0]).toHaveBeenCalledWith(expectedMutationVars);
-      expect(await queryMocks[1]).toHaveBeenCalledWith(expectedMutationVars);
+      });
     });
 
     it('mutates the item position', async () => {
@@ -396,9 +392,8 @@ describe('<room-board />', () => {
         RoomBoard,
         [
           makeHappyLockRoomBoardItemMutationStub({
-            meId: MY_ID,
-            itemId: ITEM_ID,
-            roomId: ROOM_ID,
+            lockedBy: MY_ID,
+            id: ITEM_ID,
           }),
           makeHappyUpdateRoomBoardItemMutationStub(),
           makeHappyUnlockRoomBoardItemMutationStub({
@@ -450,9 +445,8 @@ describe('<room-board />', () => {
         RoomBoard,
         [
           makeHappyLockRoomBoardItemMutationStub({
-            meId: MY_ID,
-            itemId: ITEM_ID,
-            roomId: ROOM_ID,
+            lockedBy: MY_ID,
+            id: ITEM_ID,
           }),
           makeHappyUpdateRoomBoardItemMutationStub(),
           makeHappyUnlockRoomBoardItemMutationStub({

@@ -1,7 +1,7 @@
 import {MongoDataSource} from 'apollo-datasource-mongodb';
 import {
   AddRoomBoardItemInput,
-  LockRoomBoardItemInput,
+  LockRoomBoardItemInput, UnlockRoomBoardItemInput,
   UpdateRoomBoardItemsInput,
 } from '../../../spa/src/components/Room/boardItemsGraphQL';
 import buildItem from './itemBuilder';
@@ -64,20 +64,20 @@ class Rooms extends MongoDataSource<RoomData> {
     )).value;
   }
 
-  async lockItem({itemId, meId, roomId}: LockRoomBoardItemInput): Promise<RoomData> {
+  async lockItem({id, lockedBy}: LockRoomBoardItemInput): Promise<RoomData> {
      return (await this.collection.findOneAndUpdate(
       {
-        id: roomId,
-        items: { $elemMatch: { id: itemId } }
+        'items.id': id,
+        items: { $elemMatch: { id: id } }
       },
-      { $set: { 'items.$.lockedBy' : meId } },
+      { $set: { 'items.$.lockedBy' : lockedBy } },
       {
         returnOriginal: false
       }
     )).value;
   }
 
-  async unlockItem({itemId, roomId}: LockRoomBoardItemInput): Promise<RoomData> {
+  async unlockItem({itemId, roomId}: UnlockRoomBoardItemInput): Promise<RoomData> {
     return (await this.collection.findOneAndUpdate(
       {
         id: roomId,

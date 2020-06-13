@@ -42,9 +42,8 @@ export const UNLOCK_ROOM_BOARD_ITEM_MUTATION = gql`
 `;
 
 export interface LockRoomBoardItemInput {
-  roomId: string;
-  itemId: string;
-  meId: string;
+  id: string;
+  lockedBy: string;
 }
 
 export const LOCK_ROOM_BOARD_ITEM_MUTATION = gql`
