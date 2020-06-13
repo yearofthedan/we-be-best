@@ -8,7 +8,7 @@ RUN yarn lint
 RUN yarn test
 RUN yarn build
 
-FROM node:alpine as server-build-stage
+FROM node:latest as server-build-stage
 WORKDIR /server
 COPY server/package.json .
 RUN yarn
@@ -18,7 +18,7 @@ RUN yarn lint
 RUN yarn test
 RUN yarn build
 
-FROM node:alpine as production-stage
+FROM node:latest as production-stage
 WORKDIR /app
 COPY --from=server-build-stage /server/dist .
 COPY --from=server-build-stage /server/node_modules ./node_modules

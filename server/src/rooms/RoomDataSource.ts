@@ -1,4 +1,4 @@
-import {DataSource} from 'apollo-datasource';
+import {MongoDataSource} from 'apollo-datasource-mongodb';
 import {
   AddRoomBoardItemInput,
   LockRoomBoardItemInput,
@@ -6,7 +6,8 @@ import {
 } from '../../../spa/src/components/Room/boardItemsGraphQL';
 import buildItem from './itemBuilder';
 
-export interface Room {
+export interface RoomData {
+  _id: string;
   id: string;
   members: string[];
   items: {
@@ -17,97 +18,79 @@ export interface Room {
   }[];
 }
 
-const roomsData = new Map<string, Room>();
+class Rooms extends MongoDataSource<RoomData> {
+  async getRoom(id: string): Promise<RoomData> {
+    const room = await this.collection.findOne({ id });
 
-class RoomDataSource extends DataSource {
-  getRoom(id: string): Room {
-    if (!roomsData.get(id)) {
+    if (!room) {
       throw new Error('No room found');
     }
-    return roomsData.get(id);
-  }
 
-  addItem({ itemId, roomId, posY, posX}: AddRoomBoardItemInput): Room {
-    return this.updateItems({
-      id: roomId,
-      items: [
-        ...this.getRoom(roomId).items,
-        buildItem({id: itemId, posY, posX})
-      ]
-    });
-  }
-
-  addMember(id: string, member: string): Room {
-    if (!roomsData.get(id)) {
-      this.createRoom(id);
-    }
-
-    const room = {
-      ...roomsData.get(id),
-      members: [...this.getRoom(id).members, member]
-    };
-
-    roomsData.set(id, room);
     return room;
   }
 
-  lockItem(input: LockRoomBoardItemInput): Room {
-    const items = roomsData.get(input.roomId).items;
-    const itemIndex = roomsData.get(input.roomId).items.findIndex((i => i.id === input.itemId));
-
-    const room = {
-      ...roomsData.get(input.roomId),
-      items: [
-          ...items.slice(0, itemIndex),
-          {
-            ...items[itemIndex],
-            lockedBy: input.meId,
-          },
-          ...items.slice(itemIndex + 1),
-        ]
-    };
-
-    roomsData.set(input.roomId, room);
-    return room;
+  async updateItems(update: UpdateRoomBoardItemsInput): Promise<RoomData> {
+    return (await this.collection.findOneAndUpdate(
+      {id: update.id},
+      { $set: { items: update.items } },
+      {
+        returnOriginal: false,
+      }
+    )).value;
   }
 
-  unlockItem(input: LockRoomBoardItemInput): Room {
-    const items = roomsData.get(input.roomId).items;
-    const itemIndex = roomsData.get(input.roomId).items.findIndex((i => i.id === input.itemId));
 
-    const room = {
-      ...roomsData.get(input.roomId),
-      items: [
-        ...items.slice(0, itemIndex),
-        {
-          ...items[itemIndex],
-          lockedBy: undefined,
+  async addItem({itemId, roomId, posY, posX}: AddRoomBoardItemInput): Promise<RoomData> {
+    return (await this.collection.findOneAndUpdate(
+      {id: roomId},
+      { $push: { items: buildItem({id: itemId, posY, posX}) } },
+      {
+        returnOriginal: false,
+      }
+    )).value;
+  }
+
+  async addMember(roomId: string, member: string): Promise<RoomData> {
+    return (await this.collection.findOneAndUpdate(
+      {id: roomId},
+      {
+        $push: {members: member},
+        $setOnInsert: {items: []},
+      },
+      {
+        upsert: true,
+        returnOriginal: false,
+      }
+    )).value;
+  }
+
+  async lockItem({itemId, meId, roomId}: LockRoomBoardItemInput): Promise<RoomData> {
+     return (await this.collection.findOneAndUpdate(
+      {
+        id: roomId,
+        items: { $elemMatch: { id: itemId } }
+      },
+      { $set: { 'items.$.lockedBy' : meId } },
+      {
+        returnOriginal: false
+      }
+    )).value;
+  }
+
+  async unlockItem({itemId, roomId}: LockRoomBoardItemInput): Promise<RoomData> {
+    return (await this.collection.findOneAndUpdate(
+      {
+        id: roomId,
+        items: {$elemMatch: {id: itemId}}
+      },
+      {
+        $set: {'items.$.lockedBy': undefined}
         },
-        ...items.slice(itemIndex + 1),
-      ]
-    };
-
-    roomsData.set(input.roomId, room);
-    return room;
-  }
-
-  updateItems(update: UpdateRoomBoardItemsInput): Room {
-    const room = {
-      ...roomsData.get(update.id),
-      items: update.items
-    };
-
-    roomsData.set(update.id, room);
-    return room;
-  }
-
-  private createRoom(id: string): Room {
-    return roomsData.set(id, { id, members: [], items: [] }).get(id);
-  }
-
-  clear() {
-    roomsData.clear();
+      {
+        returnOriginal: false
+      }
+    )).value;
   }
 }
 
-export default RoomDataSource;
+export default Rooms;

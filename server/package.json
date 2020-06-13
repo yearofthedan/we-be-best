@@ -18,11 +18,13 @@
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"yarn run watch-ts\" \"yarn run serve-debug\""
   },
   "dependencies": {
+    "apollo-datasource-mongodb": "^0.2.6",
     "apollo-server-express": "^2.13.1",
     "express": "^4.17.1",
     "graphql": "^15.0.0",
     "graphql-subscriptions": "^1.1.0",
-    "graphql-tag": "^2.10.3"
+    "graphql-tag": "^2.10.3",
+    "mongodb-memory-server": "^6.6.1"
   },
   "devDependencies": {
     "@types/concurrently": "^5.1.0",

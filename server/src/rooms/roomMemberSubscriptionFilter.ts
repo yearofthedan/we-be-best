@@ -1,5 +1,5 @@
-import {Room} from './RoomDataSource';
+import {RoomResult} from './queryDefinitions';
 
-export default (payload: Room, variables: { id: string }) => {
+export default (payload: RoomResult, variables: { id: string }) => {
   return payload.id === variables.id;
 };

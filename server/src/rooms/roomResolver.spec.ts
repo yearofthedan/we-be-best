@@ -1,4 +1,7 @@
 import {PubSub} from 'graphql-subscriptions';
+import {Collection} from 'apollo-datasource-mongodb';
+import {MongoClient} from 'mongodb';
+import {MongoMemoryServer} from 'mongodb-memory-server';
 import resolveRoom, {
   addRoomBoardItem,
   joinRoom,
@@ -7,98 +10,87 @@ import resolveRoom, {
   updateRoomBoardItems,
 } from './roomResolver';
 import RoomDataSource from './RoomDataSource';
+import Rooms, {RoomData} from './RoomDataSource';
 import {ROOM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
+import {
+  buildAddItemInput,
+  buildJoinRoomInput,
+  buildLockItemInput,
+  buildUnlockItemInput,
+  buildUpdateItemsInput,
+} from '../testHelpers/queryTestDataBuilder';
+import {buildItemData, buildRoomData} from '../testHelpers/storedTestDataBuilder';
 
-const ROOM_123 = '123';
+const ROOMS_COLLECTION = 'rooms';
+
 describe('roomResolver', () => {
-  beforeEach(() => {
-    new RoomDataSource().clear();
+  let rooms: RoomDataSource;
+  let connection: MongoClient;
+  let roomsCollection: Collection<RoomData>;
+
+  beforeAll(async () => {
+    connection = await MongoClient.connect(await new MongoMemoryServer().getUri());
+    const db = await connection.db();
+    roomsCollection = await db.createCollection(ROOMS_COLLECTION);
+  });
+
+  afterAll(async () => {
+    await connection.close();
+  });
+
+  beforeEach(async () => {
+    await roomsCollection.deleteMany({});
+    rooms = new Rooms(roomsCollection);
   });
 
   describe('addRoomBoardItem', () => {
     it('adds the item and publishes the update', async () => {
-      const roomDataSource = new RoomDataSource();
-      roomDataSource.addMember(ROOM_123, 'me');
+      const room = buildRoomData({id: 'ROOM_123', items: []});
+      await roomsCollection.insertOne({...room});
+      const itemInput = buildAddItemInput({roomId: 'ROOM_123', itemId: 'ITEM_123' });
       const publishStub = jest.fn();
-
       const result = await addRoomBoardItem(
         undefined,
+        { input: itemInput },
         {
-          input: {
-            roomId: ROOM_123,
-            itemId: 'item1',
-            posX: 0,
-            posY: 0,
-          },
-        },
-        {
-          pubSub: {
-            publish: publishStub,
-            dataSource: {Room: new RoomDataSource()},
-          } as unknown as PubSub,
-          dataSources: {Room: new RoomDataSource()},
+          pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
+          dataSources: {Rooms: rooms},
         },
       );
 
-      const expected = {
-        id: ROOM_123,
-        items: [
-          {
-            id: 'item1',
-            posX: 0,
-            posY: 0,
-          },
-        ],
-        members: ['me']
-      };
-
-      expect(result).toEqual(expected);
+      expect(result.items).toContainEqual({
+        id: itemInput.itemId,
+        posX: itemInput.posX,
+        posY: itemInput.posY,
+      });
       expect(publishStub).toHaveBeenCalledWith(ROOM_CHANGED_TOPIC, {
-        roomUpdates: expected,
+        roomUpdates: result,
       });
     });
   });
+
   describe('lockRoomBoardItem', () => {
     it('locks the item and publishes the update', async () => {
-      const roomDataSource = new RoomDataSource();
-      roomDataSource.addMember('123', 'me');
-      roomDataSource.updateItems({ id: '123', items: [{
-          id: 'item1',
-          posX: 0,
-          posY: 0,
-        }]});
-
       const publishStub = jest.fn();
+      const roomItemData = buildItemData({ id: 'item-id'});
+      const room = buildRoomData({id: 'ROOM_123', items: [roomItemData]});
+      await roomsCollection.insertOne({...room});
 
       const result = await lockRoomBoardItem(
         undefined,
         {
-          input: {
-            roomId: '123',
-            itemId: 'item1',
-            meId: 'me',
-          },
+          input: buildLockItemInput({roomId: 'ROOM_123', itemId: 'item-id', meId: 'me' })
         },
         {
-          pubSub: {
-            publish: publishStub,
-            dataSource: {Room: new RoomDataSource()},
-          } as unknown as PubSub,
-          dataSources: {Room: new RoomDataSource()},
+          pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
+          dataSources: {Rooms: rooms},
         },
       );
 
       const expected = {
-        id: '123',
-        items: [
-          {
-            id: 'item1',
-            lockedBy: 'me',
-            posX: 0,
-            posY: 0,
-          },
-        ],
-        members: ['me']
+        id: room.id,
+        items: [{ ...roomItemData, lockedBy: 'me' }],
+        members: room.members
       };
 
       expect(result).toEqual(expected);
@@ -107,216 +99,161 @@ describe('roomResolver', () => {
       });
     });
   });
-  describe('unlockRoomBoardItem', () => {
-    it('unlocks the item and publishes the update', async () => {
-      const roomDataSource = new RoomDataSource();
-      roomDataSource.addMember('123', 'me');
-      roomDataSource.updateItems({ id: '123', items: [{
-          id: 'item1',
-          posX: 0,
-          posY: 0,
-          lockedBy: 'me',
-        }]});
 
-      const publishStub = jest.fn();
+  describe('unlockRoomBoardItem', () => {
+    it('unlocks the item', async () => {
+      const roomItemData = buildItemData({ id: 'item-id', lockedBy: 'me'});
+      const room = buildRoomData({items: [roomItemData]});
+      await roomsCollection.insertOne({...room});
 
       const result = await unlockRoomBoardItem(
         undefined,
         {
-          input: {
-            roomId: '123',
-            itemId: 'item1',
-            meId: 'me',
-          },
+          input: buildUnlockItemInput({roomId: room.id, itemId: roomItemData.id, meId: 'me' })
         },
         {
-          pubSub: {
-            publish: publishStub,
-            dataSource: {Room: new RoomDataSource()},
-          } as unknown as PubSub,
-          dataSources: {Room: new RoomDataSource()},
+          pubSub: { publish: jest.fn(), dataSource: {Rooms: rooms} } as unknown as PubSub,
+          dataSources: {Rooms: rooms},
         },
       );
 
-      const expected = {
-        id: '123',
-        items: [
-          {
-            id: 'item1',
-            posX: 0,
-            posY: 0,
-          },
-        ],
-        members: ['me']
-      };
+      const expected = [{ ...roomItemData, lockedBy: null as string }];
 
-      expect(result).toEqual(expected);
+      expect(result.items).toEqual(expected);
+    });
+
+    it('publishes an update when the item is unlocked', async () => {
+      const publishStub = jest.fn();
+      const roomItemData = buildItemData({ id: 'item-id', lockedBy: 'me'});
+      const room = buildRoomData({items: [roomItemData]});
+      await roomsCollection.insertOne({...room});
+
+      const result = await unlockRoomBoardItem(
+        undefined,
+        {
+          input: buildUnlockItemInput({roomId: room.id, itemId: roomItemData.id, meId: 'me' })
+        },
+        {
+          pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
+          dataSources: {Rooms: rooms},
+        },
+      );
+
       expect(publishStub).toHaveBeenCalledWith(ROOM_CHANGED_TOPIC, {
-        roomUpdates: expected,
+        roomUpdates: result,
       });
     });
   });
   describe('updateRoomBoardItems', () => {
-    it('updates the room items and announces the change', async () => {
+    it('updates the room items', async () => {
+      const room = buildRoomData({id: 'ROOM_123', items: [], members: []});
+      await roomsCollection.insertOne({...room});
+      const result = await updateRoomBoardItems(
+        undefined,
+        {
+          input: buildUpdateItemsInput({
+            id: 'ROOM_123',
+            items: [{ id: 'item1', posX: 0, posY: 0 }],
+          })
+        },
+        {
+          pubSub: { publish: jest.fn(), dataSource: {Rooms: rooms} } as unknown as PubSub,
+          dataSources: {Rooms: rooms},
+        },
+      );
+
+      const expected = {
+        id: room.id,
+        items: [{ id: 'item1', posX: 0, posY: 0 }],
+        members: room.members
+      };
+
+      expect(result).toEqual(expected);
+    });
+
+    it('publishes an update after updating the items', async () => {
+      const room = buildRoomData();
+      await roomsCollection.insertOne({...room});
       const publishStub = jest.fn();
 
       const result = await updateRoomBoardItems(
         undefined,
         {
-          input: {
-            id: '123',
-            items: [
-              {
-                id: 'item1',
-                lockedBy: 'me',
-                posX: 0,
-                posY: 0,
-              },
-            ],
-          },
+          input: buildUpdateItemsInput({
+            id: room.id,
+            items: [{ id: 'item1', posX: 0, posY: 0 }],
+          })
         },
         {
-          pubSub: {
-            publish: publishStub,
-            dataSource: {Room: new RoomDataSource()},
-          } as unknown as PubSub,
-          dataSources: {Room: new RoomDataSource()},
+          pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
+          dataSources: {Rooms: rooms},
         },
       );
 
-      const expected = {
-        items: [
-          {
-            id: 'item1',
-            lockedBy: 'me',
-            posX: 0,
-            posY: 0,
-          },
-        ],
-      };
-
-      expect(result).toEqual(expected);
       expect(publishStub).toHaveBeenCalledWith(ROOM_CHANGED_TOPIC, {
-        roomUpdates: expected,
+        roomUpdates: result,
       });
     });
   });
+
   describe('joinRoom', () => {
     it('creates a room if it does not exist', async () => {
-      const roomDataSource = new RoomDataSource();
+      const publishStub = jest.fn();
 
       const result = await joinRoom(
         undefined,
-        {input: {roomName: 'my-room', memberName: 'me'}},
+        { input: buildJoinRoomInput({roomName: 'new-room', memberName: 'me'}) },
         {
-          pubSub: {
-            publish: jest.fn(),
-            dataSource: {Room: new RoomDataSource()},
-          } as unknown as PubSub,
-          dataSources: {Room: roomDataSource}
+          pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
+          dataSources: {Rooms: rooms},
         },
       );
 
-      expect(result).toEqual({
-        id: 'my-room',
-        members: ['me'],
-        items: [],
-      });
+      expect(result.id).toEqual('new-room');
+      expect(result.members).toEqual(['me']);
     });
 
     it('joins the room if it exists', async () => {
-      const roomDataSource = new RoomDataSource();
-      roomDataSource.addMember('my-room', 'my-mother');
-      roomDataSource.updateItems({
-        id: 'my-room',
-        items: [{
-          id: 'item1',
-          lockedBy: 'my-mother',
-          posX: 0,
-          posY: 0,
-        }],
-      });
+      const room = buildRoomData({ items: [], members: ['my-mother']});
+      await roomsCollection.insertOne({...room});
+
+      const publishStub = jest.fn();
 
       const result = await joinRoom(
         undefined,
-        {input: {roomName: 'my-room', memberName: 'me'}},
+        { input: buildJoinRoomInput({roomName: room.id, memberName: 'me'}) },
         {
-          pubSub: {
-            publish: jest.fn(),
-            dataSource: {Room: new RoomDataSource()},
-          } as unknown as PubSub,
-          dataSources: {Room: roomDataSource}
+          pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
+          dataSources: {Rooms: rooms},
         },
       );
 
-      expect(result).toEqual({
-        id: 'my-room',
-        members: ['my-mother', 'me'],
-        items: [{
-          id: 'item1',
-          lockedBy: 'my-mother',
-          posX: 0,
-          posY: 0,
-        }],
-      });
+      expect(result.members).toEqual(['my-mother', 'me']);
     });
 
     it('publishes an update after joining a room', async () => {
       const publishStub = jest.fn();
-      const roomDataSource = new RoomDataSource();
-      roomDataSource.addMember('my-room', 'my-mother');
 
-      await joinRoom(
+      const result = await joinRoom(
         undefined,
-        {input: {roomName: 'my-room', memberName: 'me'}},
+        { input: buildJoinRoomInput({roomName: 'new-room', memberName: 'me'}) },
         {
-          pubSub: {
-            publish: publishStub,
-            dataSource: {Room: new RoomDataSource()},
-          } as unknown as PubSub,
-          dataSources: {Room: roomDataSource}
+          pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
+          dataSources: {Rooms: rooms},
         },
       );
 
-      const expected = {
-        id: 'my-room',
-        members: ['my-mother', 'me'],
-        items: [] as string[]
-      };
-
-      expect(publishStub).toHaveBeenCalledWith(ROOM_MEMBER_CHANGED_TOPIC, expected);
+      expect(publishStub).toHaveBeenCalledWith(ROOM_MEMBER_CHANGED_TOPIC, result);
     });
   });
   describe('resolveRoom', () => {
     it('gets the room', async () => {
-      const roomDataSource = new RoomDataSource();
-      roomDataSource.updateItems({
-        id: '123',
-        items: [
-          {
-            id: 'item1',
-            lockedBy: 'me',
-            posX: 0,
-            posY: 0,
-          },
-        ],
-      });
-      const result = await resolveRoom(
-        undefined,
-        {id: '123'},
-        {dataSources: {Room: roomDataSource}},
-      );
+      const room = buildRoomData({ id: 'ROOM_123', items: [], members: []});
+      await roomsCollection.insertOne({...room});
 
-      expect(result).toEqual({
-        'items': [
-          {
-            id: 'item1',
-            lockedBy: 'me',
-            posX: 0,
-            posY: 0,
-          },
-        ],
-      });
+      const result = await resolveRoom(undefined, {id: 'ROOM_123'}, {dataSources: {Rooms: rooms}});
+
+      expect(result).toEqual({ id: 'ROOM_123', items: [], members: []});
     });
   });
 });

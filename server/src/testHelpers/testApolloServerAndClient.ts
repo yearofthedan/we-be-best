@@ -1,13 +1,12 @@
 import http from 'http';
-import expressApp from '../expressServer';
-import initialiseApollo from '../app';
 import {SubscriptionClient} from 'subscriptions-transport-ws';
 import ws from 'ws';
 import ApolloClient from 'apollo-client';
 import {WebSocketLink} from 'apollo-link-ws';
 import {InMemoryCache} from 'apollo-cache-inmemory';
 import {AddressInfo} from 'net';
-
+import expressApp from '../expressServer';
+import initialiseApollo from '../app';
 
 async function httpApolloServer() {
   const server = http.createServer(expressApp);
