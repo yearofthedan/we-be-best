@@ -22,7 +22,7 @@ import {
   LockRoomBoardItemInput,
   UNLOCK_ROOM_BOARD_ITEM_MUTATION,
   UnlockRoomBoardItemInput,
-  UPDATE_ROOM_BOARD_ITEM_MUTATION,
+  UPDATE_ROOM_BOARD_ITEMS_MUTATION,
   UpdateRoomBoardItemsInput,
   ADD_ROOM_BOARD_ITEM_MUTATION,
   AddRoomBoardItemInput,
@@ -196,7 +196,7 @@ export default Vue.extend({
 
       this.$apollo
         .mutate({
-          mutation: UPDATE_ROOM_BOARD_ITEM_MUTATION,
+          mutation: UPDATE_ROOM_BOARD_ITEMS_MUTATION,
           variables: {
             input: updateRoomBoardItemsPayload,
           },

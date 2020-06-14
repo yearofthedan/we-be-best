@@ -2,7 +2,7 @@ import { VueConstructor } from 'vue';
 import { DocumentNode } from 'graphql';
 import { createMockClient } from 'mock-apollo-client';
 import VueApollo from 'vue-apollo';
-import { render } from '@testing-library/vue';
+import {ComponentHarness, render} from '@testing-library/vue';
 import { when } from 'jest-when';
 
 interface QuerySpec {
@@ -11,24 +11,26 @@ interface QuerySpec {
   variables?: object;
 }
 
+export interface RenderResult extends ComponentHarness  {
+  queryMocks: Array<jest.Mock<any, any>>;
+}
 const renderWithApollo = (
   component: VueConstructor<Vue>,
   querySpec: QuerySpec | QuerySpec[],
   options: { [id: string]: any } = {}
-) => {
+): RenderResult => {
   const mockApolloClient = createMockClient();
   const specs: QuerySpec[] = Array.isArray(querySpec) ? querySpec : [querySpec];
 
   const queryMocks = specs.map(spec => {
     const queryMock = jest.fn();
     if (spec.variables) {
-      when(queryMock)
-        .calledWith(spec.variables)
-        .mockResolvedValue({
+      queryMock
+        .mockResolvedValueOnce({
           data: spec.successData,
         });
     } else {
-      queryMock.mockResolvedValue({
+      queryMock.mockResolvedValueOnce({
         data: spec.successData,
       });
     }

@@ -70,7 +70,7 @@ export interface UpdateRoomBoardItemsInput {
   items: ItemInput[];
 }
 
-export const UPDATE_ROOM_BOARD_ITEM_MUTATION = gql`
+export const UPDATE_ROOM_BOARD_ITEMS_MUTATION = gql`
   mutation updateRoomBoardItems($input: UpdateRoomBoardItemsInput!) {
     updateRoomBoardItems(input: $input) {
       id

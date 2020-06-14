@@ -2,7 +2,7 @@ import {
   fireEvent,
   renderWithApollo,
   screen,
-  waitFor,
+  RenderResult,
 } from '@/testHelpers/renderer';
 import RoomBoard from '@/components/Room/RoomBoard.vue';
 import {
@@ -10,7 +10,6 @@ import {
   PointerMoveEvent,
   PointerUpEvent,
 } from '@/testHelpers/jsdomFriendlyPointerEvents';
-import { AddRoomBoardItemInput } from '@/components/Room/boardItemsGraphQL';
 import { makeItem } from '@/testHelpers/testData';
 import userEvent from '@testing-library/user-event';
 import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/itemBuilder';
@@ -19,16 +18,16 @@ import {
   makeHappyAddRoomBoardItemMutationStub,
   makeHappyLockRoomBoardItemMutationStub,
   makeHappyUnlockRoomBoardItemMutationStub,
-  makeHappyUpdateRoomBoardItemMutationStub,
+  makeHappyUpdateRoomBoardItemsMutationStub,
   MY_ID,
   ROOM_ID,
 } from '@/testHelpers/testMutationStubs';
-import {resetAllWhenMocks, verifyAllWhenMocksCalled} from 'jest-when';
+import { resetAllWhenMocks } from 'jest-when';
 
 describe('<room-board />', () => {
-  beforeEach(() => {
+  afterEach(() => {
     resetAllWhenMocks();
-  })
+  });
   it('renders a item defaulting at 10px by 10px', () => {
     renderWithApollo(RoomBoard, [], {
       propsData: {
@@ -45,16 +44,18 @@ describe('<room-board />', () => {
   });
 
   describe('when adding an item', () => {
-    it('lets me add an item', async () => {
-      renderWithApollo(RoomBoard, [makeHappyAddRoomBoardItemMutationStub({
-        roomId: ROOM_ID,
-        itemId: expect.any(String),
-        posX: DEFAULT_X,
-        posY: DEFAULT_Y,
-      })], {
-        propsData: { myId: MY_ID, roomId: ROOM_ID, items: [] },
-      });
+    let renderedContext: RenderResult;
 
+    beforeEach(() => {
+      renderedContext = renderWithApollo(
+        RoomBoard,
+        [makeHappyAddRoomBoardItemMutationStub()],
+        {
+          propsData: { myId: MY_ID, roomId: ROOM_ID, items: [] },
+        }
+      );
+    });
+    it('lets me add an item', async () => {
       expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
       await userEvent.click(screen.getByRole('button', { name: /add/i }));
 
@@ -62,38 +63,23 @@ describe('<room-board />', () => {
     });
 
     it('sends an update when an item is created', async () => {
-      renderWithApollo(
-        RoomBoard,
-        [makeHappyAddRoomBoardItemMutationStub({
+      await userEvent.click(screen.getByRole('button', { name: /add/i }));
+
+      expect(renderedContext.queryMocks[0]).toHaveBeenCalledWith({
+        input: {
           roomId: ROOM_ID,
           itemId: expect.any(String),
           posX: DEFAULT_X,
           posY: DEFAULT_Y,
-        })],
-        {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [],
-          },
-        }
-      );
-
-      await userEvent.click(screen.getByRole('button', { name: /add/i }));
-
-      verifyAllWhenMocksCalled();
+        },
+      });
     });
   });
   describe('when locked', () => {
     it('allows moving a locked item if i locked it', async () => {
-      renderWithApollo(
+      const { queryMocks } = renderWithApollo(
         RoomBoard,
-        [
-          makeHappyLockRoomBoardItemMutationStub({
-            lockedBy: MY_ID,
-            id: ITEM_ID,
-          })
-        ],
+        [makeHappyLockRoomBoardItemMutationStub()],
         {
           propsData: {
             myId: MY_ID,
@@ -123,7 +109,14 @@ describe('<room-board />', () => {
         top:  20px;
         left: 30px;
       `);
+      expect(queryMocks[0]).toHaveBeenCalledWith({
+        input: {
+          lockedBy: MY_ID,
+          id: ITEM_ID,
+        },
+      });
     });
+
     it('does not register the interaction if it has been locked by somebody else', async () => {
       renderWithApollo(RoomBoard, [], {
         propsData: {
@@ -164,34 +157,9 @@ describe('<room-board />', () => {
   });
   describe('when starting to move', () => {
     it('locks the item', async () => {
-      const item = makeItem({ id: ITEM_ID, posX: 10, posY: 10 });
       const { queryMocks } = renderWithApollo(
         RoomBoard,
-        [
-          makeHappyLockRoomBoardItemMutationStub({
-            lockedBy: MY_ID,
-            id: ITEM_ID,
-          }),
-        ],
-        {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [item],
-          },
-        }
-      );
-
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-
-      verifyAllWhenMocksCalled();
-    });
-  });
-  describe('when moving', () => {
-    it('assigns the data-moving property item (vue-jest / jsdom do not support style tags)', async () => {
-      renderWithApollo(
-        RoomBoard,
-        [makeHappyLockRoomBoardItemMutationStub(), makeHappyUpdateRoomBoardItemMutationStub()],
+        [makeHappyLockRoomBoardItemMutationStub()],
         {
           propsData: {
             myId: MY_ID,
@@ -201,6 +169,24 @@ describe('<room-board />', () => {
         }
       );
 
+      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+
+      expect(queryMocks[0]).toHaveBeenCalledWith({
+        input: { lockedBy: MY_ID, id: ITEM_ID },
+      });
+    });
+  });
+  describe('when moving', () => {
+    beforeEach(() => {
+      renderWithApollo(RoomBoard, [makeHappyLockRoomBoardItemMutationStub()], {
+        propsData: {
+          myId: MY_ID,
+          roomId: ROOM_ID,
+          items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
+        },
+      });
+    });
+    it('assigns the data-moving property item (vue-jest / jsdom do not support style tags)', async () => {
       await fireEvent(
         screen.getByRole('listitem'),
         new PointerDownEvent({
@@ -212,20 +198,7 @@ describe('<room-board />', () => {
     });
 
     it('updates the position', async () => {
-      renderWithApollo(
-        RoomBoard,
-        [makeHappyLockRoomBoardItemMutationStub(), makeHappyUpdateRoomBoardItemMutationStub()],
-        {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-          },
-        }
-      );
-
       await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-
       await fireEvent(
         screen.getByRole('listitem'),
         new PointerMoveEvent({
@@ -241,21 +214,15 @@ describe('<room-board />', () => {
     });
   });
   describe('after moving', () => {
-    it('unlocks the item', async () => {
-      renderWithApollo(
+    let renderedContext: RenderResult;
+
+    beforeEach(async () => {
+      renderedContext = renderWithApollo(
         RoomBoard,
         [
-          makeHappyLockRoomBoardItemMutationStub({
-            lockedBy: MY_ID,
-            id: ITEM_ID,
-          }),
-          makeHappyUnlockRoomBoardItemMutationStub({
-            id: ITEM_ID,
-          }),
-          makeHappyUpdateRoomBoardItemMutationStub({
-            id: ROOM_ID,
-            items: [ { id: ITEM_ID, lockedBy: 'me', posX: 10, posY: 10 } ]
-          })
+          makeHappyLockRoomBoardItemMutationStub(),
+          makeHappyUnlockRoomBoardItemMutationStub(),
+          makeHappyUpdateRoomBoardItemsMutationStub(),
         ],
         {
           propsData: {
@@ -265,46 +232,18 @@ describe('<room-board />', () => {
           },
         }
       );
-
       await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+    });
+
+    it('unlocks the item', async () => {
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
 
-      verifyAllWhenMocksCalled();
+      expect(renderedContext.queryMocks[1]).toHaveBeenCalledWith({
+        input: { id: ITEM_ID },
+      });
     });
 
     it('mutates the item position', async () => {
-      renderWithApollo(
-        RoomBoard,
-        [
-          makeHappyLockRoomBoardItemMutationStub({
-            lockedBy: MY_ID,
-            id: ITEM_ID,
-          }),
-          makeHappyUpdateRoomBoardItemMutationStub({
-            id: ROOM_ID,
-            items: [
-              {
-                id: ITEM_ID,
-                posX: 30,
-                posY: 20,
-                lockedBy: MY_ID,
-              },
-            ],
-          }),
-          makeHappyUnlockRoomBoardItemMutationStub({
-            id: ITEM_ID,
-          })],
-        {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-          },
-        }
-      );
-
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-
       await fireEvent(
         screen.getByRole('listitem'),
         new PointerMoveEvent({
@@ -312,47 +251,18 @@ describe('<room-board />', () => {
           movementY: 10,
         })
       );
-
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
 
-      verifyAllWhenMocksCalled();
+      expect(renderedContext.queryMocks[2]).toHaveBeenCalledWith({
+        input: {
+          id: ROOM_ID,
+          items: [{ id: ITEM_ID, lockedBy: 'me', posX: 30, posY: 20 }],
+        },
+      });
     });
 
-    it('the item no longer has the data-moving attribute (vue-jest / jsdom do not support style tags)', async () => {
-      renderWithApollo(
-        RoomBoard,
-        [
-          makeHappyLockRoomBoardItemMutationStub({
-            lockedBy: MY_ID,
-            id: ITEM_ID,
-          }),
-          makeHappyUpdateRoomBoardItemMutationStub({
-            id: ROOM_ID,
-            items: [
-              {
-                id: ITEM_ID,
-                posX: 30,
-                posY: 20,
-                lockedBy: MY_ID,
-              },
-            ],
-          }),
-          makeHappyUnlockRoomBoardItemMutationStub({
-            id: ITEM_ID,
-          }),
-        ],
-        {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-          },
-        }
-      );
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-      await waitFor(() =>
-        expect(screen.getByRole('listitem')).toHaveAttribute('data-moving')
-      );
+    it('no longer has the data-moving attribute (vue-jest / jsdom do not support style tags)', async () => {
+      expect(screen.getByRole('listitem')).toHaveAttribute('data-moving');
       await fireEvent(
         screen.getByRole('listitem'),
         new PointerMoveEvent({
@@ -362,16 +272,14 @@ describe('<room-board />', () => {
       );
 
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
-      await waitFor(() =>
-        expect(screen.getByRole('listitem')).not.toHaveAttribute('data-moving')
-      );
+      expect(screen.getByRole('listitem')).not.toHaveAttribute('data-moving');
     });
   });
   describe('when props change', () => {
     it('updates based upon the new props', async () => {
       const { updateProps } = renderWithApollo(
         RoomBoard,
-        makeHappyUpdateRoomBoardItemMutationStub(),
+        makeHappyUpdateRoomBoardItemsMutationStub(),
         {
           propsData: {
             myId: MY_ID,

@@ -3,7 +3,7 @@ import {
   AddRoomBoardItemInput,
   LOCK_ROOM_BOARD_ITEM_MUTATION,
   UNLOCK_ROOM_BOARD_ITEM_MUTATION,
-  UPDATE_ROOM_BOARD_ITEM_MUTATION,
+  UPDATE_ROOM_BOARD_ITEMS_MUTATION,
   UpdateRoomBoardItemsInput,
 } from '@/components/Room/boardItemsGraphQL';
 
@@ -11,7 +11,7 @@ export const ITEM_ID = 'ITEM123';
 export const ROOM_ID = 'ROOM123';
 export const MY_ID = 'me';
 
-export const makeHappyUpdateRoomBoardItemMutationStub = (inputOverrides: Partial<UpdateRoomBoardItemsInput> = {}) => {
+export const makeHappyUpdateRoomBoardItemsMutationStub = (inputOverrides: Partial<UpdateRoomBoardItemsInput> = {}) => {
   const successData = {
     updateRoomBoardItems: {
       id: ITEM_ID,
@@ -19,7 +19,7 @@ export const makeHappyUpdateRoomBoardItemMutationStub = (inputOverrides: Partial
     },
   };
   return {
-    query: UPDATE_ROOM_BOARD_ITEM_MUTATION,
+    query: UPDATE_ROOM_BOARD_ITEMS_MUTATION,
     variables: {
       input: { ...inputOverrides },
     },
