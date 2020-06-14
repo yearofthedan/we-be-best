@@ -27,7 +27,7 @@ describe('room updates subscription', () => {
                     items {
                         id
                         posX
-                        posX
+                        posY
                         lockedBy
                     }
                 }

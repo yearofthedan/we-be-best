@@ -11,7 +11,7 @@ import resolveRoom, {
 } from './roomResolver';
 import RoomDataSource from './RoomDataSource';
 import Rooms, {RoomData} from './RoomDataSource';
-import {ROOM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
+import {ITEM_CHANGED_TOPIC, ROOM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
 import {
   buildAddItemInput,
   buildJoinRoomInput,
@@ -57,13 +57,14 @@ describe('roomResolver', () => {
         },
       );
 
-      expect(result.items).toContainEqual({
+      expect(result).toEqual({
         id: itemInput.itemId,
         posX: itemInput.posX,
         posY: itemInput.posY,
       });
-      expect(publishStub).toHaveBeenCalledWith(ROOM_CHANGED_TOPIC, {
-        roomUpdates: result,
+      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, {
+        item: result,
+        roomId:  'ROOM_123',
       });
     });
   });
@@ -106,7 +107,7 @@ describe('roomResolver', () => {
       const result = await unlockRoomBoardItem(
         undefined,
         {
-          input: buildUnlockItemInput({roomId: room.id, itemId: roomItemData.id, meId: 'me' })
+          input: buildUnlockItemInput({ id: roomItemData.id })
         },
         {
           pubSub: { publish: jest.fn(), dataSource: {Rooms: rooms} } as unknown as PubSub,
@@ -128,7 +129,7 @@ describe('roomResolver', () => {
       const result = await unlockRoomBoardItem(
         undefined,
         {
-          input: buildUnlockItemInput({roomId: room.id, itemId: roomItemData.id, meId: 'me' })
+          input: buildUnlockItemInput({ id: roomItemData.id })
         },
         {
           pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,

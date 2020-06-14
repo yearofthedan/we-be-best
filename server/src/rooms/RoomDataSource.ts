@@ -10,12 +10,14 @@ export interface RoomData {
   _id: string;
   id: string;
   members: string[];
-  items: {
-    id: string;
-    posY: number;
-    posX: number;
-    lockedBy?: string;
-  }[];
+  items: ItemData[];
+}
+
+export interface ItemData {
+  id: string;
+  posY: number;
+  posX: number;
+  lockedBy?: string;
 }
 
 class Rooms extends MongoDataSource<RoomData> {
@@ -40,14 +42,21 @@ class Rooms extends MongoDataSource<RoomData> {
   }
 
 
-  async addItem({itemId, roomId, posY, posX}: AddRoomBoardItemInput): Promise<RoomData> {
-    return (await this.collection.findOneAndUpdate(
+  async addItem({itemId, roomId, posY, posX}: AddRoomBoardItemInput): Promise<ItemData> {
+    const result = await this.collection.findOneAndUpdate(
       {id: roomId},
       { $push: { items: buildItem({id: itemId, posY, posX}) } },
       {
+        projection: {
+          items: {
+            $elemMatch: {id: itemId},
+          }
+        },
         returnOriginal: false,
       }
-    )).value;
+    );
+
+    return result.value.items[0];
   }
 
   async addMember(roomId: string, member: string): Promise<RoomData> {

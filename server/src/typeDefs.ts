@@ -54,6 +54,7 @@ const typeDefs = gql`
     type Subscription {
         roomUpdates(id: ID!): Room!
         roomMemberUpdates(id: ID!): Room!
+        itemUpdates(roomId: ID!): Item! 
     }
     
     type Mutation {
@@ -61,7 +62,7 @@ const typeDefs = gql`
         updateRoomBoardItems(input: UpdateRoomBoardItemsInput!): Room!
         lockRoomBoardItem(input: LockRoomBoardItemInput!): Room!
         unlockRoomBoardItem(input: UnlockRoomBoardItemInput!): Room!
-        addRoomBoardItem(input: AddRoomBoardItemInput!): Room!
+        addRoomBoardItem(input: AddRoomBoardItemInput!): Item!
     }
 `;
 

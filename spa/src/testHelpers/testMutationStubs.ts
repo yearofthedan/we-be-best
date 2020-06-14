@@ -52,15 +52,10 @@ export const makeHappyAddRoomBoardItemMutationStub = (
 ) => {
   const successData = {
     addRoomBoardItem: {
-      id: ROOM_ID,
-      items: [
-        {
-          id: ITEM_ID,
-          posX: 0,
-          posY: 0,
-          lockedBy: null
-        },
-      ],
+      id: ITEM_ID,
+      posX: 0,
+      posY: 0,
+      lockedBy: null
     },
   };
   return {

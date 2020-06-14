@@ -3,12 +3,14 @@ import gql from 'graphql-tag';
 export interface RoomData {
   id: string;
   members: string[];
-  items: {
-    id: string;
-    posX: number;
-    posY: number;
-    lockedBy?: string;
-  }[];
+  items: ItemData[];
+}
+
+export interface ItemData {
+  id: string;
+  posX: number;
+  posY: number;
+  lockedBy?: string;
 }
 
 export interface RoomMemberUpdatesSubscriptionData {
@@ -24,6 +26,21 @@ export const ROOM_MEMBER_UPDATES_SUBSCRIPTION = gql`
     roomMemberUpdates(id: $id) {
       id
       members
+    }
+  }
+`;
+
+export interface RoomItemUpdatesSubscriptionData {
+  itemUpdates: ItemData;
+}
+
+export const ROOM_ITEM_UPDATES_SUBSCRIPTION = gql`
+  subscription itemUpdates($roomId: ID!) {
+    itemUpdates(roomId: $roomId) {
+      id
+      posX
+      posY
+      lockedBy
     }
   }
 `;

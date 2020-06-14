@@ -1,6 +1,7 @@
 import Room from '@/components/Room/Room.vue';
 import {
   GET_ROOM_QUERY,
+  ROOM_ITEM_UPDATES_SUBSCRIPTION,
   ROOM_MEMBER_UPDATES_SUBSCRIPTION,
   ROOM_UPDATES_SUBSCRIPTION,
 } from '@/components/Room/roomGraphQLQuery';
@@ -26,7 +27,7 @@ describe('<room />', () => {
         roomUpdates: {
           id: '123',
           members: [makeRoomMember('my-name')],
-          items: [makeItem({ id: 'ITEM123' }), makeItem({ id: 'ITEM124' })],
+          items: [makeItem({ id: 'ITEM123' })],
         },
       },
     };
@@ -41,9 +42,21 @@ describe('<room />', () => {
       },
     };
 
+    const stubRoomItemUpdatesSubscription = {
+      query: ROOM_ITEM_UPDATES_SUBSCRIPTION,
+      successData: {
+        itemUpdates: makeItem({ id: '123' }),
+      },
+    };
+
     renderWithApollo(
       Room,
-      [stubQuery, stubRoomUpdateSubscription, stubRoomMemberUpdateSubscription],
+      [
+        stubQuery,
+        stubRoomUpdateSubscription,
+        stubRoomMemberUpdateSubscription,
+        stubRoomItemUpdatesSubscription,
+      ],
       {
         propsData: { roomId: '123', myId: 'me' },
       }

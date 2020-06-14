@@ -1,5 +1,5 @@
 import {PubSub} from 'apollo-server-express';
-import {DataSources, ROOM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
+import {DataSources, ITEM_CHANGED_TOPIC, ROOM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
 import {
   AddRoomBoardItemInput,
   LockRoomBoardItemInput, UnlockRoomBoardItemInput,
@@ -8,16 +8,17 @@ import {
 import {
   JoinRoomInput,
 } from '../../../spa/src/components/Room/roomGraphQLQuery';
-import {RoomResult} from './queryDefinitions';
+import {ItemResult, RoomResult} from './queryDefinitions';
 
 export const addRoomBoardItem = async (
   _: unknown,
   { input }: { input: AddRoomBoardItemInput },
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
-): Promise<RoomResult> => {
+): Promise<ItemResult> => {
   const result = await dataSources.Rooms.addItem(input);
-  await pubSub.publish(ROOM_CHANGED_TOPIC, {
-    roomUpdates: result
+  await pubSub.publish(ITEM_CHANGED_TOPIC, {
+    item: result,
+    roomId: input.roomId
   });
   return result;
 };

@@ -12,12 +12,14 @@ import roomMemberSubscriptionFilter from './rooms/roomMemberSubscriptionFilter';
 import Rooms from './rooms/RoomDataSource';
 import { MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import itemUpdatesSubscriptionFilter from './rooms/itemUpdatesSubscriptionFilter';
 
 export interface DataSources {
   Rooms: RoomDataSource;
 }
 
 export const ROOM_CHANGED_TOPIC = 'room_changed_topic';
+export const ITEM_CHANGED_TOPIC = 'item_changed_topic';
 export const ROOM_MEMBER_CHANGED_TOPIC = 'room_member_changed_topic';
 
 const pubSub = new PubSub();
@@ -45,6 +47,13 @@ const apolloServer = async () => {
       Subscription: {
         roomUpdates: {
           subscribe: async (_, __, {pubSub}) => pubSub.asyncIterator(ROOM_CHANGED_TOPIC)
+        },
+        itemUpdates: {
+          subscribe: withFilter(
+            () => pubSub.asyncIterator(ITEM_CHANGED_TOPIC),
+            itemUpdatesSubscriptionFilter,
+          ),
+          resolve: (payload) => payload.item
         },
         roomMemberUpdates: {
           subscribe: withFilter(

@@ -11,12 +11,9 @@ export const ADD_ROOM_BOARD_ITEM_MUTATION = gql`
   mutation addRoomBoardItem($input: AddRoomBoardItemInput!) {
     addRoomBoardItem(input: $input) {
       id
-      items {
-        id
-        posX
-        posY
-        lockedBy
-      }
+      posX
+      posY
+      lockedBy
     }
   }
 `;
