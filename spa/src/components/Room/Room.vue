@@ -31,6 +31,7 @@ import {
 import RoomBoard from '@/components/Room/RoomBoard.vue';
 import RoomMembers from '@/components/Room/RoomMembers.vue';
 import { ApolloError } from 'apollo-client';
+import { Item } from '@/components/Room/itemBuilder';
 
 interface RoomComponentProps {
   roomId: string;
@@ -41,6 +42,16 @@ interface RoomComponentData {
   error?: ApolloError | Error | null;
   room?: RoomData | null;
 }
+
+const upsertItem = (array: Item[], item: Item) => {
+  const index = array.findIndex(e => e.id === item.id);
+
+  if (index == -1) {
+    return [...array, item];
+  }
+
+  return [...array.slice(0, index), item, ...array.slice(index + 1)];
+};
 
 export default Vue.extend({
   name: 'room' as string,
@@ -131,15 +142,17 @@ export default Vue.extend({
             if (!currentRoom?.items) {
               return;
             }
-            return {
-              room: {
-                ...currentRoom,
-                items: [
-                  ...currentRoom?.items,
-                  subscriptionData.data.itemUpdates,
-                ],
-              },
-            };
+
+            if (currentRoom.items)
+              return {
+                room: {
+                  ...currentRoom,
+                  items: upsertItem(
+                    currentRoom.items,
+                    subscriptionData.data.itemUpdates
+                  ),
+                },
+              };
           },
         },
       ],

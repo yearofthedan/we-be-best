@@ -3,7 +3,7 @@ import {DataSources, ITEM_CHANGED_TOPIC, ROOM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED
 import {
   AddRoomBoardItemInput,
   LockRoomBoardItemInput, UnlockRoomBoardItemInput,
-  UpdateRoomBoardItemsInput,
+  MoveBoardItemInput,
 } from '../../../spa/src/components/Room/boardItemsGraphQL';
 import {
   JoinRoomInput,
@@ -47,16 +47,19 @@ export const unlockRoomBoardItem = async (
   return result;
 };
 
-export const updateRoomBoardItems = async (
+export const moveBoardItem = async (
   _: unknown,
-  { input }: { input: UpdateRoomBoardItemsInput },
+  { input }: { input: MoveBoardItemInput },
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
-): Promise<RoomResult> => {
-  const { _id, ...result } = await dataSources.Rooms.updateItems(input);
-  await pubSub.publish(ROOM_CHANGED_TOPIC, {
-    roomUpdates: result
+): Promise<ItemResult> => {
+  const { item, roomId } = await dataSources.Rooms.moveItem(input);
+
+  await pubSub.publish(ITEM_CHANGED_TOPIC, {
+    item,
+    roomId: roomId
   });
-  return result;
+
+  return item;
 };
 
 const resolveRoom = async (

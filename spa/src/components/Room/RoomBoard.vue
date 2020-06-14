@@ -22,8 +22,8 @@ import {
   LockRoomBoardItemInput,
   UNLOCK_ROOM_BOARD_ITEM_MUTATION,
   UnlockRoomBoardItemInput,
-  UPDATE_ROOM_BOARD_ITEMS_MUTATION,
-  UpdateRoomBoardItemsInput,
+  MOVE_BOARD_ITEM_MUTATION,
+  MoveBoardItemInput,
   ADD_ROOM_BOARD_ITEM_MUTATION,
   AddRoomBoardItemInput,
 } from './boardItemsGraphQL';
@@ -183,20 +183,15 @@ export default Vue.extend({
         this.interactions = {};
       }
 
-      //TODO just update the single item
-      const updateRoomBoardItemsPayload: UpdateRoomBoardItemsInput = {
-        id: this.roomId,
-        items: this.itemsData.map(entry => ({
-          id: entry.id,
-          lockedBy: entry.lockedBy,
-          posX: entry.posX,
-          posY: entry.posY,
-        })),
+      const updateRoomBoardItemsPayload: MoveBoardItemInput = {
+        id: item.id,
+        posX: item.posX,
+        posY: item.posY,
       };
 
       this.$apollo
         .mutate({
-          mutation: UPDATE_ROOM_BOARD_ITEMS_MUTATION,
+          mutation: MOVE_BOARD_ITEM_MUTATION,
           variables: {
             input: updateRoomBoardItemsPayload,
           },

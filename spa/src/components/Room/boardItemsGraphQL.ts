@@ -62,21 +62,19 @@ export interface ItemInput {
   lockedBy?: string;
 }
 
-export interface UpdateRoomBoardItemsInput {
+export interface MoveBoardItemInput {
   id: string;
-  items: ItemInput[];
+  posX: number;
+  posY: number;
 }
 
-export const UPDATE_ROOM_BOARD_ITEMS_MUTATION = gql`
-  mutation updateRoomBoardItems($input: UpdateRoomBoardItemsInput!) {
-    updateRoomBoardItems(input: $input) {
+export const MOVE_BOARD_ITEM_MUTATION = gql`
+  mutation moveBoardItem($input: MoveBoardItemInput!) {
+    moveBoardItem(input: $input) {
       id
-      items {
-        id
-        posX
-        posY
-        lockedBy
-      }
+      posX
+      posY
+      lockedBy
     }
   }
 `;

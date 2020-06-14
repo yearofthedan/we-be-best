@@ -7,7 +7,7 @@ import resolveRoom, {
   joinRoom,
   lockRoomBoardItem,
   unlockRoomBoardItem,
-  updateRoomBoardItems,
+  moveBoardItem,
 } from './roomResolver';
 import RoomDataSource from './RoomDataSource';
 import Rooms, {RoomData} from './RoomDataSource';
@@ -142,17 +142,14 @@ describe('roomResolver', () => {
       });
     });
   });
-  describe('updateRoomBoardItems', () => {
-    it('updates the room items', async () => {
-      const room = buildRoomData({id: 'ROOM_123', items: [], members: []});
+  describe('moveBoardItem', () => {
+    it('updates the item', async () => {
+      const room = buildRoomData({id: 'ROOM_123', items: [buildItemData({ id: 'item1'})]});
       await roomsCollection.insertOne({...room});
-      const result = await updateRoomBoardItems(
+      const result = await moveBoardItem(
         undefined,
         {
-          input: buildUpdateItemsInput({
-            id: 'ROOM_123',
-            items: [{ id: 'item1', posX: 0, posY: 0 }],
-          })
+          input: buildUpdateItemsInput({ id: 'item1', posX: 100, posY: 33 }),
         },
         {
           pubSub: { publish: jest.fn(), dataSource: {Rooms: rooms} } as unknown as PubSub,
@@ -160,27 +157,19 @@ describe('roomResolver', () => {
         },
       );
 
-      const expected = {
-        id: room.id,
-        items: [{ id: 'item1', posX: 0, posY: 0 }],
-        members: room.members
-      };
-
+      const expected = { id: 'item1', posX: 100, posY: 33, lockedBy: 'me' };
       expect(result).toEqual(expected);
     });
 
-    it('publishes an update after updating the items', async () => {
-      const room = buildRoomData();
+    it('publishes an update after updating', async () => {
+      const room = buildRoomData({ items: [buildItemData({id: 'item1'})]});
       await roomsCollection.insertOne({...room});
       const publishStub = jest.fn();
 
-      const result = await updateRoomBoardItems(
+      const result = await moveBoardItem(
         undefined,
         {
-          input: buildUpdateItemsInput({
-            id: room.id,
-            items: [{ id: 'item1', posX: 0, posY: 0 }],
-          })
+          input: buildUpdateItemsInput({ id: 'item1', posX: 0, posY: 0 }),
         },
         {
           pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
@@ -188,8 +177,9 @@ describe('roomResolver', () => {
         },
       );
 
-      expect(publishStub).toHaveBeenCalledWith(ROOM_CHANGED_TOPIC, {
-        roomUpdates: result,
+      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, {
+        item: result,
+        roomId: room.id
       });
     });
   });

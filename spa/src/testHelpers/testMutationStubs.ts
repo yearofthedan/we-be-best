@@ -3,23 +3,25 @@ import {
   AddRoomBoardItemInput,
   LOCK_ROOM_BOARD_ITEM_MUTATION,
   UNLOCK_ROOM_BOARD_ITEM_MUTATION,
-  UPDATE_ROOM_BOARD_ITEMS_MUTATION,
-  UpdateRoomBoardItemsInput,
+  MOVE_BOARD_ITEM_MUTATION,
+  MoveBoardItemInput,
 } from '@/components/Room/boardItemsGraphQL';
 
 export const ITEM_ID = 'ITEM123';
 export const ROOM_ID = 'ROOM123';
 export const MY_ID = 'me';
 
-export const makeHappyUpdateRoomBoardItemsMutationStub = (inputOverrides: Partial<UpdateRoomBoardItemsInput> = {}) => {
+export const makeHappyMoveBoardItemMutationStub = (inputOverrides: Partial<MoveBoardItemInput> = {}) => {
   const successData = {
-    updateRoomBoardItems: {
+    moveBoardItem: {
       id: ITEM_ID,
-      items: [],
+      posX: 0,
+      posY: 0,
+      lockedBy: null
     },
   };
   return {
-    query: UPDATE_ROOM_BOARD_ITEMS_MUTATION,
+    query: MOVE_BOARD_ITEM_MUTATION,
     variables: {
       input: { ...inputOverrides },
     },

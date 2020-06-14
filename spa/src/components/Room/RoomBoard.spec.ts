@@ -18,7 +18,7 @@ import {
   makeHappyAddRoomBoardItemMutationStub,
   makeHappyLockRoomBoardItemMutationStub,
   makeHappyUnlockRoomBoardItemMutationStub,
-  makeHappyUpdateRoomBoardItemsMutationStub,
+  makeHappyMoveBoardItemMutationStub,
   MY_ID,
   ROOM_ID,
 } from '@/testHelpers/testMutationStubs';
@@ -222,7 +222,7 @@ describe('<room-board />', () => {
         [
           makeHappyLockRoomBoardItemMutationStub(),
           makeHappyUnlockRoomBoardItemMutationStub(),
-          makeHappyUpdateRoomBoardItemsMutationStub(),
+          makeHappyMoveBoardItemMutationStub(),
         ],
         {
           propsData: {
@@ -254,10 +254,7 @@ describe('<room-board />', () => {
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
 
       expect(renderedContext.queryMocks[2]).toHaveBeenCalledWith({
-        input: {
-          id: ROOM_ID,
-          items: [{ id: ITEM_ID, lockedBy: 'me', posX: 30, posY: 20 }],
-        },
+        input: { id: ITEM_ID, posX: 30, posY: 20 },
       });
     });
 
@@ -279,7 +276,7 @@ describe('<room-board />', () => {
     it('updates based upon the new props', async () => {
       const { updateProps } = renderWithApollo(
         RoomBoard,
-        makeHappyUpdateRoomBoardItemsMutationStub(),
+        makeHappyMoveBoardItemMutationStub(),
         {
           propsData: {
             myId: MY_ID,

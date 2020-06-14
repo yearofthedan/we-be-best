@@ -2,7 +2,7 @@ import {MongoDataSource} from 'apollo-datasource-mongodb';
 import {
   AddRoomBoardItemInput,
   LockRoomBoardItemInput, UnlockRoomBoardItemInput,
-  UpdateRoomBoardItemsInput,
+  MoveBoardItemInput,
 } from '../../../spa/src/components/Room/boardItemsGraphQL';
 import buildItem from './itemBuilder';
 
@@ -31,16 +31,23 @@ class Rooms extends MongoDataSource<RoomData> {
     return room;
   }
 
-  async updateItems(update: UpdateRoomBoardItemsInput): Promise<RoomData> {
-    return (await this.collection.findOneAndUpdate(
-      {id: update.id},
-      { $set: { items: update.items } },
+  async moveItem({ id, posX, posY}: MoveBoardItemInput): Promise<{ item: ItemData; roomId: string }> {
+    const result = await this.collection.findOneAndUpdate(
       {
-        returnOriginal: false,
+        'items.id': id,
+        items: { $elemMatch: { id } }
+      },
+      { $set: { 'items.$.posX' : posX, 'items.$.posY' : posY } },
+      {
+        returnOriginal: false
       }
-    )).value;
-  }
+    );
 
+    return {
+      item: result.value.items[0],
+      roomId: result.value.id
+    };
+  }
 
   async addItem({itemId, roomId, posY, posX}: AddRoomBoardItemInput): Promise<ItemData> {
     const result = await this.collection.findOneAndUpdate(

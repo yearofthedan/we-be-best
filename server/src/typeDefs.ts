@@ -8,9 +8,10 @@ const typeDefs = gql`
         lockedBy: String
     }
 
-    input UpdateRoomBoardItemsInput {
-        id: ID!
-        items: [ItemInput]!
+    input MoveBoardItemInput {
+        id: String!
+        posX: Int!
+        posY: Int!
     }
 
     input LockRoomBoardItemInput {
@@ -59,7 +60,7 @@ const typeDefs = gql`
     
     type Mutation {
         joinRoom(input: JoinRoomInput!): Room!
-        updateRoomBoardItems(input: UpdateRoomBoardItemsInput!): Room!
+        moveBoardItem(input: MoveBoardItemInput!): Item!
         lockRoomBoardItem(input: LockRoomBoardItemInput!): Room!
         unlockRoomBoardItem(input: UnlockRoomBoardItemInput!): Room!
         addRoomBoardItem(input: AddRoomBoardItemInput!): Item!
