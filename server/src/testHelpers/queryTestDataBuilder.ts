@@ -21,9 +21,7 @@ export const buildLockItemInput = (overrides: Partial<LockRoomBoardItemInput> = 
 });
 
 export const buildUnlockItemInput = (overrides: Partial<UnlockRoomBoardItemInput> = {}): UnlockRoomBoardItemInput => ({
-  roomId: 'ROOM_123',
-  itemId: 'item1',
-  meId: 'me-id',
+  id: 'item1',
   ...overrides
 });
 

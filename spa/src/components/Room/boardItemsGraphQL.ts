@@ -22,9 +22,7 @@ export const ADD_ROOM_BOARD_ITEM_MUTATION = gql`
 `;
 
 export interface UnlockRoomBoardItemInput {
-  roomId: string;
-  itemId: string;
-  meId: string;
+  id: string;
 }
 
 export const UNLOCK_ROOM_BOARD_ITEM_MUTATION = gql`

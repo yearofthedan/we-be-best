@@ -68,7 +68,7 @@ class Rooms extends MongoDataSource<RoomData> {
      return (await this.collection.findOneAndUpdate(
       {
         'items.id': id,
-        items: { $elemMatch: { id: id } }
+        items: { $elemMatch: { id } }
       },
       { $set: { 'items.$.lockedBy' : lockedBy } },
       {
@@ -77,11 +77,11 @@ class Rooms extends MongoDataSource<RoomData> {
     )).value;
   }
 
-  async unlockItem({itemId, roomId}: UnlockRoomBoardItemInput): Promise<RoomData> {
+  async unlockItem({id}: UnlockRoomBoardItemInput): Promise<RoomData> {
     return (await this.collection.findOneAndUpdate(
       {
-        id: roomId,
-        items: {$elemMatch: {id: itemId}}
+        'items.id': id,
+        items: { $elemMatch: { id } }
       },
       {
         $set: {'items.$.lockedBy': undefined}

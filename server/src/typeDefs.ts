@@ -19,9 +19,7 @@ const typeDefs = gql`
     }
     
     input UnlockRoomBoardItemInput {
-        roomId: ID!
-        itemId: ID!
-        meId: ID!
+        id: ID!
     }
     
     input AddRoomBoardItemInput {

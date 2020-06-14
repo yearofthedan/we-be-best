@@ -193,6 +193,7 @@ export default Vue.extend({
           posY: entry.posY,
         })),
       };
+
       this.$apollo
         .mutate({
           mutation: UPDATE_ROOM_BOARD_ITEM_MUTATION,
@@ -205,9 +206,7 @@ export default Vue.extend({
         });
 
       const mutationPayload: UnlockRoomBoardItemInput = {
-        roomId: this.roomId,
-        itemId: item.id,
-        meId: this.myId,
+        id: item.id,
       };
       this.$apollo
         .mutate({

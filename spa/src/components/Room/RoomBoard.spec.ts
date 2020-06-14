@@ -10,126 +10,27 @@ import {
   PointerMoveEvent,
   PointerUpEvent,
 } from '@/testHelpers/jsdomFriendlyPointerEvents';
-import {
-  ADD_ROOM_BOARD_ITEM_MUTATION,
-  AddRoomBoardItemInput,
-  LOCK_ROOM_BOARD_ITEM_MUTATION,
-  UNLOCK_ROOM_BOARD_ITEM_MUTATION,
-  UPDATE_ROOM_BOARD_ITEM_MUTATION,
-} from '@/components/Room/boardItemsGraphQL';
+import { AddRoomBoardItemInput } from '@/components/Room/boardItemsGraphQL';
 import { makeItem } from '@/testHelpers/testData';
 import userEvent from '@testing-library/user-event';
-import buildItem, {
-  DEFAULT_X,
-  DEFAULT_Y,
-  Item,
-} from '@/components/Room/itemBuilder';
-
-const ITEM_ID = 'ITEM123';
-const ROOM_ID = 'ROOM123';
-const MY_ID = 'me';
-
-function makeHappyUpdateRoomBoardItemMutationStub(items?: Item[]) {
-  const successData = {
-    updateRoomBoardItems: {
-      id: ITEM_ID,
-      items: [],
-    },
-  };
-  return {
-    query: UPDATE_ROOM_BOARD_ITEM_MUTATION,
-    variables: {
-      input: {
-        id: ROOM_ID,
-        items: items || [
-          {
-            id: ITEM_ID,
-            lockedBy: MY_ID,
-            posY: 20,
-            posX: 30,
-          },
-        ],
-      },
-    },
-    successData,
-  };
-}
-
-function makeHappyLockRoomBoardItemMutationStub(
-  overrides = {
-    id: 'item1',
-    lockedBy: 'me',
-  }
-) {
-  const successData = {
-    lockRoomBoardItem: {
-      id: ITEM_ID,
-      items: [],
-    },
-  };
-  return {
-    query: LOCK_ROOM_BOARD_ITEM_MUTATION,
-    variables: {
-      input: { ...overrides },
-    },
-    successData,
-  };
-}
-
-function makeHappyAddRoomBoardItemMutationStub(
-  overrides?: Partial<AddRoomBoardItemInput>
-) {
-  const successData = {
-    addRoomBoardItem: {
-      id: ROOM_ID,
-      items: [
-        {
-          id: ITEM_ID,
-          posX: 0,
-          posY: 0,
-        },
-      ],
-    },
-  };
-  return {
-    query: ADD_ROOM_BOARD_ITEM_MUTATION,
-    variables: {
-      input: {
-        ...buildItem(),
-        itemId: ITEM_ID,
-        roomId: ROOM_ID,
-        ...overrides,
-      },
-    },
-    successData,
-  };
-}
-
-function makeHappyUnlockRoomBoardItemMutationStub(
-  overrides = {
-    roomId: '123',
-    itemId: 'item1',
-    meId: 'me',
-  }
-) {
-  const successData = {
-    unlockRoomBoardItem: {
-      id: ITEM_ID,
-      items: [],
-    },
-  };
-  return {
-    query: UNLOCK_ROOM_BOARD_ITEM_MUTATION,
-    variables: {
-      input: { ...overrides },
-    },
-    successData,
-  };
-}
+import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/itemBuilder';
+import {
+  ITEM_ID,
+  makeHappyAddRoomBoardItemMutationStub,
+  makeHappyLockRoomBoardItemMutationStub,
+  makeHappyUnlockRoomBoardItemMutationStub,
+  makeHappyUpdateRoomBoardItemMutationStub,
+  MY_ID,
+  ROOM_ID,
+} from '@/testHelpers/testMutationStubs';
+import {resetAllWhenMocks, verifyAllWhenMocksCalled} from 'jest-when';
 
 describe('<room-board />', () => {
+  beforeEach(() => {
+    resetAllWhenMocks();
+  })
   it('renders a item defaulting at 10px by 10px', () => {
-    renderWithApollo(RoomBoard, [makeHappyUpdateRoomBoardItemMutationStub()], {
+    renderWithApollo(RoomBoard, [], {
       propsData: {
         myId: MY_ID,
         roomId: ROOM_ID,
@@ -145,7 +46,12 @@ describe('<room-board />', () => {
 
   describe('when adding an item', () => {
     it('lets me add an item', async () => {
-      renderWithApollo(RoomBoard, [makeHappyAddRoomBoardItemMutationStub()], {
+      renderWithApollo(RoomBoard, [makeHappyAddRoomBoardItemMutationStub({
+        roomId: ROOM_ID,
+        itemId: expect.any(String),
+        posX: DEFAULT_X,
+        posY: DEFAULT_Y,
+      })], {
         propsData: { myId: MY_ID, roomId: ROOM_ID, items: [] },
       });
 
@@ -156,9 +62,14 @@ describe('<room-board />', () => {
     });
 
     it('sends an update when an item is created', async () => {
-      const { queryMocks } = renderWithApollo(
+      renderWithApollo(
         RoomBoard,
-        [makeHappyAddRoomBoardItemMutationStub()],
+        [makeHappyAddRoomBoardItemMutationStub({
+          roomId: ROOM_ID,
+          itemId: expect.any(String),
+          posX: DEFAULT_X,
+          posY: DEFAULT_Y,
+        })],
         {
           propsData: {
             myId: MY_ID,
@@ -170,18 +81,7 @@ describe('<room-board />', () => {
 
       await userEvent.click(screen.getByRole('button', { name: /add/i }));
 
-      const expectedMutationVars: { input: AddRoomBoardItemInput } = {
-        input: {
-          roomId: ROOM_ID,
-          itemId: expect.any(String),
-          posX: DEFAULT_X,
-          posY: DEFAULT_Y,
-        },
-      };
-
-      await waitFor(() =>
-        expect(queryMocks[0]).toHaveBeenCalledWith(expectedMutationVars)
-      );
+      verifyAllWhenMocksCalled();
     });
   });
   describe('when locked', () => {
@@ -192,13 +92,7 @@ describe('<room-board />', () => {
           makeHappyLockRoomBoardItemMutationStub({
             lockedBy: MY_ID,
             id: ITEM_ID,
-          }),
-          makeHappyUpdateRoomBoardItemMutationStub(),
-          makeHappyUnlockRoomBoardItemMutationStub({
-            meId: MY_ID,
-            itemId: ITEM_ID,
-            roomId: ROOM_ID,
-          }),
+          })
         ],
         {
           propsData: {
@@ -290,20 +184,14 @@ describe('<room-board />', () => {
 
       await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
 
-      const expectedMutationVars = {
-        input: { lockedBy: MY_ID, id: ITEM_ID },
-      };
-
-      await waitFor(() =>
-        expect(queryMocks[0]).toHaveBeenCalledWith(expectedMutationVars)
-      );
+      verifyAllWhenMocksCalled();
     });
   });
   describe('when moving', () => {
     it('assigns the data-moving property item (vue-jest / jsdom do not support style tags)', async () => {
       renderWithApollo(
         RoomBoard,
-        [makeHappyUpdateRoomBoardItemMutationStub()],
+        [makeHappyLockRoomBoardItemMutationStub(), makeHappyUpdateRoomBoardItemMutationStub()],
         {
           propsData: {
             myId: MY_ID,
@@ -326,7 +214,7 @@ describe('<room-board />', () => {
     it('updates the position', async () => {
       renderWithApollo(
         RoomBoard,
-        [makeHappyUpdateRoomBoardItemMutationStub()],
+        [makeHappyLockRoomBoardItemMutationStub(), makeHappyUpdateRoomBoardItemMutationStub()],
         {
           propsData: {
             myId: MY_ID,
@@ -354,7 +242,7 @@ describe('<room-board />', () => {
   });
   describe('after moving', () => {
     it('unlocks the item', async () => {
-      const { queryMocks } = renderWithApollo(
+      renderWithApollo(
         RoomBoard,
         [
           makeHappyLockRoomBoardItemMutationStub({
@@ -362,16 +250,18 @@ describe('<room-board />', () => {
             id: ITEM_ID,
           }),
           makeHappyUnlockRoomBoardItemMutationStub({
-            meId: MY_ID,
-            itemId: ITEM_ID,
-            roomId: ROOM_ID,
+            id: ITEM_ID,
           }),
+          makeHappyUpdateRoomBoardItemMutationStub({
+            id: ROOM_ID,
+            items: [ { id: ITEM_ID, lockedBy: 'me', posX: 10, posY: 10 } ]
+          })
         ],
         {
           propsData: {
             myId: MY_ID,
             roomId: ROOM_ID,
-            items: [{ id: ITEM_ID, posX: 10, posY: 10 }],
+            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
           },
         }
       );
@@ -379,29 +269,31 @@ describe('<room-board />', () => {
       await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
 
-      expect(await queryMocks[0]).toHaveBeenCalledWith({
-        input: { lockedBy: MY_ID, id: ITEM_ID },
-      });
-      expect(await queryMocks[1]).toHaveBeenCalledWith({
-        input: { meId: MY_ID, itemId: ITEM_ID, roomId: ROOM_ID },
-      });
+      verifyAllWhenMocksCalled();
     });
 
     it('mutates the item position', async () => {
-      const { queryMocks } = renderWithApollo(
+      renderWithApollo(
         RoomBoard,
         [
           makeHappyLockRoomBoardItemMutationStub({
             lockedBy: MY_ID,
             id: ITEM_ID,
           }),
-          makeHappyUpdateRoomBoardItemMutationStub(),
-          makeHappyUnlockRoomBoardItemMutationStub({
-            meId: MY_ID,
-            itemId: ITEM_ID,
-            roomId: ROOM_ID,
+          makeHappyUpdateRoomBoardItemMutationStub({
+            id: ROOM_ID,
+            items: [
+              {
+                id: ITEM_ID,
+                posX: 30,
+                posY: 20,
+                lockedBy: MY_ID,
+              },
+            ],
           }),
-        ],
+          makeHappyUnlockRoomBoardItemMutationStub({
+            id: ITEM_ID,
+          })],
         {
           propsData: {
             myId: MY_ID,
@@ -423,21 +315,7 @@ describe('<room-board />', () => {
 
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
 
-      const expectedMutationVars = {
-        input: {
-          id: ROOM_ID,
-          items: [
-            {
-              id: ITEM_ID,
-              posX: 30,
-              posY: 20,
-              lockedBy: MY_ID,
-            },
-          ],
-        },
-      };
-
-      expect(await queryMocks[1]).toHaveBeenCalledWith(expectedMutationVars);
+      verifyAllWhenMocksCalled();
     });
 
     it('the item no longer has the data-moving attribute (vue-jest / jsdom do not support style tags)', async () => {
@@ -448,11 +326,19 @@ describe('<room-board />', () => {
             lockedBy: MY_ID,
             id: ITEM_ID,
           }),
-          makeHappyUpdateRoomBoardItemMutationStub(),
+          makeHappyUpdateRoomBoardItemMutationStub({
+            id: ROOM_ID,
+            items: [
+              {
+                id: ITEM_ID,
+                posX: 30,
+                posY: 20,
+                lockedBy: MY_ID,
+              },
+            ],
+          }),
           makeHappyUnlockRoomBoardItemMutationStub({
-            meId: MY_ID,
-            itemId: ITEM_ID,
-            roomId: ROOM_ID,
+            id: ITEM_ID,
           }),
         ],
         {
