@@ -6,6 +6,7 @@ import {
   MOVE_BOARD_ITEM_MUTATION,
   MoveBoardItemInput,
 } from '@/components/Room/boardItemsGraphQL';
+import {makeItem} from '@/testHelpers/testData';
 
 export const ITEM_ID = 'ITEM123';
 export const ROOM_ID = 'ROOM123';
@@ -35,10 +36,7 @@ export const makeHappyLockRoomBoardItemMutationStub = (
   }
 ) => {
   const successData = {
-    lockRoomBoardItem: {
-      id: ITEM_ID,
-      items: [],
-    },
+    lockRoomBoardItem: makeItem(),
   };
   return {
     query: LOCK_ROOM_BOARD_ITEM_MUTATION,
@@ -77,10 +75,7 @@ export const makeHappyAddRoomBoardItemMutationStub = (
 
 export const makeHappyUnlockRoomBoardItemMutationStub = (inputOverrides = { id: 'item1' }) => {
   const successData = {
-    unlockRoomBoardItem: {
-      id: ITEM_ID,
-      items: [],
-    },
+    unlockRoomBoardItem: makeItem(),
   };
   return {
     query: UNLOCK_ROOM_BOARD_ITEM_MUTATION,

@@ -26,12 +26,9 @@ export const UNLOCK_ROOM_BOARD_ITEM_MUTATION = gql`
   mutation unlockRoomBoardItem($input: UnlockRoomBoardItemInput!) {
     unlockRoomBoardItem(input: $input) {
       id
-      items {
-        id
-        posX
-        posY
-        lockedBy
-      }
+      posX
+      posY
+      lockedBy
     }
   }
 `;
@@ -45,12 +42,9 @@ export const LOCK_ROOM_BOARD_ITEM_MUTATION = gql`
   mutation lockRoomBoardItem($input: LockRoomBoardItemInput!) {
     lockRoomBoardItem(input: $input) {
       id
-      items {
-        id
-        posX
-        posY
-        lockedBy
-      }
+      posX
+      posY
+      lockedBy
     }
   }
 `;
