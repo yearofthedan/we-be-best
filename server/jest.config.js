@@ -18,5 +18,6 @@ module.exports = {
     'dist',
   ],
   testEnvironment: 'node',
+  coveragePathIgnorePatterns: ['<rootDir>/src/testHelpers'],
   preset: 'ts-jest',
 };

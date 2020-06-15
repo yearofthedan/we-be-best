@@ -19,9 +19,9 @@
   },
   "dependencies": {
     "apollo-datasource-mongodb": "^0.2.6",
-    "apollo-server-express": "^2.13.1",
+    "apollo-server-express": "^2.14.4",
     "express": "^4.17.1",
-    "graphql": "^15.0.0",
+    "graphql": "^15.1.0",
     "graphql-subscriptions": "^1.1.0",
     "graphql-tag": "^2.10.3",
     "mongodb-memory-server": "^6.6.1"
@@ -37,7 +37,7 @@
     "apollo-cache-inmemory": "^1.6.6",
     "apollo-client": "^2.6.10",
     "apollo-link-ws": "^1.0.20",
-    "apollo-server-testing": "^2.12.0",
+    "apollo-server-testing": "^2.14.4",
     "concurrently": "^5.2.0",
     "eslint": "^7.2.0",
     "jest": "^26.0.1",
