@@ -1,5 +1,5 @@
 import {PubSub} from 'apollo-server-express';
-import {DataSources, ITEM_CHANGED_TOPIC, ROOM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
+import {DataSources, ITEM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
 import {
   AddRoomBoardItemInput,
   LockRoomBoardItemInput, UnlockRoomBoardItemInput,

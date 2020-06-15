@@ -22,7 +22,6 @@ import {
   GET_ROOM_QUERY,
   GetRoomQueryData,
   ROOM_MEMBER_UPDATES_SUBSCRIPTION,
-  ROOM_UPDATES_SUBSCRIPTION,
   RoomData,
   RoomMemberUpdatesSubscriptionData,
   ROOM_ITEM_UPDATES_SUBSCRIPTION,
@@ -83,25 +82,6 @@ export default Vue.extend({
         return { id: this.roomId };
       },
       subscribeToMore: [
-        {
-          document: ROOM_UPDATES_SUBSCRIPTION,
-          variables: function(): { id: string } {
-            return { id: ((this as unknown) as RoomComponentProps).roomId };
-          },
-          onError(error: ApolloError) {
-            ((this as unknown) as RoomComponentData).error = error;
-          },
-          updateQuery(
-            previousResult: GetRoomQueryData,
-            {
-              subscriptionData,
-            }: { subscriptionData: { data: { roomUpdates: RoomData } } }
-          ) {
-            return {
-              room: subscriptionData.data.roomUpdates,
-            };
-          },
-        },
         {
           document: ROOM_MEMBER_UPDATES_SUBSCRIPTION,
           variables: function(): { id: string } {

@@ -18,7 +18,6 @@ export interface DataSources {
   Rooms: RoomDataSource;
 }
 
-export const ROOM_CHANGED_TOPIC = 'room_changed_topic';
 export const ITEM_CHANGED_TOPIC = 'item_changed_topic';
 export const ROOM_MEMBER_CHANGED_TOPIC = 'room_member_changed_topic';
 
@@ -45,9 +44,6 @@ const apolloServer = async () => {
         room: resolveRoom,
       },
       Subscription: {
-        roomUpdates: {
-          subscribe: async (_, __, {pubSub}) => pubSub.asyncIterator(ROOM_CHANGED_TOPIC)
-        },
         itemUpdates: {
           subscribe: withFilter(
             () => pubSub.asyncIterator(ITEM_CHANGED_TOPIC),

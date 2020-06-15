@@ -45,21 +45,6 @@ export const ROOM_ITEM_UPDATES_SUBSCRIPTION = gql`
   }
 `;
 
-export const ROOM_UPDATES_SUBSCRIPTION = gql`
-  subscription roomUpdates($id: ID!) {
-    roomUpdates(id: $id) {
-      id
-      members
-      items {
-        id
-        posX
-        posY
-        lockedBy
-      }
-    }
-  }
-`;
-
 export const GET_ROOM_QUERY = gql`
   query room($id: ID!) {
     room(id: $id) {

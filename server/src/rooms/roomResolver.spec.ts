@@ -11,7 +11,7 @@ import resolveRoom, {
 } from './roomResolver';
 import RoomDataSource from './RoomDataSource';
 import Rooms, {RoomData} from './RoomDataSource';
-import {ITEM_CHANGED_TOPIC, ROOM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
+import {ITEM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
 import {
   buildAddItemInput,
   buildJoinRoomInput,

@@ -3,7 +3,6 @@ import {
   GET_ROOM_QUERY,
   ROOM_ITEM_UPDATES_SUBSCRIPTION,
   ROOM_MEMBER_UPDATES_SUBSCRIPTION,
-  ROOM_UPDATES_SUBSCRIPTION,
 } from '@/components/Room/roomGraphQLQuery';
 import { renderWithApollo, screen } from '@/testHelpers/renderer';
 import { makeItem, makeRoomMember } from '@/testHelpers/testData';
@@ -14,17 +13,6 @@ describe('<room />', () => {
       query: GET_ROOM_QUERY,
       successData: {
         room: {
-          id: '123',
-          members: [makeRoomMember('my-name')],
-          items: [makeItem({ id: 'ITEM123' })],
-        },
-      },
-    };
-
-    const stubRoomUpdateSubscription = {
-      query: ROOM_UPDATES_SUBSCRIPTION,
-      successData: {
-        roomUpdates: {
           id: '123',
           members: [makeRoomMember('my-name')],
           items: [makeItem({ id: 'ITEM123' })],
@@ -53,7 +41,6 @@ describe('<room />', () => {
       Room,
       [
         stubQuery,
-        stubRoomUpdateSubscription,
         stubRoomMemberUpdateSubscription,
         stubRoomItemUpdatesSubscription,
       ],
