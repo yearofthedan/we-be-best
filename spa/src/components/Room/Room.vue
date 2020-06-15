@@ -43,7 +43,7 @@ interface RoomComponentData {
 }
 
 const upsertItem = (array: Item[], item: Item) => {
-  const index = array.findIndex(e => e.id === item.id);
+  const index = array.findIndex((e) => e.id === item.id);
 
   if (index == -1) {
     return [...array, item];
@@ -68,7 +68,7 @@ export default Vue.extend({
       required: true,
     },
   },
-  data: function(): RoomComponentData {
+  data: function (): RoomComponentData {
     return {
       loading: null,
       error: null,
@@ -84,7 +84,7 @@ export default Vue.extend({
       subscribeToMore: [
         {
           document: ROOM_MEMBER_UPDATES_SUBSCRIPTION,
-          variables: function(): { id: string } {
+          variables: function (): { id: string } {
             return { id: ((this as unknown) as RoomComponentProps).roomId };
           },
           onError(error: ApolloError) {
@@ -106,7 +106,7 @@ export default Vue.extend({
         },
         {
           document: ROOM_ITEM_UPDATES_SUBSCRIPTION,
-          variables: function(): { roomId: string } {
+          variables: function (): { roomId: string } {
             return { roomId: ((this as unknown) as RoomComponentProps).roomId };
           },
           onError(error: ApolloError) {

@@ -16,7 +16,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    _onJoined: function(params: { roomName: string; memberName: string }) {
+    _onJoined: function (params: { roomName: string; memberName: string }) {
       this.roomId = params.roomName;
       this.memberName = params.memberName;
     },

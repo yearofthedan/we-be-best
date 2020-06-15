@@ -41,7 +41,7 @@ export default Vue.extend({
     },
   },
   computed: {
-    styleObject: function() {
+    styleObject: function () {
       return {
         left: `${this.posX}px`,
         top: `${this.posY}px`,
@@ -49,7 +49,7 @@ export default Vue.extend({
     },
   },
   methods: {
-    _onPointerDown: function(event: PointerEvent): void {
+    _onPointerDown: function (event: PointerEvent): void {
       if (this.lockedBy) {
         return;
       }

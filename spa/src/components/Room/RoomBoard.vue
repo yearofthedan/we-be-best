@@ -55,11 +55,11 @@ export default Vue.extend({
     },
   },
   watch: {
-    items: function(newVal) {
+    items: function (newVal) {
       this.itemsData = newVal;
     },
   },
-  data: function(): {
+  data: function (): {
     itemsData: Item[];
     interactions: { [interactionId: string]: Interaction };
     movingItemIds: string[];
@@ -75,7 +75,7 @@ export default Vue.extend({
     window.addEventListener('pointerup', this._onPointerUp);
   },
   methods: {
-    _onAddItem: function(): void {
+    _onAddItem: function (): void {
       const newItem = buildItem();
       this.itemsData = [...this.itemsData, newItem];
 
@@ -92,16 +92,16 @@ export default Vue.extend({
             input: mutationPayload,
           },
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error);
         });
     },
-    _onPointerUp: function({ pointerId }: PointerEvent): void {
+    _onPointerUp: function ({ pointerId }: PointerEvent): void {
       this._onBoardItemInteractionFinish({
         interactionId: pointerId.toString(),
       });
     },
-    _onPointerMove: function({
+    _onPointerMove: function ({
       pointerId,
       movementX,
       movementY,
@@ -112,7 +112,7 @@ export default Vue.extend({
         movementY,
       });
     },
-    _onBoardItemInteractionStart: function(
+    _onBoardItemInteractionStart: function (
       payload: InteractionStartEventPayload
     ) {
       this.interactions = {
@@ -135,11 +135,11 @@ export default Vue.extend({
             input: mutationPayload,
           },
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error);
         });
     },
-    _onBoardItemInteractionMoved: function({
+    _onBoardItemInteractionMoved: function ({
       interactionId,
       movementX,
       movementY,
@@ -149,7 +149,9 @@ export default Vue.extend({
         return;
       }
 
-      const index = this.itemsData.findIndex(e => e.id === interaction.itemId);
+      const index = this.itemsData.findIndex(
+        (e) => e.id === interaction.itemId
+      );
       this.itemsData = [
         ...this.itemsData.slice(0, index),
         {
@@ -161,7 +163,7 @@ export default Vue.extend({
         ...this.itemsData.slice(index + 1),
       ];
     },
-    _onBoardItemInteractionFinish: function({
+    _onBoardItemInteractionFinish: function ({
       interactionId,
     }: InteractionEndEventPayload): void {
       const interaction = this.interactions[interactionId];
@@ -170,7 +172,7 @@ export default Vue.extend({
         return;
       }
 
-      const item = this.itemsData.find(i => i.id === interaction.itemId);
+      const item = this.itemsData.find((i) => i.id === interaction.itemId);
 
       if (!item) {
         return;
@@ -178,7 +180,7 @@ export default Vue.extend({
 
       if (this.interactions[interactionId]) {
         this.movingItemIds = this.movingItemIds.filter(
-          id => id !== this.interactions[interactionId].itemId
+          (id) => id !== this.interactions[interactionId].itemId
         );
         this.interactions = {};
       }
@@ -196,7 +198,7 @@ export default Vue.extend({
             input: updateRoomBoardItemsPayload,
           },
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error);
         });
 
@@ -210,7 +212,7 @@ export default Vue.extend({
             input: mutationPayload,
           },
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error);
         });
     },
