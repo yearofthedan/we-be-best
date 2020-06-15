@@ -86,15 +86,12 @@ describe('roomResolver', () => {
         },
       );
 
-      const expected = {
-        id: room.id,
-        items: [{ ...roomItemData, lockedBy: 'me' }],
-        members: room.members
-      };
+      const expected = { ...roomItemData, lockedBy: 'me' };
 
       expect(result).toEqual(expected);
-      expect(publishStub).toHaveBeenCalledWith(ROOM_CHANGED_TOPIC, {
-        roomUpdates: expected,
+      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, {
+        item: expected,
+        roomId: 'ROOM_123'
       });
     });
   });
@@ -115,9 +112,9 @@ describe('roomResolver', () => {
         },
       );
 
-      const expected = [{ ...roomItemData, lockedBy: null as string }];
+      const expected = { ...roomItemData, lockedBy: null as string };
 
-      expect(result.items).toEqual(expected);
+      expect(result).toEqual(expected);
     });
 
     it('publishes an update when the item is unlocked', async () => {
@@ -137,8 +134,9 @@ describe('roomResolver', () => {
         },
       );
 
-      expect(publishStub).toHaveBeenCalledWith(ROOM_CHANGED_TOPIC, {
-        roomUpdates: result,
+      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, {
+        item: result,
+        roomId: room.id
       });
     });
   });

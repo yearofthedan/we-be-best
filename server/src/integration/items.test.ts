@@ -119,6 +119,23 @@ describe('integration: items', () => {
 
         await apolloClient.mutate({
           mutation: gql`
+              mutation addRoomBoardItem($input: AddRoomBoardItemInput!) {
+                  addRoomBoardItem(input: $input)  {
+                      id
+                  }
+              }`,
+          variables: {
+            input: {
+              roomId: '123',
+              itemId: 'item123',
+              posX: 10,
+              posY: 10,
+            }
+          }
+        });
+
+        await apolloClient.mutate({
+          mutation: gql`
               mutation moveBoardItem($input: MoveBoardItemInput!) {
                   moveBoardItem(input: $input)  {
                       id
@@ -138,4 +155,167 @@ describe('integration: items', () => {
       expect(result.data.itemUpdates.id).toEqual('item123');
     });
   });
+
+  describe('lock item subscription', () => {
+    it('sends an update when the item is locked for a room I am subscribed to', async function() {
+      const subscriptionPromise = new Promise((resolve, reject) => {
+        apolloClient.subscribe({
+          query: gql`
+              subscription itemUpdates($roomId: ID!) {
+                  itemUpdates(roomId: $roomId) {
+                      id
+                      posX
+                      posY
+                      lockedBy
+                  }
+              }`,
+          variables: { roomId: '123'}
+        }).subscribe({
+          next: resolve,
+          error: reject
+        });
+      });
+      //TODO work out an approach which doesn't require a timeout
+      setTimeout(async () => {
+        await apolloClient.mutate({
+          mutation: gql`
+              mutation joinRoom($input: JoinRoomInput!) {
+                  joinRoom(input: $input)  {
+                      id
+                  }
+              }`,
+          variables: {
+            input: {
+              roomName: '123',
+              memberName: 'me'
+            }
+          }
+        });
+
+        await apolloClient.mutate({
+          mutation: gql`
+              mutation addRoomBoardItem($input: AddRoomBoardItemInput!) {
+                  addRoomBoardItem(input: $input)  {
+                      id
+                  }
+              }`,
+          variables: {
+            input: {
+              roomId: '123',
+              itemId: 'item123',
+              posX: 10,
+              posY: 10,
+            }
+          }
+        });
+
+        await apolloClient.mutate({
+          mutation: gql`
+              mutation lockRoomBoardItem($input: LockRoomBoardItemInput!) {
+                  lockRoomBoardItem(input: $input)  {
+                      id
+                  }
+              }`,
+          variables: {
+            input: {
+              id: 'item123',
+              lockedBy: 'me',
+            }
+          }
+        });
+      }, 1000);
+
+      const result: any = await subscriptionPromise;
+      expect(result.data.itemUpdates.id).toEqual('item123');
+    });
+  });
+
+  describe('unlock item subscription', () => {
+    it('sends an update when the item is unlocked for a room I am subscribed to', async function() {
+      const subscriptionPromise = new Promise((resolve, reject) => {
+        apolloClient.subscribe({
+          query: gql`
+              subscription itemUpdates($roomId: ID!) {
+                  itemUpdates(roomId: $roomId) {
+                      id
+                      posX
+                      posY
+                      lockedBy
+                  }
+              }`,
+          variables: { roomId: '123'}
+        }).subscribe({
+          next: resolve,
+          error: reject
+        });
+      });
+      //TODO work out an approach which doesn't require a timeout
+      setTimeout(async () => {
+        await apolloClient.mutate({
+          mutation: gql`
+              mutation joinRoom($input: JoinRoomInput!) {
+                  joinRoom(input: $input)  {
+                      id
+                  }
+              }`,
+          variables: {
+            input: {
+              roomName: '123',
+              memberName: 'me'
+            }
+          }
+        });
+
+        await apolloClient.mutate({
+          mutation: gql`
+              mutation addRoomBoardItem($input: AddRoomBoardItemInput!) {
+                  addRoomBoardItem(input: $input)  {
+                      id
+                  }
+              }`,
+          variables: {
+            input: {
+              roomId: '123',
+              itemId: 'item123',
+              posX: 10,
+              posY: 10,
+            }
+          }
+        });
+
+        await apolloClient.mutate({
+          mutation: gql`
+              mutation lockRoomBoardItem($input: LockRoomBoardItemInput!) {
+                  lockRoomBoardItem(input: $input)  {
+                      id
+                  }
+              }`,
+          variables: {
+            input: {
+              id: 'item123',
+              lockedBy: 'me',
+            }
+          }
+        });
+
+        await apolloClient.mutate({
+          mutation: gql`
+              mutation unlockRoomBoardItem($input: UnlockRoomBoardItemInput!) {
+                  unlockRoomBoardItem(input: $input)  {
+                      id
+                  }
+              }`,
+          variables: {
+            input: {
+              id: 'item123'
+            }
+          }
+        });
+      }, 1000);
+
+      const result: any = await subscriptionPromise;
+      expect(result.data.itemUpdates.id).toEqual('item123');
+    });
+  });
+
 });

@@ -27,24 +27,30 @@ export const lockRoomBoardItem = async (
   _: unknown,
   { input }: { input: LockRoomBoardItemInput },
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
-): Promise<RoomResult> => {
-  const { _id, ...result } = await dataSources.Rooms.lockItem(input);
-  await pubSub.publish(ROOM_CHANGED_TOPIC, {
-    roomUpdates: result
+): Promise<ItemResult> => {
+  const { item, roomId } = await dataSources.Rooms.lockItem(input);
+
+  await pubSub.publish(ITEM_CHANGED_TOPIC, {
+    item,
+    roomId: roomId
   });
-  return result;
+
+  return item;
 };
 
 export const unlockRoomBoardItem = async (
   _: unknown,
   { input }: { input: UnlockRoomBoardItemInput },
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
-): Promise<RoomResult> => {
-  const { _id, ...result } = await dataSources.Rooms.unlockItem(input);
-  await pubSub.publish(ROOM_CHANGED_TOPIC, {
-    roomUpdates: result
+): Promise<ItemResult> => {
+  const { item, roomId } = await dataSources.Rooms.unlockItem(input);
+
+  await pubSub.publish(ITEM_CHANGED_TOPIC, {
+    item,
+    roomId: roomId
   });
-  return result;
+
+  return item;
 };
 
 export const moveBoardItem = async (
