@@ -95,8 +95,9 @@ describe('integration: items', () => {
 
   describe('add item subscription', () => {
     it('sends an update when the item is created for a room I am subscribed to', async function () {
-      const subscriptionPromise = addAnItemUpdateSubscription();
       await addARoom();
+
+      const subscriptionPromise = addAnItemUpdateSubscription();
       await addAnItemToARoom();
       const result = await subscriptionPromise;
 
@@ -106,9 +107,10 @@ describe('integration: items', () => {
 
   describe('move item subscription', () => {
     it('sends an update when the item is moved for a room I am subscribed to', async function () {
-      const subscriptionPromise = addAnItemUpdateSubscription();
       await addARoom();
       await addAnItemToARoom();
+
+      const subscriptionPromise = addAnItemUpdateSubscription();
       await apolloClient.mutate({
         mutation: gql`
             mutation moveBoardItem($input: MoveBoardItemInput!) {
@@ -134,9 +136,10 @@ describe('integration: items', () => {
 
   describe('lock item subscription', () => {
     it('sends an update when the item is locked for a room I am subscribed to', async function () {
-      const subscriptionPromise = addAnItemUpdateSubscription();
       await addARoom();
       await addAnItemToARoom();
+
+      const subscriptionPromise = addAnItemUpdateSubscription();
       await lockAnItemInARoom();
 
       const result = await subscriptionPromise;
@@ -147,11 +150,11 @@ describe('integration: items', () => {
 
   describe('unlock item subscription', () => {
     it('sends an update when the item is unlocked for a room I am subscribed to', async function () {
-      const subscriptionPromise = addAnItemUpdateSubscription();
       await addARoom();
       await addAnItemToARoom();
       await lockAnItemInARoom();
 
+      const subscriptionPromise = addAnItemUpdateSubscription();
       await apolloClient.mutate({
         mutation: gql`
             mutation unlockRoomBoardItem($input: UnlockRoomBoardItemInput!) {
@@ -174,10 +177,10 @@ describe('integration: items', () => {
 
   describe('update item text subscription', () => {
     it('sends an update when the item text is updated for a room I am subscribed to', async function () {
-      const subscriptionPromise = addAnItemUpdateSubscription();
       await addARoom();
       await addAnItemToARoom();
 
+      const subscriptionPromise = addAnItemUpdateSubscription();
       await apolloClient.mutate<ItemResult, { input: UpdateBoardItemTextInput }>({
         mutation: gql`
             mutation updateBoardItemText($input: UpdateBoardItemTextInput!) {
