@@ -2,16 +2,27 @@
   <li
     v-bind:style="styleObject"
     v-on:pointerdown="_onPointerDown"
+    v-on:dblclick="_onEditClick"
     v-bind:data-moving="moving"
     v-bind:data-locked-by="lockedBy"
   >
-    {{ text }}
+    <template v-if="editing">
+      <textarea v-model="textData" />
+      <button aria-label="save" v-on:click="_onSaveClick">✔️</button>
+    </template>
+    <template v-else>
+      {{ text }}
+    </template>
   </li>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { ActionType } from '@/components/Room/RoomBoardTypes';
+import {
+  UPDATE_BOARD_ITEM_TEXT_MUTATION,
+  UpdateBoardItemTextInput,
+} from '@/components/Room/boardItemsGraphQL';
 
 export default Vue.extend({
   name: 'room-board-item',
@@ -30,15 +41,16 @@ export default Vue.extend({
     },
     moving: {
       type: Boolean,
-      required: true,
     },
     text: {
       type: String,
-      default: 'placeholder text',
     },
     lockedBy: {
       type: String,
     },
+  },
+  data(): { editing: boolean; textData: string } {
+    return { editing: false, textData: this.text };
   },
   computed: {
     styleObject: function () {
@@ -49,6 +61,27 @@ export default Vue.extend({
     },
   },
   methods: {
+    _onSaveClick: async function (): Promise<void> {
+      const mutationPayload: UpdateBoardItemTextInput = {
+        id: this.id,
+        text: this.textData,
+      };
+
+      try {
+        await this.$apollo.mutate({
+          mutation: UPDATE_BOARD_ITEM_TEXT_MUTATION,
+          variables: {
+            input: mutationPayload,
+          },
+        });
+        this.editing = false;
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    _onEditClick: function (): void {
+      this.editing = true;
+    },
     _onPointerDown: function (event: PointerEvent): void {
       if (this.lockedBy) {
         return;

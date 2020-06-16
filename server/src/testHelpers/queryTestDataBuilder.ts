@@ -3,6 +3,7 @@ import {
   LockRoomBoardItemInput,
   UnlockRoomBoardItemInput,
   MoveBoardItemInput,
+  UpdateBoardItemTextInput,
 } from '../../../spa/src/components/Room/boardItemsGraphQL';
 import {JoinRoomInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
 
@@ -13,6 +14,13 @@ export const buildAddItemInput = (overrides: Partial<AddRoomBoardItemInput> = {}
   posY: 0,
   ...overrides
 });
+
+export const buildUpdateBoardItemTextInput = (overrides: Partial<UpdateBoardItemTextInput> = {}): UpdateBoardItemTextInput => ({
+  id: 'item1',
+  text: 'some text',
+  ...overrides
+});
+
 
 export const buildLockItemInput = (overrides: Partial<LockRoomBoardItemInput> = {}): LockRoomBoardItemInput => ({
   id: 'item1',
@@ -43,6 +51,7 @@ export const buildItemResult = (overrides: Partial<ItemResult> = {}): ItemResult
   posX: 0,
   posY: 0,
   room: 'room_123',
+  text: 'some text',
   ...overrides
 });
 

@@ -4,7 +4,7 @@ import {
   LOCK_ROOM_BOARD_ITEM_MUTATION,
   UNLOCK_ROOM_BOARD_ITEM_MUTATION,
   MOVE_BOARD_ITEM_MUTATION,
-  MoveBoardItemInput,
+  MoveBoardItemInput, UPDATE_BOARD_ITEM_TEXT_MUTATION,
 } from '@/components/Room/boardItemsGraphQL';
 import {makeItem} from '@/testHelpers/testData';
 
@@ -81,6 +81,25 @@ export const makeHappyUnlockRoomBoardItemMutationStub = (inputOverrides = { id: 
     query: UNLOCK_ROOM_BOARD_ITEM_MUTATION,
     variables: {
       input: { ...inputOverrides },
+    },
+    successData,
+  };
+}
+
+export const makeHappyUpdateRoomBoardItemMutationStub = (
+  inputOverrides = {}
+) => {
+  const successData = {
+    updateBoardItemText: makeItem({ text: 'some content' })
+  };
+  return {
+    query: UPDATE_BOARD_ITEM_TEXT_MUTATION,
+    variables: {
+      input: {
+        id: 'some-id',
+        text: 'some-text',
+        ...inputOverrides
+      },
     },
     successData,
   };

@@ -7,7 +7,7 @@ import resolveRoom, {
   joinRoom,
   lockRoomBoardItem,
   unlockRoomBoardItem,
-  moveBoardItem,
+  moveBoardItem, updateBoardItemText,
 } from './roomResolver';
 import RoomsDataSource, {RoomModel} from './RoomsDataSource';
 import {ITEM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
@@ -15,7 +15,7 @@ import {
   buildAddItemInput,
   buildJoinRoomInput,
   buildLockItemInput,
-  buildUnlockItemInput,
+  buildUnlockItemInput, buildUpdateBoardItemTextInput,
   buildUpdateItemsInput,
 } from '../testHelpers/queryTestDataBuilder';
 import {buildItemData, buildItemModel, buildRoomModel} from '../testHelpers/storedTestDataBuilder';
@@ -39,6 +39,28 @@ describe('roomResolver', () => {
   beforeEach(async () => {
     await roomsCollection.deleteMany({});
     rooms = new RoomsDataSource(roomsCollection);
+  });
+  describe('updateBoardItemText', function () {
+    it('updates the item text and publishes the update', async () => {
+      const existingItemModel = buildItemModel({ id: 'item-id'});
+      const existingRoomModel = buildRoomModel({id: 'ROOM_123', items: [existingItemModel]});
+      await roomsCollection.insertOne(existingRoomModel);
+      const itemInput = buildUpdateBoardItemTextInput({ text: 'yolo', id: existingItemModel.id });
+      const publishStub = jest.fn();
+
+      const result = await updateBoardItemText(
+        undefined,
+        { input: itemInput },
+        {
+          pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
+          dataSources: {Rooms: rooms},
+        },
+      );
+
+      const expected = { ...existingItemModel, text: 'yolo' };
+      expect(result).toEqual(expected);
+      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, expected);
+    });
   });
 
   describe('addRoomBoardItem', () => {

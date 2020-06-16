@@ -5,7 +5,7 @@ import resolveRoom, {
   joinRoom,
   lockRoomBoardItem,
   unlockRoomBoardItem,
-  moveBoardItem,
+  moveBoardItem, updateBoardItemText,
 } from './rooms/roomResolver';
 import roomMemberSubscriptionFilter from './rooms/roomMemberSubscriptionFilter';
 import RoomsDataSource from './rooms/RoomsDataSource';
@@ -63,7 +63,8 @@ const apolloServer = async () => {
         lockRoomBoardItem: lockRoomBoardItem,
         unlockRoomBoardItem: unlockRoomBoardItem,
         moveBoardItem: moveBoardItem,
-        addRoomBoardItem: addRoomBoardItem
+        addRoomBoardItem: addRoomBoardItem,
+        updateBoardItemText: updateBoardItemText
       }
     },
     dataSources: () => ({

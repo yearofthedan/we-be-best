@@ -22,6 +22,11 @@ const typeDefs = gql`
     input UnlockRoomBoardItemInput {
         id: ID!
     }
+
+    input UpdateBoardItemTextInput {
+        id: ID!
+        text: String!
+    }
     
     input AddRoomBoardItemInput {
         roomId: ID!
@@ -47,6 +52,7 @@ const typeDefs = gql`
         posY: Int!
         lockedBy: String
         room: Room
+        text: String!
     }
 
     type Query {
@@ -54,7 +60,6 @@ const typeDefs = gql`
     }
 
     type Subscription {
-        roomUpdates(id: ID!): Room!
         roomMemberUpdates(id: ID!): Room!
         itemUpdates(roomId: ID!): Item! 
     }
@@ -65,6 +70,7 @@ const typeDefs = gql`
         lockRoomBoardItem(input: LockRoomBoardItemInput!): Item!
         unlockRoomBoardItem(input: UnlockRoomBoardItemInput!): Item!
         addRoomBoardItem(input: AddRoomBoardItemInput!): Item!
+        updateBoardItemText(input: UpdateBoardItemTextInput!): Item!
     }
 `;
 

@@ -1,5 +1,4 @@
 import {MongoDataSource} from 'apollo-datasource-mongodb';
-import {ItemInput} from './roomResolver';
 
 export interface RoomModel {
   _id: string;
@@ -21,7 +20,7 @@ export type NewItemParam = Pick<ItemModel, 'id'|'posX'|'posY'|'text'>
 export type UpdateItemParam = Partial<ItemModel> & Pick<ItemModel, 'id'>;
 export type NewMemberParam = string;
 
-const buildItem = ({id, posX, posY, text, lockedBy, room}: ItemInput & { room: string }): ItemModel => ({
+const buildItem = ({id, posX, posY, text, lockedBy, room}: ItemModel): ItemModel => ({
   id,
   posX,
   posY,
@@ -43,7 +42,7 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
     return room;
   }
 
-  async updateItem(item: ItemInput): Promise<ItemModel> {
+  async updateItem(item: UpdateItemParam): Promise<ItemModel> {
     const updateSpecification = Object.entries(item)
       .filter(([, value]) => value !== undefined)
       .reduce(

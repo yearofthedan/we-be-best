@@ -3,20 +3,12 @@ import {DataSources, ITEM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apo
 import {
   AddRoomBoardItemInput,
   LockRoomBoardItemInput, UnlockRoomBoardItemInput,
-  MoveBoardItemInput,
+  MoveBoardItemInput, UpdateBoardItemTextInput,
 } from '../../../spa/src/components/Room/boardItemsGraphQL';
 import {
   JoinRoomInput,
 } from '../../../spa/src/components/Room/roomGraphQLQuery';
 import {ItemResult, RoomResult} from './queryDefinitions';
-
-export interface ItemInput {
-  id: string;
-  posY?: number;
-  posX?: number;
-  text?: string;
-  lockedBy?: string;
-}
 
 export const addRoomBoardItem = async (
   _: unknown,
@@ -24,8 +16,20 @@ export const addRoomBoardItem = async (
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
 ): Promise<ItemResult> => {
   const { itemId, roomId, posX, posY } = input;
-
   const result = await dataSources.Rooms.addItem(roomId, { id: itemId, posY, posX, text: ''});
+
+  await pubSub.publish(ITEM_CHANGED_TOPIC, result);
+
+  return result;
+};
+
+export const updateBoardItemText = async (
+  _: unknown,
+  { input }: { input: UpdateBoardItemTextInput },
+  { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
+): Promise<ItemResult> => {
+  const result = await dataSources.Rooms.updateItem({ id: input.id, text: input.text});
+
   await pubSub.publish(ITEM_CHANGED_TOPIC, result);
 
   return result;

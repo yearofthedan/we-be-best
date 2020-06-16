@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import testApolloServerAndClient from '../testHelpers/testApolloServerAndClient';
 import {JoinRoomInput, RoomItemUpdatesSubscriptionData} from '../../../spa/src/components/Room/roomGraphQLQuery';
 import {AddRoomBoardItemInput, ItemResult, RoomResult} from '../rooms/queryDefinitions';
-import {LockRoomBoardItemInput} from '../../../spa/src/components/Room/boardItemsGraphQL';
+import {LockRoomBoardItemInput, UpdateBoardItemTextInput} from '../../../spa/src/components/Room/boardItemsGraphQL';
 
 describe('integration: items', () => {
   let apolloClient: ApolloClient<any>;
@@ -29,6 +29,7 @@ describe('integration: items', () => {
                     posX
                     posY
                     lockedBy
+                    text
                 }
             }`,
         variables: {roomId: '123'},
@@ -119,13 +120,15 @@ describe('integration: items', () => {
           input: {
             id: 'item123',
             posX: 10,
-            posY: 10,
+            posY: 11,
           },
         },
       });
 
       const result = await subscriptionPromise;
       expect(result.data.itemUpdates.id).toEqual('item123');
+      expect(result.data.itemUpdates.posX).toEqual(10);
+      expect(result.data.itemUpdates.posY).toEqual(11);
     });
   });
 
@@ -138,6 +141,7 @@ describe('integration: items', () => {
 
       const result = await subscriptionPromise;
       expect(result.data.itemUpdates.id).toEqual('item123');
+      expect(result.data.itemUpdates.lockedBy).toEqual('me');
     });
   });
 
@@ -164,6 +168,34 @@ describe('integration: items', () => {
 
       const result = await subscriptionPromise;
       expect(result.data.itemUpdates.id).toEqual('item123');
+      expect(result.data.itemUpdates.lockedBy).toEqual(null);
+    });
+  });
+
+  describe('update item text subscription', () => {
+    it('sends an update when the item text is updated for a room I am subscribed to', async function () {
+      const subscriptionPromise = addAnItemUpdateSubscription();
+      await addARoom();
+      await addAnItemToARoom();
+
+      await apolloClient.mutate<ItemResult, { input: UpdateBoardItemTextInput }>({
+        mutation: gql`
+            mutation updateBoardItemText($input: UpdateBoardItemTextInput!) {
+                updateBoardItemText(input: $input)  {
+                    id
+                }
+            }`,
+        variables: {
+          input: {
+            id: 'item123',
+            text: 'some-text'
+          },
+        },
+      });
+
+      const result = await subscriptionPromise;
+      expect(result.data.itemUpdates.id).toEqual('item123');
+      expect(result.data.itemUpdates.text).toEqual('some-text');
     });
   });
 });

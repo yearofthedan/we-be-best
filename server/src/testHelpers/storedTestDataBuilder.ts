@@ -10,7 +10,7 @@ export const buildItemData = (overrides: Partial<ItemModel> = {}): ItemModel => 
     ...overrides,
 });
 
-export const buildRoomMemberData = (overrides?: string) => overrides || 'PERSON';
+export const buildRoomMemberData = (overrides?: string): string => overrides || 'PERSON';
 
 export const buildItemModel = (overrides: Partial<ItemModel> = {}): ItemModel => ({
     id: 'ITEM123',

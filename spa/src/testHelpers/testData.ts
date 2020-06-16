@@ -5,6 +5,7 @@ export const makeItem = (overrides: Partial<Item> = {}) => ({
     lockedBy: 'me',
     posY: 20,
     posX: 30,
+    text: 'placeholder text',
     ...overrides,
 });
 

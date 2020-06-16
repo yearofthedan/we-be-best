@@ -11,6 +11,7 @@ export interface ItemData {
   posX: number;
   posY: number;
   lockedBy?: string;
+  text: string;
 }
 
 export interface RoomMemberUpdatesSubscriptionData {
@@ -41,6 +42,7 @@ export const ROOM_ITEM_UPDATES_SUBSCRIPTION = gql`
       posX
       posY
       lockedBy
+      text
     }
   }
 `;
@@ -55,6 +57,7 @@ export const GET_ROOM_QUERY = gql`
         posX
         posY
         lockedBy
+        text
       }
     }
   }
@@ -74,6 +77,7 @@ export const JOIN_ROOM_MUTATION = gql`
         posX
         posY
         lockedBy
+        text
       }
     }
   }

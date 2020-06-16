@@ -8,12 +8,14 @@ export interface Item {
   posX: number;
   posY: number;
   lockedBy?: string;
+  text: string;
 }
 
 const buildItem = (): Item => ({
   id: v4(),
   posX: DEFAULT_X,
   posY: DEFAULT_Y,
+  text: '',
 });
 
 export default buildItem;

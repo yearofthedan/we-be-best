@@ -33,7 +33,7 @@ describe('<room />', () => {
     const stubRoomItemUpdatesSubscription = {
       query: ROOM_ITEM_UPDATES_SUBSCRIPTION,
       successData: {
-        itemUpdates: makeItem({ id: '123' }),
+        itemUpdates: makeItem({ id: 'ITEMM1234' }),
       },
     };
 
@@ -51,6 +51,6 @@ describe('<room />', () => {
 
     expect(await screen.findByText('my-name')).toBeInTheDocument();
     expect(screen.getByText('my-name2')).toBeInTheDocument();
-    expect(screen.getAllByText('placeholder text')).toHaveLength(2);
+    expect(await screen.findAllByText('placeholder text')).toHaveLength(2);
   });
 });
