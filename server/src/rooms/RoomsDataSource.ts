@@ -37,9 +37,8 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
     const room = await this.collection.findOne({id});
 
     if (!room) {
-      throw new Error('No room found');
+      throw new UserInputError('could not find room', { invalidArgs: ['id']});
     }
-
     return room;
   }
 

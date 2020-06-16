@@ -1,17 +1,18 @@
+import { MongoClient } from 'mongodb';
 import {ApolloServer, PubSub, withFilter} from 'apollo-server-express';
 import typeDefs from './typeDefs';
-import resolveRoom, {
-  addRoomBoardItem,
-  joinRoom,
-  lockRoomBoardItem,
-  unlockRoomBoardItem,
-  moveBoardItem, updateBoardItemText,
-} from './rooms/roomResolver';
-import roomMemberSubscriptionFilter from './rooms/roomMemberSubscriptionFilter';
 import RoomsDataSource from './rooms/RoomsDataSource';
-import { MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import itemUpdatesSubscriptionFilter from './rooms/itemUpdatesSubscriptionFilter';
+import itemUpdatesSubscriptionFilter from './items/itemUpdatesSubscriptionFilter';
+import roomMemberSubscriptionFilter from './rooms/roomMemberSubscriptionFilter';
+import {
+  addRoomBoardItem,
+  lockRoomBoardItem,
+  moveBoardItem,
+  unlockRoomBoardItem,
+  updateBoardItemText,
+} from './items/itemResolvers';
+import {joinRoom, resolveRoom} from './rooms/roomResolvers';
 
 export interface DataSources {
   Rooms: RoomsDataSource;

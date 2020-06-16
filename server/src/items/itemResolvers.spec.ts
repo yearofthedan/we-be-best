@@ -2,27 +2,27 @@ import {PubSub} from 'graphql-subscriptions';
 import {Collection} from 'apollo-datasource-mongodb';
 import {MongoClient} from 'mongodb';
 import {MongoMemoryServer} from 'mongodb-memory-server';
-import resolveRoom, {
+import {
   addRoomBoardItem,
-  joinRoom,
   lockRoomBoardItem,
+  moveBoardItem,
   unlockRoomBoardItem,
-  moveBoardItem, updateBoardItemText,
-} from './roomResolver';
-import RoomsDataSource, {RoomModel} from './RoomsDataSource';
-import {ITEM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
+  updateBoardItemText,
+} from './itemResolvers';
+import RoomsDataSource, {RoomModel} from '../rooms/RoomsDataSource';
+import {ITEM_CHANGED_TOPIC} from '../apolloServer';
 import {
   buildAddItemInput,
-  buildJoinRoomInput,
   buildLockItemInput,
-  buildUnlockItemInput, buildUpdateBoardItemTextInput,
+  buildUnlockItemInput,
+  buildUpdateBoardItemTextInput,
   buildUpdateItemsInput,
 } from '../testHelpers/queryTestDataBuilder';
 import {buildItemData, buildItemModel, buildRoomModel} from '../testHelpers/storedTestDataBuilder';
 
 const ROOMS_COLLECTION = 'rooms';
 
-describe('roomResolver', () => {
+describe('itemResolvers', () => {
   let rooms: RoomsDataSource;
   let connection: MongoClient;
   let roomsCollection: Collection<RoomModel>;
@@ -62,7 +62,6 @@ describe('roomResolver', () => {
       expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, expected);
     });
   });
-
   describe('addRoomBoardItem', () => {
     it('adds the item and publishes the update', async () => {
       const room = buildRoomModel({id: 'ROOM_123', items: []});
@@ -200,66 +199,6 @@ describe('roomResolver', () => {
 
       expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, { ...existingItemModel, posX: 100, posY: 33 });
 
-    });
-  });
-  describe('joinRoom', () => {
-    it('creates a room if it does not exist', async () => {
-      const publishStub = jest.fn();
-
-      const result = await joinRoom(
-        undefined,
-        { input: buildJoinRoomInput({roomName: 'new-room', memberName: 'me'}) },
-        {
-          pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
-          dataSources: {Rooms: rooms},
-        },
-      );
-
-      expect(result.id).toEqual('new-room');
-      expect(result.members).toEqual(['me']);
-    });
-
-    it('joins the room if it exists', async () => {
-      const room = buildRoomModel({ items: [], members: ['my-mother']});
-      await roomsCollection.insertOne({...room});
-
-      const publishStub = jest.fn();
-
-      const result = await joinRoom(
-        undefined,
-        { input: buildJoinRoomInput({roomName: room.id, memberName: 'me'}) },
-        {
-          pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
-          dataSources: {Rooms: rooms},
-        },
-      );
-
-      expect(result.members).toEqual(['my-mother', 'me']);
-    });
-
-    it('publishes an update after joining a room', async () => {
-      const publishStub = jest.fn();
-
-      const result = await joinRoom(
-        undefined,
-        { input: buildJoinRoomInput({roomName: 'new-room', memberName: 'me'}) },
-        {
-          pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
-          dataSources: {Rooms: rooms},
-        },
-      );
-
-      expect(publishStub).toHaveBeenCalledWith(ROOM_MEMBER_CHANGED_TOPIC, result);
-    });
-  });
-  describe('resolveRoom', () => {
-    it('gets the room', async () => {
-      const room = buildRoomModel({ id: 'ROOM_123', items: [], members: []});
-      await roomsCollection.insertOne({...room});
-
-      const result = await resolveRoom(undefined, {id: 'ROOM_123'}, {dataSources: {Rooms: rooms}});
-
-      expect(result).toEqual({ id: 'ROOM_123', items: [], members: []});
     });
   });
 });

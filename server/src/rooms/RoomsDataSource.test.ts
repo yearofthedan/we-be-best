@@ -1,22 +1,19 @@
 import {Collection} from 'apollo-datasource-mongodb';
-import {MongoClient, Db} from 'mongodb';
+import {Db, MongoClient} from 'mongodb';
 import {MongoMemoryServer} from 'mongodb-memory-server';
 import {buildItemModel, buildRoomModel} from '../testHelpers/storedTestDataBuilder';
 import RoomsDataSource, {NewItemParam, RoomModel, UpdateItemParam} from './RoomsDataSource';
 import {UserInputError} from 'apollo-server-express';
-import {buildAddItemInput} from '../testHelpers/queryTestDataBuilder';
 
 const ROOMS_COLLECTION = 'rooms';
-
-export const buildNewItemParam = (overrides: Partial<NewItemParam> = {}): NewItemParam => ({
+const buildNewItemParam = (overrides: Partial<NewItemParam> = {}): NewItemParam => ({
   id: 'item1',
   posX: 0,
   posY: 0,
   text: 'some text',
   ...overrides
 });
-
-export const buildUpdateItemParam = (overrides: Partial<UpdateItemParam> = {}): UpdateItemParam => ({
+const buildUpdateItemParam = (overrides: Partial<UpdateItemParam> = {}): UpdateItemParam => ({
   id: 'item1',
   posX: 0,
   posY: 0,
@@ -36,12 +33,31 @@ describe('RoomsDataSource', () => {
     roomsCollection = await db.createCollection(ROOMS_COLLECTION);
     await roomsCollection.createIndex({'items.id': 1});
   });
+
   beforeEach(async () => {
     await roomsCollection.deleteMany({});
     rooms = new RoomsDataSource(roomsCollection);
   });
+
   afterAll( () => {
     return connection.close(true);
+  });
+
+  describe('getRoom', () => {
+    it('gets a room when it exists', async () => {
+      const existingRoomModel = buildRoomModel({id: 'ROOM_123', members: ['me']});
+      await roomsCollection.insertOne(existingRoomModel);
+
+      const roomModel = await rooms.getRoom('ROOM_123');
+
+      expect(roomModel).toEqual(existingRoomModel);
+    });
+
+    it('throws an error if the room is not there', async () => {
+      const expectedError = new UserInputError('could not find room', { invalidArgs: ['id']});
+
+      await expect(rooms.getRoom('UNKNOWN_ROOM')).rejects.toThrow(expectedError);
+    });
   });
 
   describe('addItem', () => {
