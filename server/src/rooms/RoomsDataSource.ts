@@ -1,4 +1,5 @@
 import {MongoDataSource} from 'apollo-datasource-mongodb';
+import {UserInputError} from 'apollo-server-express';
 
 export interface RoomModel {
   _id: string;
@@ -63,6 +64,10 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
         returnOriginal: false,
       },
     );
+
+    if (result.value === null) {
+      throw new UserInputError('could not find item to update', { invalidArgs: ['id']});
+    }
 
     return result.value.items.find(i => i.id === item.id);
   }

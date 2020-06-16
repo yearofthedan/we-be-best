@@ -3,6 +3,8 @@ import {MongoClient, Db} from 'mongodb';
 import {MongoMemoryServer} from 'mongodb-memory-server';
 import {buildItemModel, buildRoomModel} from '../testHelpers/storedTestDataBuilder';
 import RoomsDataSource, {NewItemParam, RoomModel, UpdateItemParam} from './RoomsDataSource';
+import {UserInputError} from 'apollo-server-express';
+import {buildAddItemInput} from '../testHelpers/queryTestDataBuilder';
 
 const ROOMS_COLLECTION = 'rooms';
 
@@ -34,12 +36,12 @@ describe('RoomsDataSource', () => {
     roomsCollection = await db.createCollection(ROOMS_COLLECTION);
     await roomsCollection.createIndex({'items.id': 1});
   });
-  afterAll( () => {
-    return connection.close(true);
-  });
   beforeEach(async () => {
     await roomsCollection.deleteMany({});
     rooms = new RoomsDataSource(roomsCollection);
+  });
+  afterAll( () => {
+    return connection.close(true);
   });
 
   describe('addItem', () => {
@@ -154,6 +156,14 @@ describe('RoomsDataSource', () => {
         text: 'interesting',
       });
     });
+
+    it('throws an error if the item is not there', async () => {
+      await roomsCollection.insertOne(buildRoomModel({id: 'ROOM_123', items: [buildItemModel()]}));
+      const itemParams = buildUpdateItemParam({ id: 'UNKNOWN_ITEM' });
+
+      const expectedError = new UserInputError('could not find item to update', { invalidArgs: ['id']});
+      await expect(rooms.updateItem(itemParams)).rejects.toThrow(expectedError);
+    });
   });
 
   describe('addMember', () => {
@@ -180,5 +190,4 @@ describe('RoomsDataSource', () => {
       });
     });
   });
-
 });
