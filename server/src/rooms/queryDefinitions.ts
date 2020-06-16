@@ -5,6 +5,7 @@ export interface ItemResult {
   posY: number;
   posX: number;
   lockedBy?: string;
+  room: string;
 }
 
 export interface RoomResult {

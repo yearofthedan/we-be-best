@@ -42,6 +42,7 @@ export const buildItemResult = (overrides: Partial<ItemResult> = {}): ItemResult
   id: 'ITEM_123',
   posX: 0,
   posY: 0,
+  room: 'room_123',
   ...overrides
 });
 

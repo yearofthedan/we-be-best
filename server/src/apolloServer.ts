@@ -1,6 +1,5 @@
 import {ApolloServer, PubSub, withFilter} from 'apollo-server-express';
 import typeDefs from './typeDefs';
-import RoomDataSource from './rooms/RoomDataSource';
 import resolveRoom, {
   addRoomBoardItem,
   joinRoom,
@@ -9,13 +8,13 @@ import resolveRoom, {
   moveBoardItem,
 } from './rooms/roomResolver';
 import roomMemberSubscriptionFilter from './rooms/roomMemberSubscriptionFilter';
-import Rooms from './rooms/RoomDataSource';
+import RoomsDataSource from './rooms/RoomsDataSource';
 import { MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import itemUpdatesSubscriptionFilter from './rooms/itemUpdatesSubscriptionFilter';
 
 export interface DataSources {
-  Rooms: RoomDataSource;
+  Rooms: RoomsDataSource;
 }
 
 export const ITEM_CHANGED_TOPIC = 'item_changed_topic';
@@ -27,7 +26,7 @@ const ROOMS_COLLECTION = 'rooms';
 const initMongo = async () => {
   const mongod = new MongoMemoryServer();
   const uri = await mongod.getUri();
-  const client = new MongoClient(uri);
+  const client = new MongoClient(uri, { useUnifiedTopology: true });
   await client.connect();
   await client.db().collection(ROOMS_COLLECTION).createIndex({'items.id': 1});
 
@@ -49,7 +48,7 @@ const apolloServer = async () => {
             () => pubSub.asyncIterator(ITEM_CHANGED_TOPIC),
             itemUpdatesSubscriptionFilter,
           ),
-          resolve: (payload) => payload.item
+          resolve: (payload) => payload
         },
         roomMemberUpdates: {
           subscribe: withFilter(
@@ -68,13 +67,13 @@ const apolloServer = async () => {
       }
     },
     dataSources: () => ({
-      Rooms: new Rooms(mongoClient.db().collection(ROOMS_COLLECTION))
+      Rooms: new RoomsDataSource(mongoClient.db().collection(ROOMS_COLLECTION))
     }),
     context: ({req, connection}) => {
       if (connection) {
         return {
           dataSources: {
-            Rooms: new Rooms(mongoClient.db().collection(ROOMS_COLLECTION))
+            Rooms: new RoomsDataSource(mongoClient.db().collection(ROOMS_COLLECTION))
           },
           pubSub
         };

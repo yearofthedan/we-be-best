@@ -9,8 +9,7 @@ import resolveRoom, {
   unlockRoomBoardItem,
   moveBoardItem,
 } from './roomResolver';
-import RoomDataSource from './RoomDataSource';
-import Rooms, {RoomData} from './RoomDataSource';
+import RoomsDataSource, {RoomModel} from './RoomsDataSource';
 import {ITEM_CHANGED_TOPIC, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
 import {
   buildAddItemInput,
@@ -19,14 +18,14 @@ import {
   buildUnlockItemInput,
   buildUpdateItemsInput,
 } from '../testHelpers/queryTestDataBuilder';
-import {buildItemData, buildRoomData} from '../testHelpers/storedTestDataBuilder';
+import {buildItemData, buildItemModel, buildRoomModel} from '../testHelpers/storedTestDataBuilder';
 
 const ROOMS_COLLECTION = 'rooms';
 
 describe('roomResolver', () => {
-  let rooms: RoomDataSource;
+  let rooms: RoomsDataSource;
   let connection: MongoClient;
-  let roomsCollection: Collection<RoomData>;
+  let roomsCollection: Collection<RoomModel>;
 
   beforeAll(async () => {
     connection = await MongoClient.connect(await new MongoMemoryServer().getUri());
@@ -39,12 +38,12 @@ describe('roomResolver', () => {
   });
   beforeEach(async () => {
     await roomsCollection.deleteMany({});
-    rooms = new Rooms(roomsCollection);
+    rooms = new RoomsDataSource(roomsCollection);
   });
 
   describe('addRoomBoardItem', () => {
     it('adds the item and publishes the update', async () => {
-      const room = buildRoomData({id: 'ROOM_123', items: []});
+      const room = buildRoomModel({id: 'ROOM_123', items: []});
       await roomsCollection.insertOne({...room});
       const itemInput = buildAddItemInput({roomId: 'ROOM_123', itemId: 'ITEM_123' });
       const publishStub = jest.fn();
@@ -61,19 +60,26 @@ describe('roomResolver', () => {
         id: itemInput.itemId,
         posX: itemInput.posX,
         posY: itemInput.posY,
+        lockedBy: null,
+        text: '',
+        room: 'ROOM_123'
       });
       expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, {
-        item: result,
-        roomId:  'ROOM_123',
+        id: itemInput.itemId,
+        posX: itemInput.posX,
+        posY: itemInput.posY,
+        lockedBy: null,
+        text: '',
+        room: 'ROOM_123'
       });
     });
   });
   describe('lockRoomBoardItem', () => {
     it('locks the item and publishes the update', async () => {
       const publishStub = jest.fn();
-      const roomItemData = buildItemData({ id: 'item-id'});
-      const room = buildRoomData({id: 'ROOM_123', items: [roomItemData]});
-      await roomsCollection.insertOne({...room});
+      const existingItemModel = buildItemModel({ id: 'item-id', room: 'ROOM_123' });
+      const existingRoomModel = buildRoomModel({id: 'ROOM_123', items: [existingItemModel]});
+      await roomsCollection.insertOne(existingRoomModel);
 
       const result = await lockRoomBoardItem(
         undefined,
@@ -86,19 +92,16 @@ describe('roomResolver', () => {
         },
       );
 
-      const expected = { ...roomItemData, lockedBy: 'me' };
+      const expected = { ...existingItemModel, lockedBy: 'me' };
 
       expect(result).toEqual(expected);
-      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, {
-        item: expected,
-        roomId: 'ROOM_123'
-      });
+      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, expected);
     });
   });
   describe('unlockRoomBoardItem', () => {
     it('unlocks the item', async () => {
       const roomItemData = buildItemData({ id: 'item-id', lockedBy: 'me'});
-      const room = buildRoomData({items: [roomItemData]});
+      const room = buildRoomModel({items: [roomItemData]});
       await roomsCollection.insertOne({...room});
 
       const result = await unlockRoomBoardItem(
@@ -120,7 +123,7 @@ describe('roomResolver', () => {
     it('publishes an update when the item is unlocked', async () => {
       const publishStub = jest.fn();
       const roomItemData = buildItemData({ id: 'item-id', lockedBy: 'me'});
-      const room = buildRoomData({items: [roomItemData]});
+      const room = buildRoomModel({items: [roomItemData]});
       await roomsCollection.insertOne({...room});
 
       const result = await unlockRoomBoardItem(
@@ -134,15 +137,13 @@ describe('roomResolver', () => {
         },
       );
 
-      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, {
-        item: result,
-        roomId: room.id
-      });
+      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, result);
     });
   });
   describe('moveBoardItem', () => {
     it('updates the item', async () => {
-      const room = buildRoomData({id: 'ROOM_123', items: [buildItemData({ id: 'item1'})]});
+      const existingItemModel = buildItemData({ id: 'item1'});
+      const room = buildRoomModel({id: 'ROOM_123', items: [existingItemModel]});
       await roomsCollection.insertOne({...room});
       const result = await moveBoardItem(
         undefined,
@@ -155,19 +156,19 @@ describe('roomResolver', () => {
         },
       );
 
-      const expected = { id: 'item1', posX: 100, posY: 33, lockedBy: 'me' };
-      expect(result).toEqual(expected);
+      expect(result).toEqual({ ...existingItemModel, posX: 100, posY: 33 });
     });
 
     it('publishes an update after updating', async () => {
-      const room = buildRoomData({ items: [buildItemData({id: 'item1'})]});
+      const existingItemModel = buildItemData({ id: 'item1'});
+      const room = buildRoomModel({ items: [existingItemModel]});
       await roomsCollection.insertOne({...room});
       const publishStub = jest.fn();
 
-      const result = await moveBoardItem(
+      await moveBoardItem(
         undefined,
         {
-          input: buildUpdateItemsInput({ id: 'item1', posX: 0, posY: 0 }),
+          input: buildUpdateItemsInput({ id: 'item1', posX: 100, posY: 33 }),
         },
         {
           pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
@@ -175,10 +176,8 @@ describe('roomResolver', () => {
         },
       );
 
-      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, {
-        item: result,
-        roomId: room.id
-      });
+      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, { ...existingItemModel, posX: 100, posY: 33 });
+
     });
   });
   describe('joinRoom', () => {
@@ -199,7 +198,7 @@ describe('roomResolver', () => {
     });
 
     it('joins the room if it exists', async () => {
-      const room = buildRoomData({ items: [], members: ['my-mother']});
+      const room = buildRoomModel({ items: [], members: ['my-mother']});
       await roomsCollection.insertOne({...room});
 
       const publishStub = jest.fn();
@@ -233,7 +232,7 @@ describe('roomResolver', () => {
   });
   describe('resolveRoom', () => {
     it('gets the room', async () => {
-      const room = buildRoomData({ id: 'ROOM_123', items: [], members: []});
+      const room = buildRoomModel({ id: 'ROOM_123', items: [], members: []});
       await roomsCollection.insertOne({...room});
 
       const result = await resolveRoom(undefined, {id: 'ROOM_123'}, {dataSources: {Rooms: rooms}});

@@ -1,20 +1,31 @@
-import {Item} from '../rooms/itemBuilder';
-import {RoomData} from '../rooms/RoomDataSource';
+import {ItemModel, RoomModel} from '../rooms/RoomsDataSource';
 
-export const buildItemData = (overrides: Partial<Item> = {}) => ({
+export const buildItemData = (overrides: Partial<ItemModel> = {}): ItemModel => ({
     id: 'ITEM123',
     lockedBy: 'me',
     posY: 20,
     posX: 30,
+    text: 'some text',
+    room: 'ROOM123',
     ...overrides,
 });
 
 export const buildRoomMemberData = (overrides?: string) => overrides || 'PERSON';
 
-export const buildRoomData = (overrides: Partial<RoomData> = {}): RoomData => ({
+export const buildItemModel = (overrides: Partial<ItemModel> = {}): ItemModel => ({
+    id: 'ITEM123',
+    lockedBy: 'me',
+    posY: 20,
+    posX: 30,
+    text: 'some text',
+    room: 'ROOM123',
+    ...overrides,
+});
+
+export const buildRoomModel = (overrides: Partial<RoomModel> = {}): RoomModel => ({
     _id: 'internal_id',
     id: 'ROOM123',
-    items: [buildItemData()],
+    items: [buildItemModel()],
     members: [buildRoomMemberData()],
-    ...overrides
+    ...overrides,
 });

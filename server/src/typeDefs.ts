@@ -46,6 +46,7 @@ const typeDefs = gql`
         posX: Int!
         posY: Int!
         lockedBy: String
+        room: Room
     }
 
     type Query {
