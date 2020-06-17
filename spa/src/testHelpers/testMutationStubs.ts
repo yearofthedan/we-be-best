@@ -5,7 +5,7 @@ import {
   UNLOCK_ROOM_BOARD_ITEM_MUTATION,
   MOVE_BOARD_ITEM_MUTATION,
   MoveBoardItemInput, UPDATE_BOARD_ITEM_TEXT_MUTATION,
-} from '@/components/Room/boardItemsGraphQL';
+} from '@/components/Room/Board/boardItemsGraphQL';
 import {makeItem} from '@/testHelpers/testData';
 
 export const ITEM_ID = 'ITEM123';

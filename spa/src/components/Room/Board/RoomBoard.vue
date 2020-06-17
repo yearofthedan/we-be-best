@@ -32,8 +32,8 @@ import {
   InteractionEndEventPayload,
   InteractionMovedEventPayload,
   InteractionStartEventPayload,
-} from '@/components/Room/RoomBoardTypes';
-import buildItem, { Item } from '@/components/Room/itemBuilder';
+} from '@/components/Room/Board/RoomBoardTypes';
+import buildItem, { Item } from '@/components/Room/Board/itemBuilder';
 
 export default Vue.extend({
   name: 'board',

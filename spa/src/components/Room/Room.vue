@@ -27,10 +27,10 @@ import {
   ROOM_ITEM_UPDATES_SUBSCRIPTION,
   RoomItemUpdatesSubscriptionData,
 } from '@/components/Room/roomGraphQLQuery';
-import RoomBoard from '@/components/Room/RoomBoard.vue';
 import RoomMembers from '@/components/Room/RoomMembers.vue';
 import { ApolloError } from 'apollo-client';
-import { Item } from '@/components/Room/itemBuilder';
+import { Item } from '@/components/Room/Board/itemBuilder';
+import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 
 interface RoomComponentProps {
   roomId: string;

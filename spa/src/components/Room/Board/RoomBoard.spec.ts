@@ -4,7 +4,7 @@ import {
   screen,
   RenderResult,
 } from '@/testHelpers/renderer';
-import RoomBoard from '@/components/Room/RoomBoard.vue';
+import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import {
   PointerDownEvent,
   PointerMoveEvent,
@@ -12,7 +12,7 @@ import {
 } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import { makeItem } from '@/testHelpers/testData';
 import userEvent from '@testing-library/user-event';
-import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/itemBuilder';
+import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/itemBuilder';
 import {
   ITEM_ID,
   makeHappyAddRoomBoardItemMutationStub,

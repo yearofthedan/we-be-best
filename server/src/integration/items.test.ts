@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import testApolloServerAndClient from '../testHelpers/testApolloServerAndClient';
 import {JoinRoomInput, RoomItemUpdatesSubscriptionData} from '../../../spa/src/components/Room/roomGraphQLQuery';
 import {AddRoomBoardItemInput, ItemResult, RoomResult} from '../rooms/queryDefinitions';
-import {LockRoomBoardItemInput, UpdateBoardItemTextInput} from '../../../spa/src/components/Room/boardItemsGraphQL';
+import {LockRoomBoardItemInput, UpdateBoardItemTextInput} from '../../../spa/src/components/Room/Board/boardItemsGraphQL';
 
 describe('integration: items', () => {
   let apolloClient: ApolloClient<any>;

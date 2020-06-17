@@ -1,4 +1,4 @@
-export {AddRoomBoardItemInput} from '../../../spa/src/components/Room/boardItemsGraphQL';
+export {AddRoomBoardItemInput} from '../../../spa/src/components/Room/Board/boardItemsGraphQL';
 
 export interface ItemResult {
   id: string;

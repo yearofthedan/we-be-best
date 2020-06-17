@@ -4,7 +4,7 @@ import {
   UnlockRoomBoardItemInput,
   MoveBoardItemInput,
   UpdateBoardItemTextInput,
-} from '../../../spa/src/components/Room/boardItemsGraphQL';
+} from '../../../spa/src/components/Room/Board/boardItemsGraphQL';
 import {JoinRoomInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
 
 export const buildAddItemInput = (overrides: Partial<AddRoomBoardItemInput> = {}): AddRoomBoardItemInput => ({

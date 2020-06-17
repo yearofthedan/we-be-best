@@ -4,7 +4,7 @@ export {
   MoveBoardItemInput,
   UnlockRoomBoardItemInput,
   UpdateBoardItemTextInput
-} from '../../../spa/src/components/Room/boardItemsGraphQL';
+} from '../../../spa/src/components/Room/Board/boardItemsGraphQL';
 
 export interface ItemResult {
   id: string;

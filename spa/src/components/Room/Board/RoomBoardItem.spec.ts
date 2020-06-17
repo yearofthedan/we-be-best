@@ -4,7 +4,7 @@ import {
   renderWithApollo,
   screen,
 } from '@/testHelpers/renderer';
-import RoomBoardItem from '@/components/Room/RoomBoardItem.vue';
+import RoomBoardItem from '@/components/Room/Board/RoomBoardItem.vue';
 import { PointerDownEvent } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import userEvent from '@testing-library/user-event';
 import { waitFor, waitForElementToBeRemoved } from '@testing-library/dom';
@@ -85,7 +85,7 @@ describe('<room-board-item />', () => {
     expect(emitted().interactionstart).toBeUndefined();
   });
 
-  it('lets me edit the item', async () => {
+  it('lets me edit the item and sends the update', async () => {
     const itemId = 'item123';
     const { queryMocks } = renderWithApollo(
       RoomBoardItem,
@@ -100,20 +100,22 @@ describe('<room-board-item />', () => {
           id: itemId,
           posX: 2,
           posY: 1,
+          text: 'some text',
         },
       }
     );
 
     await userEvent.dblClick(screen.getByRole('listitem'));
-    await userEvent.clear(screen.getByRole('textbox'));
-    await userEvent.type(screen.getByRole('textbox'), 'some content');
+    await fireEvent.input(screen.getByRole('textbox'), {
+      target: { innerText: 'updated content' },
+    });
     await userEvent.click(screen.getByRole('button', { name: /save/i }));
     await waitForElementToBeRemoved(() =>
-      screen.queryByRole('button', { name: /save/i })
+      screen.getByRole('button', { name: /save/i })
     );
     await waitFor(() =>
       expect(queryMocks[0]).toHaveBeenCalledWith({
-        input: { id: itemId, text: 'some content' },
+        input: { id: itemId, text: 'updated content' },
       })
     );
   });
