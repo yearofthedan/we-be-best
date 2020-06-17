@@ -24,13 +24,12 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-textarea {
-  padding: calc(2 * var(--unit-base-rem));
+[role=textbox] {
+  background-color: var(--colour-background);
   width: inherit;
-  height: inherit;
   outline: none;
   resize: none;
-  overflow: auto;
-  white-space: pre;
+  white-space: inherit;
+  flex: 1;
 }
 </style>

@@ -121,19 +121,8 @@ li[data-moving] {
 }
 
 li[data-editing] {
-  padding: 0;
   display: flex;
   flex-direction: column;
-  width: fit-content;
-}
-
-li textarea {
-  padding: calc(2 * var(--unit-base-rem));
-  width: inherit;
-  height: inherit;
-  outline: none;
-  resize: none;
-  overflow: auto;
 }
 
 li {
@@ -141,20 +130,16 @@ li {
   background: var(--colour-primary);
   position: absolute;
   border: calc(2 * var(--unit-base-rem)) var(--colour-primary) solid;
-  padding: calc(2 * var(--unit-base-rem));
-  width: 80px;
+  min-width: 100px;
+  min-height: 100px;
+  max-width: 140px;
   height: fit-content;
   display: inline-block;
-  margin: 0 10px;
   cursor: grab;
   user-select: none;
+  white-space: pre-wrap;
   word-wrap: break-spaces;
   text-overflow: ellipsis;
   touch-action: none;
-}
-
-textarea {
-  width: inherit;
-  white-space: pre;
 }
 </style>
