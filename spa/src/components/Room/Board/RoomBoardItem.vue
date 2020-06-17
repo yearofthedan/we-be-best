@@ -138,8 +138,8 @@ li {
   cursor: grab;
   user-select: none;
   white-space: pre-wrap;
-  word-wrap: break-spaces;
   text-overflow: ellipsis;
   touch-action: none;
+  word-break: break-all;
 }
 </style>
