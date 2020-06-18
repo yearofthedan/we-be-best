@@ -1,7 +1,7 @@
 <template>
   <div v-once
     role="textbox"
-    contenteditable="plaintext-only"
+    contenteditable
     v-on:input="$emit('input', $event.target.innerText)"
   >
     {{ value }}
