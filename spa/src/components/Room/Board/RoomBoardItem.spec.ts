@@ -41,7 +41,7 @@ describe('<room-board-item />', () => {
     expect(screen.getByText('some text')).toBeInTheDocument();
   });
 
-  it('fires an interaction start event when clicking on the item', async () => {
+  it('fires an moving start event when clicking on the item', async () => {
     const { emitted } = render(RoomBoardItem, {
       propsData: {
         id: 'item123',
@@ -56,17 +56,16 @@ describe('<room-board-item />', () => {
       new PointerDownEvent({ pointerId: 1000 })
     );
 
-    expect(emitted().interactionstart).not.toBeUndefined();
-    expect(emitted().interactionstart[0]).toEqual([
+    expect(emitted().movestart).not.toBeUndefined();
+    expect(emitted().movestart[0]).toEqual([
       {
-        action: 'MOVING',
-        interactionId: 1000,
+        pointerId: 1000,
         itemId: 'item123',
       },
     ]);
   });
 
-  it('does not fire the interaction start event when the item is locked', async () => {
+  it('does not fire the moving start event when the item is locked', async () => {
     const { emitted } = render(RoomBoardItem, {
       propsData: {
         id: 'item123',
@@ -82,7 +81,7 @@ describe('<room-board-item />', () => {
       new PointerDownEvent({ pointerId: 1000 })
     );
 
-    expect(emitted().interactionstart).toBeUndefined();
+    expect(emitted().movestart).toBeUndefined();
   });
 
   it('lets me edit the item and sends the update', async () => {

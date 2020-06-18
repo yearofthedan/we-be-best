@@ -1,5 +1,6 @@
 <template>
-  <div v-once
+  <div
+    v-once
     role="textbox"
     contenteditable
     v-on:input="$emit('input', $event.target.innerText)"
@@ -24,7 +25,7 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-[role=textbox] {
+[role='textbox'] {
   background-color: var(--colour-background);
   width: inherit;
   outline: none;

@@ -19,12 +19,16 @@
 </template>
 <script lang="ts">
 import Vue from 'vue';
-import { ActionType } from '@/components/Room/Board/RoomBoardTypes';
 import {
   UPDATE_BOARD_ITEM_TEXT_MUTATION,
   UpdateBoardItemTextInput,
 } from '@/components/Room/Board/boardItemsGraphQL';
 import AutoExpandingTextBox from '@/components/Room/Board/AutoExpandingTextBox.vue';
+
+interface MoveStartEventPayload {
+  itemId: string;
+  pointerId: number;
+}
 
 export default Vue.extend({
   name: 'room-board-item',
@@ -95,11 +99,10 @@ export default Vue.extend({
         return;
       }
 
-      this.$emit('interactionstart', {
+      this.$emit('movestart', {
         itemId: this.$props.id,
-        interactionId: event.pointerId,
-        action: ActionType.MOVING,
-      });
+        pointerId: event.pointerId,
+      } as MoveStartEventPayload);
     },
   },
 });

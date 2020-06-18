@@ -117,7 +117,7 @@ describe('<room-board />', () => {
       });
     });
 
-    it('does not register the interaction if it has been locked by somebody else', async () => {
+    it('does not move the item if it has been locked by somebody else', async () => {
       renderWithApollo(RoomBoard, [], {
         propsData: {
           myId: MY_ID,

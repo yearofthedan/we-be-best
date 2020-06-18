@@ -5,8 +5,8 @@
         v-for="item in itemsData"
         v-bind="item"
         v-bind:locked-by="item.lockedBy !== myId ? item.lockedBy : undefined"
-        v-bind:moving="movingItemIds.includes(item.id)"
-        v-on:interactionstart="_onBoardItemInteractionStart"
+        v-bind:moving="_getIsMoving(item.id)"
+        v-on:movestart="_onBoardItemMoveStart"
         :key="item.id"
       />
     </ul>
@@ -27,13 +27,26 @@ import {
   ADD_ROOM_BOARD_ITEM_MUTATION,
   AddRoomBoardItemInput,
 } from './boardItemsGraphQL';
-import {
-  Interaction,
-  InteractionEndEventPayload,
-  InteractionMovedEventPayload,
-  InteractionStartEventPayload,
-} from '@/components/Room/Board/RoomBoardTypes';
 import buildItem, { Item } from '@/components/Room/Board/itemBuilder';
+
+interface MovingItemReference {
+  itemId: string;
+}
+
+interface ItemMoveStartedEventPayload {
+  itemId: string;
+  pointerId: number;
+}
+
+interface ItemMovedEventPayload {
+  pointerId: string;
+  movementX: number;
+  movementY: number;
+}
+
+interface ItemMoveEndedEventPayload {
+  pointerId: string;
+}
 
 export default Vue.extend({
   name: 'board',
@@ -61,13 +74,11 @@ export default Vue.extend({
   },
   data: function (): {
     itemsData: Item[];
-    interactions: { [interactionId: string]: Interaction };
-    movingItemIds: string[];
+    movingItemsByPointer: { [pointerId: string]: MovingItemReference };
   } {
     return {
       itemsData: this.$props.items,
-      interactions: {},
-      movingItemIds: [],
+      movingItemsByPointer: {},
     };
   },
   mounted() {
@@ -75,6 +86,13 @@ export default Vue.extend({
     window.addEventListener('pointerup', this._onPointerUp);
   },
   methods: {
+    _getIsMoving: function (itemId: string): boolean {
+      //todo would rather this be reactive
+      const result = Object.values(this.movingItemsByPointer).find(
+        (itemRefs) => itemRefs.itemId === itemId
+      );
+      return !!result;
+    },
     _onAddItem: function (): void {
       const newItem = buildItem();
       this.itemsData = [...this.itemsData, newItem];
@@ -97,8 +115,8 @@ export default Vue.extend({
         });
     },
     _onPointerUp: function ({ pointerId }: PointerEvent): void {
-      this._onBoardItemInteractionFinish({
-        interactionId: pointerId.toString(),
+      this._onBoardItemStoppedMoving({
+        pointerId: pointerId.toString(),
       });
     },
     _onPointerMove: function ({
@@ -106,24 +124,18 @@ export default Vue.extend({
       movementX,
       movementY,
     }: PointerEvent): void {
-      this._onBoardItemInteractionMoved({
-        interactionId: pointerId.toString(),
+      this._onBoardItemMoved({
+        pointerId: pointerId.toString(),
         movementX,
         movementY,
       });
     },
-    _onBoardItemInteractionStart: function (
-      payload: InteractionStartEventPayload
-    ) {
-      this.interactions = {
-        ...this.interactions,
-        [payload.interactionId]: {
-          itemId: payload.itemId,
-          action: payload.action,
-        },
+    _onBoardItemMoveStart: function (payload: ItemMoveStartedEventPayload) {
+      this.movingItemsByPointer = {
+        ...this.movingItemsByPointer,
+        [payload.pointerId]: { itemId: payload.itemId },
       };
 
-      this.movingItemIds = [...this.movingItemIds, payload.itemId];
       const mutationPayload: LockRoomBoardItemInput = {
         id: payload.itemId,
         lockedBy: this.myId,
@@ -139,51 +151,47 @@ export default Vue.extend({
           console.error(error);
         });
     },
-    _onBoardItemInteractionMoved: function ({
-      interactionId,
+    _onBoardItemMoved: function ({
+      pointerId,
       movementX,
       movementY,
-    }: InteractionMovedEventPayload) {
-      const interaction = this.interactions[interactionId];
-      if (!interaction || (movementX === 0 && movementY === 0)) {
+    }: ItemMovedEventPayload) {
+      const itemReference = this.movingItemsByPointer[pointerId];
+      if (!itemReference || (movementX === 0 && movementY === 0)) {
         return;
       }
 
-      const index = this.itemsData.findIndex(
-        (e) => e.id === interaction.itemId
+      const itemIndex = this.itemsData.findIndex(
+        (e) => e.id === itemReference.itemId
       );
       this.itemsData = [
-        ...this.itemsData.slice(0, index),
+        ...this.itemsData.slice(0, itemIndex),
         {
-          ...this.itemsData[index],
-          posX: Math.max(0, this.itemsData[index].posX + movementX),
-          posY: Math.max(0, this.itemsData[index].posY + movementY),
+          ...this.itemsData[itemIndex],
+          posX: Math.max(0, this.itemsData[itemIndex].posX + movementX),
+          posY: Math.max(0, this.itemsData[itemIndex].posY + movementY),
           lockedBy: this.myId,
         },
-        ...this.itemsData.slice(index + 1),
+        ...this.itemsData.slice(itemIndex + 1),
       ];
     },
-    _onBoardItemInteractionFinish: function ({
-      interactionId,
-    }: InteractionEndEventPayload): void {
-      const interaction = this.interactions[interactionId];
+    _onBoardItemStoppedMoving: function ({
+      pointerId,
+    }: ItemMoveEndedEventPayload): void {
+      const itemRef = this.movingItemsByPointer[pointerId];
 
-      if (!interaction) {
+      if (!itemRef) {
         return;
       }
 
-      const item = this.itemsData.find((i) => i.id === interaction.itemId);
+      const item = this.itemsData.find((i) => i.id === itemRef.itemId);
 
       if (!item) {
         return;
       }
 
-      if (this.interactions[interactionId]) {
-        this.movingItemIds = this.movingItemIds.filter(
-          (id) => id !== this.interactions[interactionId].itemId
-        );
-        this.interactions = {};
-      }
+      //todo this doesn't support multiple items, so bother with an object?
+      this.movingItemsByPointer = {};
 
       const updateRoomBoardItemsPayload: MoveBoardItemInput = {
         id: item.id,
