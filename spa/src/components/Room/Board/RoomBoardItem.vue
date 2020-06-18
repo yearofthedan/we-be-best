@@ -24,6 +24,7 @@ import {
   UpdateBoardItemTextInput,
 } from '@/components/Room/Board/boardItemsGraphQL';
 import AutoExpandingTextBox from '@/components/Room/Board/AutoExpandingTextBox.vue';
+import { PRIMARY_MOUSE_BUTTON_ID } from '@/common/dom';
 
 interface MoveStartEventPayload {
   itemId: string;
@@ -96,6 +97,10 @@ export default Vue.extend({
     },
     _onPointerDown: function (event: PointerEvent): void {
       if (this.lockedBy) {
+        return;
+      }
+
+      if (event.button && event.button !== PRIMARY_MOUSE_BUTTON_ID) {
         return;
       }
 
