@@ -3,11 +3,11 @@ import { DocumentNode } from 'graphql';
 import { createMockClient } from 'mock-apollo-client';
 import VueApollo from 'vue-apollo';
 import {ComponentHarness, render} from '@testing-library/vue';
-import { when } from 'jest-when';
 
 interface QuerySpec {
   query: DocumentNode;
-  successData: object;
+  successData?: object;
+  errorData?: { message: string };
   variables?: object;
 }
 
@@ -28,10 +28,12 @@ const renderWithApollo = (
       queryMock
         .mockResolvedValueOnce({
           data: spec.successData,
+          errors: spec.errorData ? [spec.errorData] : undefined,
         });
     } else {
       queryMock.mockResolvedValueOnce({
         data: spec.successData,
+        errors: spec.errorData ? [spec.errorData] : undefined,
       });
     }
 

@@ -104,3 +104,23 @@ export const makeHappyUpdateRoomBoardItemMutationStub = (
     successData,
   };
 }
+
+export const makeSadUpdateRoomBoardItemMutationStub = (
+  inputOverrides = {}
+) => {
+  const errorData = {
+    message: 'everything is broken',
+  };
+  return {
+    query: UPDATE_BOARD_ITEM_TEXT_MUTATION,
+    variables: {
+      input: {
+        id: 'some-id',
+        text: 'some-text',
+        ...inputOverrides
+      },
+    },
+    errorData,
+  };
+}
+

@@ -8,11 +8,15 @@ import RoomBoardItem from '@/components/Room/Board/RoomBoardItem.vue';
 import { PointerDownEvent } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import userEvent from '@testing-library/user-event';
 import { waitFor, waitForElementToBeRemoved } from '@testing-library/dom';
-import { makeHappyUpdateRoomBoardItemMutationStub } from '@/testHelpers/testMutationStubs';
+import {
+  makeHappyUpdateRoomBoardItemMutationStub,
+  makeSadUpdateRoomBoardItemMutationStub,
+} from '@/testHelpers/testMutationStubs';
 import {
   PRIMARY_MOUSE_BUTTON_ID,
   SECONDARY_MOUSE_BUTTON_ID,
 } from '@/common/dom';
+import { sleep } from '@/testHelpers/timeout';
 
 describe('<room-board-item />', () => {
   it('renders the positioning based upon the x and y props', () => {
@@ -134,12 +138,14 @@ describe('<room-board-item />', () => {
 
   it('lets me edit the item and sends the update', async () => {
     const itemId = 'item123';
+    const updatedText = 'updated content';
+
     const { queryMocks } = renderWithApollo(
       RoomBoardItem,
       [
         makeHappyUpdateRoomBoardItemMutationStub({
           id: itemId,
-          text: 'some content',
+          text: updatedText,
         }),
       ],
       {
@@ -149,12 +155,15 @@ describe('<room-board-item />', () => {
           posY: 1,
           text: 'some text',
         },
+        mocks: {
+          $toasted: { global: { apollo_error: jest.fn() } },
+        },
       }
     );
 
     await userEvent.dblClick(screen.getByRole('listitem'));
     await fireEvent.input(screen.getByRole('textbox'), {
-      target: { innerText: 'updated content' },
+      target: { innerText: updatedText },
     });
     await userEvent.click(screen.getByRole('button', { name: /save/i }));
     await waitForElementToBeRemoved(() =>
@@ -162,8 +171,49 @@ describe('<room-board-item />', () => {
     );
     await waitFor(() =>
       expect(queryMocks[0]).toHaveBeenCalledWith({
-        input: { id: itemId, text: 'updated content' },
+        input: { id: itemId, text: updatedText },
       })
+    );
+  });
+
+  it('sends a toast update when an error occurs', async () => {
+    const updatedText = 'updated content';
+    const itemId = 'item123';
+    const $toasted = {
+      global: {
+        apollo_error: jest.fn(),
+      },
+    };
+    renderWithApollo(
+      RoomBoardItem,
+      [
+        makeSadUpdateRoomBoardItemMutationStub({
+          id: itemId,
+          text: updatedText,
+        }),
+      ],
+      {
+        propsData: {
+          id: itemId,
+          posX: 2,
+          posY: 1,
+          text: 'some text',
+        },
+        mocks: {
+          $toasted: $toasted,
+        },
+      }
+    );
+
+    await userEvent.dblClick(screen.getByRole('listitem'));
+    await fireEvent.input(screen.getByRole('textbox'), {
+      target: { innerText: updatedText },
+    });
+    await userEvent.click(screen.getByRole('button', { name: /save/i }));
+    await sleep(5);
+
+    expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+      'Could not save item changes: GraphQL error: everything is broken'
     );
   });
 });

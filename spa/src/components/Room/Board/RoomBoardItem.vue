@@ -89,7 +89,9 @@ export default Vue.extend({
         });
         this.editing = false;
       } catch (e) {
-        console.error(e);
+        this.$toasted.global.apollo_error(
+          `Could not save item changes: ${e.message}`
+        );
       }
     },
     _onEditClick: function (): void {

@@ -6,6 +6,7 @@ import { split } from 'apollo-link';
 import { WebSocketLink } from 'apollo-link-ws';
 import { getMainDefinition } from 'apollo-utilities';
 import VueApollo from 'vue-apollo';
+import Toasted from 'vue-toasted';
 import App from './components/App.vue';
 
 const GRAPHQL_URI_HTTP =
@@ -49,7 +50,27 @@ const apolloProvider = new VueApollo({
   defaultClient: apolloClient,
 });
 
+Vue.use(Toasted);
 Vue.use(VueApollo);
+Vue.toasted.register('apollo_error', 'Oops.. Something Went Wrong..', {
+  type: 'error',
+  icon: 'error_outline',
+});
+
+Vue.toasted.register(
+  'apollo_error',
+  (message) => {
+    return message;
+  },
+  {
+    position: 'bottom-center',
+    duration: 5000,
+    fullWidth: true,
+    type: 'error',
+    theme: 'outline',
+    singleton: true,
+  }
+);
 
 new Vue({
   render: (h) => h(App),
