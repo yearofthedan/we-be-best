@@ -45,6 +45,7 @@ section {
   --colour-primary: var(--light-blue);
   --colour-primary-emphasis: var(--blue);
   --colour-secondary: var(--grey);
+  --colour-shadow: var(--black);
   --colour-background: var(--mint);
   --colour-warning: var(--red);
 

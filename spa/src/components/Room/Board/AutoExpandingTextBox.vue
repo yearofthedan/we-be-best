@@ -26,7 +26,6 @@ export default Vue.extend({
 
 <style scoped>
 [role='textbox'] {
-  background-color: var(--colour-background);
   width: inherit;
   outline: none;
   resize: none;

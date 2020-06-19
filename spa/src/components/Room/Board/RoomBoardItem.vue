@@ -9,6 +9,7 @@
     v-bind:data-locked-by="lockedBy"
   >
     <template v-if="editing">
+      <colour-style-selector v-on:input="_onStyleChange" />
       <auto-expanding-text-box v-model="textData" />
       <button aria-label="save" v-on:click="_onSaveClick">✔️</button>
     </template>
@@ -25,16 +26,23 @@ import {
 } from '@/components/Room/Board/boardItemsGraphQL';
 import AutoExpandingTextBox from '@/components/Room/Board/AutoExpandingTextBox.vue';
 import { PRIMARY_MOUSE_BUTTON_ID } from '@/common/dom';
+import ColourStyleSelector from '@/components/Room/Board/ColourStyleSelector.vue';
 
 interface MoveStartEventPayload {
   itemId: string;
   pointerId: number;
 }
 
+type DataProperties = {
+  editing: boolean;
+  textData: string;
+  style: { backgroundColour?: string; textColour?: string };
+};
 export default Vue.extend({
   name: 'room-board-item',
   components: {
     'auto-expanding-text-box': AutoExpandingTextBox,
+    'colour-style-selector': ColourStyleSelector,
   },
   props: {
     id: {
@@ -59,14 +67,23 @@ export default Vue.extend({
       type: String,
     },
   },
-  data(): { editing: boolean; textData: string } {
-    return { editing: false, textData: this.text };
+  data(): DataProperties {
+    return { editing: false, textData: this.text, style: {} };
   },
   computed: {
-    styleObject: function () {
+    styleObject: function (): {
+      left: string;
+      top: string;
+      '--theme-primary-colour': string;
+      '--theme-text-colour': string;
+    } {
       return {
         left: `${this.posX}px`,
         top: `${this.posY}px`,
+        '--theme-primary-colour':
+          this.style.backgroundColour || 'var(--colour-primary-emphasis)',
+        '--theme-text-colour':
+          this.style.textColour || 'var(--colour-background)',
       };
     },
     elementId: function () {
@@ -111,6 +128,9 @@ export default Vue.extend({
         pointerId: event.pointerId,
       } as MoveStartEventPayload);
     },
+    _onStyleChange: function (style: DataProperties['style']) {
+      this.style = style;
+    },
   },
 });
 </script>
@@ -126,7 +146,7 @@ li[data-locked-by]::before {
 }
 
 li[data-moving] {
-  box-shadow: 0 1px 3px 1px var(--colour-primary-emphasis);
+  border-color: var(--colour-primary-emphasis);
   cursor: none;
 }
 
@@ -136,10 +156,14 @@ li[data-editing] {
 }
 
 li {
-  box-shadow: 0 1px 3px 1px var(--colour-primary-emphasis);
-  background: var(--colour-primary);
+  --theme-primary-colour: injected-by-component;
+  --theme-text-colour: injected-by-component;
+
+  box-shadow: 2px 2px 4px 0px var(--colour-shadow);
+  background: var(--theme-primary-colour);
+  color: var(--theme-text-colour);
   position: absolute;
-  border: calc(2 * var(--unit-base-rem)) var(--colour-primary) solid;
+  border: calc(1 * var(--unit-base-rem)) var(--theme-primary-colour) solid;
   min-width: 100px;
   min-height: 100px;
   max-width: 140px;

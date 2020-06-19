@@ -42,7 +42,6 @@ describe('<room-board />', () => {
       left: 10px;
     `);
   });
-
   describe('when adding an item', () => {
     let renderedContext: RenderResult;
 

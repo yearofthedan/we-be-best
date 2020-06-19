@@ -17,6 +17,10 @@ import {
   SECONDARY_MOUSE_BUTTON_ID,
 } from '@/common/dom';
 import { sleep } from '@/testHelpers/timeout';
+import {
+  BLACKEST_BLACK,
+  LIGHT_ORANGE,
+} from '@/components/Room/Board/itemBuilder';
 
 describe('<room-board-item />', () => {
   it('renders the positioning based upon the x and y props', () => {
@@ -32,6 +36,22 @@ describe('<room-board-item />', () => {
     expect(screen.getByRole('listitem')).toHaveStyle(`
       top:  1px;
       left: 2px;
+    `);
+  });
+
+  it('renders a default themed style', () => {
+    render(RoomBoardItem, {
+      propsData: {
+        id: 'item123',
+        posX: 2,
+        posY: 1,
+        moving: false,
+      },
+    });
+
+    expect(screen.getByRole('listitem')).toHaveStyle(`
+      --theme-primary-colour: var(--colour-primary-emphasis);
+      --theme-text-colour: var(--colour-background);
     `);
   });
 
@@ -174,6 +194,25 @@ describe('<room-board-item />', () => {
         input: { id: itemId, text: updatedText },
       })
     );
+  });
+
+  it('lets me edit the item and update the themed style', async () => {
+    render(RoomBoardItem, {
+      propsData: {
+        id: 'item123',
+        posX: 2,
+        posY: 1,
+        moving: false,
+      },
+    });
+
+    await userEvent.dblClick(screen.getByRole('listitem'));
+    await userEvent.click(screen.getByRole('radio', { name: /style-3/i }));
+
+    expect(screen.getByRole('listitem')).toHaveStyle(`
+      --theme-primary-colour: ${LIGHT_ORANGE};
+      --theme-text-colour: ${BLACKEST_BLACK};
+    `);
   });
 
   it('sends a toast update when an error occurs', async () => {
