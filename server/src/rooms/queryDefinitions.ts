@@ -7,6 +7,7 @@ export interface ItemResult {
   lockedBy?: string;
   room: string;
   text: string;
+  isDeleted?: boolean;
 }
 
 export interface RoomResult {

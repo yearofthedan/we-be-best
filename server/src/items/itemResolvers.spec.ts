@@ -3,7 +3,7 @@ import {Collection} from 'apollo-datasource-mongodb';
 import {MongoClient} from 'mongodb';
 import {MongoMemoryServer} from 'mongodb-memory-server';
 import {
-  addRoomBoardItem,
+  addRoomBoardItem, deleteBoardItem,
   lockRoomBoardItem,
   moveBoardItem,
   unlockRoomBoardItem,
@@ -199,6 +199,41 @@ describe('itemResolvers', () => {
 
       expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, { ...existingItemModel, posX: 100, posY: 33 });
 
+    });
+  });
+  describe('deleteBoardItem', () => {
+    it('deletes the item', async () => {
+      const existingItemModel = buildItemData({ id: 'item1'});
+      const room = buildRoomModel({id: 'ROOM_123', items: [existingItemModel]});
+      await roomsCollection.insertOne({...room});
+      const result = await deleteBoardItem(
+        undefined,
+        { id: 'item1' },
+        {
+          pubSub: { publish: jest.fn(), dataSource: {Rooms: rooms} } as unknown as PubSub,
+          dataSources: {Rooms: rooms},
+        },
+      );
+
+      expect(result).toEqual({ ...existingItemModel, isDeleted: true });
+    });
+
+    it('publishes an update after deleting', async () => {
+      const existingItemModel = buildItemData({ id: 'item1'});
+      const room = buildRoomModel({ items: [existingItemModel]});
+      await roomsCollection.insertOne({...room});
+      const publishStub = jest.fn();
+
+      await deleteBoardItem(
+        undefined,
+        { id: 'item1' },
+        {
+          pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
+          dataSources: {Rooms: rooms},
+        },
+      );
+
+      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, { ...existingItemModel, isDeleted: true });
     });
   });
 });

@@ -182,6 +182,28 @@ describe('RoomsDataSource', () => {
     });
   });
 
+  describe('deleteItem', () => {
+    it('deletes an existing item', async () => {
+      const existingItemModel = buildItemModel({id: 'ITEM_123', room: 'ROOM_123'});
+      const room = buildRoomModel({id: 'ROOM_123', items: [existingItemModel]});
+      await roomsCollection.insertOne({...room});
+
+      const itemModel = await rooms.deleteItem('ITEM_123');
+
+      expect(itemModel).toEqual({
+        ...existingItemModel,
+        isDeleted: true
+      });
+    });
+
+    it('throws an error if the item is not there', async () => {
+      await roomsCollection.insertOne(buildRoomModel({id: 'ROOM_123', items: [buildItemModel()]}));
+
+      const expectedError = new UserInputError('could not find item to update', { invalidArgs: ['id']});
+      await expect(rooms.deleteItem('UNKNOWN_ITEM')).rejects.toThrow(expectedError);
+    });
+  });
+
   describe('addMember', () => {
     it('adds a member to an existing room', async () => {
       const existingRoomModel = buildRoomModel({id: 'ROOM_123', members: ['me']});

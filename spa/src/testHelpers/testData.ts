@@ -6,6 +6,7 @@ export const makeItem = (overrides: Partial<Item> = {}) => ({
     posY: 20,
     posX: 30,
     text: 'placeholder text',
+    isDeleted: null,
     ...overrides,
 });
 

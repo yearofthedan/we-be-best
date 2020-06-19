@@ -15,6 +15,7 @@ export interface Item {
   posY: number;
   lockedBy?: string;
   text: string;
+  isDeleted?: boolean;
 }
 
 const buildItem = (): Item => ({

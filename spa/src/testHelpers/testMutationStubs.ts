@@ -4,7 +4,7 @@ import {
   LOCK_ROOM_BOARD_ITEM_MUTATION,
   UNLOCK_ROOM_BOARD_ITEM_MUTATION,
   MOVE_BOARD_ITEM_MUTATION,
-  MoveBoardItemInput, UPDATE_BOARD_ITEM_TEXT_MUTATION,
+  MoveBoardItemInput, UPDATE_BOARD_ITEM_TEXT_MUTATION, DELETE_BOARD_ITEM_MUTATION,
 } from '@/components/Room/Board/boardItemsGraphQL';
 import {makeItem} from '@/testHelpers/testData';
 
@@ -124,3 +124,38 @@ export const makeSadUpdateRoomBoardItemMutationStub = (
   };
 }
 
+export const makeHappyDeleteBoardItemMutationStub = (
+  inputOverrides: { id?: string} = {}
+) => {
+  const successData = {
+    deleteBoardItem: {
+      id: 'some-id',
+      isDeleted: true,
+      ...inputOverrides
+    }
+  };
+  return {
+    query: DELETE_BOARD_ITEM_MUTATION,
+    variables: {
+      id: 'some-id',
+      ...inputOverrides
+    },
+    successData,
+  };
+}
+
+export const makeSadDeleteBoardItemMutationStub = (
+  inputOverrides: { id?: string } = {}
+) => {
+  const errorData = {
+    message: 'everything is broken',
+  };
+  return {
+    query: DELETE_BOARD_ITEM_MUTATION,
+    variables: {
+      id: 'some-id',
+      ...inputOverrides
+    },
+    errorData,
+  };
+}

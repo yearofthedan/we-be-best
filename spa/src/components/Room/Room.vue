@@ -45,6 +45,10 @@ interface RoomComponentData {
 const upsertItem = (array: Item[], item: Item) => {
   const index = array.findIndex((e) => e.id === item.id);
 
+  if (item.isDeleted) {
+    return [...array.slice(0, index), ...array.slice(index + 1)];
+  }
+
   if (index == -1) {
     return [...array, item];
   }

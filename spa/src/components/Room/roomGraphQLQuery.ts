@@ -12,6 +12,7 @@ export interface ItemData {
   posY: number;
   lockedBy?: string;
   text: string;
+  isDeleted?: boolean;
 }
 
 export interface RoomMemberUpdatesSubscriptionData {
@@ -43,6 +44,7 @@ export const ROOM_ITEM_UPDATES_SUBSCRIPTION = gql`
       posY
       lockedBy
       text
+      isDeleted
     }
   }
 `;
@@ -58,6 +60,7 @@ export const GET_ROOM_QUERY = gql`
         posY
         lockedBy
         text
+        isDeleted
       }
     }
   }
@@ -78,6 +81,7 @@ export const JOIN_ROOM_MUTATION = gql`
         posY
         lockedBy
         text
+        isDeleted
       }
     }
   }

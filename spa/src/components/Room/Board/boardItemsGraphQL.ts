@@ -29,6 +29,7 @@ export const UNLOCK_ROOM_BOARD_ITEM_MUTATION = gql`
       posX
       posY
       lockedBy
+      isDeleted
     }
   }
 `;
@@ -45,6 +46,7 @@ export const LOCK_ROOM_BOARD_ITEM_MUTATION = gql`
       posX
       posY
       lockedBy
+      isDeleted
     }
   }
 `;
@@ -62,6 +64,7 @@ export const MOVE_BOARD_ITEM_MUTATION = gql`
       posX
       posY
       lockedBy
+      isDeleted
     }
   }
 `;
@@ -78,6 +81,16 @@ export const UPDATE_BOARD_ITEM_TEXT_MUTATION = gql`
       posX
       posY
       lockedBy
+      isDeleted
+    }
+  }
+`;
+
+export const DELETE_BOARD_ITEM_MUTATION = gql`
+  mutation deleteBoardItem($id: ID!) {
+    deleteBoardItem(id: $id) {
+      id
+      isDeleted
     }
   }
 `;

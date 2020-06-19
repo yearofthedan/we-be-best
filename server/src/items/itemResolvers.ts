@@ -69,3 +69,14 @@ export const moveBoardItem = async (
 
   return result;
 };
+
+export const deleteBoardItem = async (
+  _: unknown,
+  { id }: { id: string },
+  { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
+): Promise<ItemResult> => {
+  const result = await dataSources.Rooms.deleteItem(id);
+  await pubSub.publish(ITEM_CHANGED_TOPIC, result);
+
+  return result;
+};

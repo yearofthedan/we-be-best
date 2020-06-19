@@ -15,6 +15,7 @@ export interface ItemModel {
   text: string;
   lockedBy?: string;
   room: string;
+  isDeleted?: boolean;
 }
 
 export type NewItemParam = Pick<ItemModel, 'id'|'posX'|'posY'|'text'>
@@ -40,6 +41,25 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
       throw new UserInputError('could not find room', { invalidArgs: ['id']});
     }
     return room;
+  }
+
+  async deleteItem(itemId: string): Promise<ItemModel> {
+    const result = await this.collection.findOneAndUpdate(
+      {
+        'items.id': itemId
+      },
+      {$set: { 'items.$.isDeleted': true }},
+      {
+        projection: { items: 1 },
+        returnOriginal: false,
+      },
+    );
+
+    if (result.value === null) {
+      throw new UserInputError('could not find item to update', { invalidArgs: ['id']});
+    }
+
+    return result.value.items.find(i => i.id === itemId);
   }
 
   async updateItem(item: UpdateItemParam): Promise<ItemModel> {

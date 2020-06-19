@@ -11,6 +11,8 @@ import { waitFor, waitForElementToBeRemoved } from '@testing-library/dom';
 import {
   makeHappyUpdateRoomBoardItemMutationStub,
   makeSadUpdateRoomBoardItemMutationStub,
+  makeHappyDeleteBoardItemMutationStub,
+  makeSadDeleteBoardItemMutationStub,
 } from '@/testHelpers/testMutationStubs';
 import {
   PRIMARY_MOUSE_BUTTON_ID,
@@ -215,7 +217,7 @@ describe('<room-board-item />', () => {
     `);
   });
 
-  it('sends a toast update when an error occurs', async () => {
+  it('displays a toast update when an error occurs while updating', async () => {
     const updatedText = 'updated content';
     const itemId = 'item123';
     const $toasted = {
@@ -253,6 +255,72 @@ describe('<room-board-item />', () => {
 
     expect($toasted.global.apollo_error).toHaveBeenCalledWith(
       'Could not save item changes: GraphQL error: everything is broken'
+    );
+  });
+  it('lets me edit the item and delete', async () => {
+    const itemId = 'item123';
+
+    const { queryMocks } = renderWithApollo(
+      RoomBoardItem,
+      [
+        makeHappyDeleteBoardItemMutationStub({
+          id: itemId,
+        }),
+      ],
+      {
+        propsData: {
+          id: itemId,
+          posX: 2,
+          posY: 1,
+          text: 'some text',
+        },
+        mocks: {
+          $toasted: { global: { apollo_error: jest.fn() } },
+        },
+      }
+    );
+
+    await userEvent.dblClick(screen.getByRole('listitem'));
+    await userEvent.click(screen.getByRole('button', { name: /delete/i }));
+
+    await waitFor(() =>
+      expect(queryMocks[0]).toHaveBeenCalledWith({ id: itemId })
+    );
+  });
+
+  it('displays a toast update when an error occurs while deleting', async () => {
+    const itemId = 'item123';
+    const $toasted = {
+      global: {
+        apollo_error: jest.fn(),
+      },
+    };
+    renderWithApollo(
+      RoomBoardItem,
+      [
+        makeSadDeleteBoardItemMutationStub({
+          id: itemId,
+        }),
+      ],
+      {
+        propsData: {
+          id: itemId,
+          posX: 2,
+          posY: 1,
+          text: 'some text',
+        },
+        mocks: {
+          $toasted: $toasted,
+        },
+      }
+    );
+
+    await userEvent.dblClick(screen.getByRole('listitem'));
+    await userEvent.click(screen.getByRole('button', { name: /delete/i }));
+    await sleep(5);
+
+    expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+      'Could not remove item: GraphQL error: everything is broken'
     );
   });
 });

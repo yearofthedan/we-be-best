@@ -1,8 +1,8 @@
 import {
   fireEvent,
+  RenderResult,
   renderWithApollo,
   screen,
-  RenderResult,
 } from '@/testHelpers/renderer';
 import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import {
@@ -17,8 +17,8 @@ import {
   ITEM_ID,
   makeHappyAddRoomBoardItemMutationStub,
   makeHappyLockRoomBoardItemMutationStub,
-  makeHappyUnlockRoomBoardItemMutationStub,
   makeHappyMoveBoardItemMutationStub,
+  makeHappyUnlockRoomBoardItemMutationStub,
   MY_ID,
   ROOM_ID,
 } from '@/testHelpers/testMutationStubs';

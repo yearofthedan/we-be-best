@@ -30,6 +30,7 @@ describe('integration: items', () => {
                     posY
                     lockedBy
                     text
+                    isDeleted
                 }
             }`,
         variables: {roomId: '123'},
@@ -199,6 +200,31 @@ describe('integration: items', () => {
       const result = await subscriptionPromise;
       expect(result.data.itemUpdates.id).toEqual('item123');
       expect(result.data.itemUpdates.text).toEqual('some-text');
+    });
+  });
+
+  describe('delete item subscription', () => {
+    it('sends an update when the item is deleted for a room I am subscribed to', async function () {
+      await addARoom();
+      await addAnItemToARoom();
+
+      const subscriptionPromise = addAnItemUpdateSubscription();
+      await apolloClient.mutate<ItemResult, { id: string }>({
+        mutation: gql`
+            mutation deleteBoardItem($id: ID!) {
+                deleteBoardItem(id: $id)  {
+                    id
+                    isDeleted
+                }
+            }`,
+        variables: {
+          id: 'item123',
+        },
+      });
+
+      const result = await subscriptionPromise;
+      expect(result.data.itemUpdates.id).toEqual('item123');
+      expect(result.data.itemUpdates.isDeleted).toEqual(true);
     });
   });
 });

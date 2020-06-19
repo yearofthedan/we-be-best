@@ -53,6 +53,7 @@ const typeDefs = gql`
         lockedBy: String
         room: Room
         text: String!
+        isDeleted: Boolean
     }
 
     type Query {
@@ -71,6 +72,7 @@ const typeDefs = gql`
         unlockRoomBoardItem(input: UnlockRoomBoardItemInput!): Item!
         addRoomBoardItem(input: AddRoomBoardItemInput!): Item!
         updateBoardItemText(input: UpdateBoardItemTextInput!): Item!
+        deleteBoardItem(id: ID!): Item!
     }
 `;
 

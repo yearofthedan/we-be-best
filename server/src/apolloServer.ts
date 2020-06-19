@@ -6,7 +6,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import itemUpdatesSubscriptionFilter from './items/itemUpdatesSubscriptionFilter';
 import roomMemberSubscriptionFilter from './rooms/roomMemberSubscriptionFilter';
 import {
-  addRoomBoardItem,
+  addRoomBoardItem, deleteBoardItem,
   lockRoomBoardItem,
   moveBoardItem,
   unlockRoomBoardItem,
@@ -65,7 +65,8 @@ const apolloServer = async () => {
         unlockRoomBoardItem: unlockRoomBoardItem,
         moveBoardItem: moveBoardItem,
         addRoomBoardItem: addRoomBoardItem,
-        updateBoardItemText: updateBoardItemText
+        updateBoardItemText: updateBoardItemText,
+        deleteBoardItem: deleteBoardItem,
       }
     },
     dataSources: () => ({

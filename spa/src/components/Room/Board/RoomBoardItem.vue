@@ -11,7 +11,16 @@
     <template v-if="editing">
       <colour-style-selector v-on:input="_onStyleChange" />
       <auto-expanding-text-box v-model="textData" />
-      <button aria-label="save" v-on:click="_onSaveClick">✔️</button>
+      <button id="save-button" aria-label="save" v-on:click="_onSaveClick">
+        ✔️
+      </button>
+      <button
+        id="delete-button"
+        aria-label="delete"
+        v-on:click="_onDeleteClick"
+      >
+        🗑️️
+      </button>
     </template>
     <template v-else>
       {{ text }}
@@ -21,6 +30,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import {
+  DELETE_BOARD_ITEM_MUTATION,
   UPDATE_BOARD_ITEM_TEXT_MUTATION,
   UpdateBoardItemTextInput,
 } from '@/components/Room/Board/boardItemsGraphQL';
@@ -91,6 +101,20 @@ export default Vue.extend({
     },
   },
   methods: {
+    _onDeleteClick: async function (): Promise<void> {
+      try {
+        await this.$apollo.mutate({
+          mutation: DELETE_BOARD_ITEM_MUTATION,
+          variables: {
+            id: this.id,
+          },
+        });
+      } catch (e) {
+        this.$toasted.global.apollo_error(
+          `Could not remove item: ${e.message}`
+        );
+      }
+    },
     _onSaveClick: async function (): Promise<void> {
       const mutationPayload: UpdateBoardItemTextInput = {
         id: this.id,
@@ -179,8 +203,6 @@ li {
 
 button {
   position: absolute;
-  right: -40px;
-  bottom: 0;
   width: 20px;
   text-align: center;
   height: 20px;
@@ -188,6 +210,15 @@ button {
   padding: 0;
   border-radius: 100%;
   box-shadow: 2px 2px 4px 0px var(--colour-secondary);
+}
 
+button#save-button {
+  right: -36px;
+  bottom: 0;
+}
+
+button#delete-button {
+  right: -36px;
+  top: 0;
 }
 </style>

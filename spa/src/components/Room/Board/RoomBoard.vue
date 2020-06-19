@@ -77,7 +77,7 @@ export default Vue.extend({
     movingItemsByPointer: { [pointerId: string]: MovingItemReference };
   } {
     return {
-      itemsData: this.$props.items,
+      itemsData: this.$props.items.filter((item: Item) => !item.isDeleted),
       movingItemsByPointer: {},
     };
   },
