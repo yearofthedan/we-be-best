@@ -176,4 +176,18 @@ li {
   touch-action: none;
   word-break: break-all;
 }
+
+button {
+  position: absolute;
+  right: -40px;
+  bottom: 0;
+  width: 20px;
+  text-align: center;
+  height: 20px;
+  border: solid 1px;
+  padding: 0;
+  border-radius: 100%;
+  box-shadow: 2px 2px 4px 0px var(--colour-secondary);
+
+}
 </style>
