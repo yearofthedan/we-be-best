@@ -1,7 +1,7 @@
+import { renderWithApollo, screen } from '../testHelpers/renderer';
 import userEvent from '@testing-library/user-event';
-import Lobby from '@/components/Lobby/Lobby.vue';
-import { screen, renderWithApollo } from '@/testHelpers/renderer';
-import { JOIN_ROOM_MUTATION } from '@/components/Room/roomGraphQLQuery';
+import App from './App.vue';
+import { JOIN_ROOM_MUTATION } from './Room/roomGraphQLQuery';
 
 const ROOM_NAME = 'my-room';
 const MEMBER_NAME = 'me';
@@ -26,10 +26,10 @@ function makeHappyPathMutationStub() {
   };
 }
 
-describe('<lobby />', () => {
+describe('App', () => {
   it('creates a gathering when I input a valid name and continue', async () => {
     const { queryMocks } = renderWithApollo(
-      Lobby,
+      App,
       [makeHappyPathMutationStub()],
       {
         stubs: {

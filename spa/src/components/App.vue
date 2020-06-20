@@ -1,17 +1,34 @@
 <template>
   <main id="app">
-    <lobby room-id="123" />
+    <article>
+      <lobby v-if="!roomId" v-on:joined="_onJoined" />
+      <room v-else v-bind:room-id="roomId" v-bind:my-id="memberName" />
+    </article>
   </main>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import Lobby from '@/components/Lobby/Lobby.vue';
+import Room from '@/components/Room/Room.vue';
 
 export default Vue.extend({
   name: 'app',
   components: {
     lobby: Lobby,
+    room: Room,
+  },
+  data(): { roomId: string | null; memberName: string | null } {
+    return {
+      roomId: null,
+      memberName: null,
+    };
+  },
+  methods: {
+    _onJoined: function (params: { roomName: string; memberName: string }) {
+      this.roomId = params.roomName;
+      this.memberName = params.memberName;
+    },
   },
 });
 </script>
@@ -26,10 +43,6 @@ body,
 h1,
 h2 {
   margin: 0;
-}
-
-section {
-  background-color: var(--colour-background);
 }
 
 #app {
@@ -55,5 +68,13 @@ section {
   --font-size-interactive: calc(4 * var(--unit-base-rem));
   --font-size-label: calc(4 * var(--unit-base-rem));
   --font-size-aside: calc(3 * var(--unit-base-rem));
+
+  background-color: var(--colour-background);
+}
+article {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-row-gap: calc(3 * var(--unit-base-rem));
 }
 </style>

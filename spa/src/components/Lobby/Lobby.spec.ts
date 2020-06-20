@@ -5,7 +5,7 @@ import {
   waitFor,
 } from '@/testHelpers/renderer';
 import userEvent from '@testing-library/user-event';
-import JoinRoomForm from './JoinRoomForm.vue';
+import Lobby from './Lobby.vue';
 import { JOIN_ROOM_MUTATION } from '@/components/Room/roomGraphQLQuery';
 
 const ROOM_NAME = 'my-room';
@@ -31,9 +31,9 @@ function makeHappyPathMutationStub() {
   };
 }
 
-describe('<join-room-form />', () => {
+describe('<lobby />', () => {
   it('shows an error message when I try to submit without a name', async () => {
-    render(JoinRoomForm);
+    render(Lobby);
 
     await userEvent.click(screen.getByRole('button', { name: /join room/i }));
 
@@ -41,7 +41,7 @@ describe('<join-room-form />', () => {
   });
 
   it('shows an error message when I try to submit without a room name', async () => {
-    render(JoinRoomForm);
+    render(Lobby);
 
     await userEvent.click(screen.getByRole('button', { name: /join room/i }));
 
@@ -49,7 +49,7 @@ describe('<join-room-form />', () => {
   });
 
   it('joins the room and emits a joined event', async () => {
-    const { queryMocks, emitted } = renderWithApollo(JoinRoomForm, [
+    const { queryMocks, emitted } = renderWithApollo(Lobby, [
       makeHappyPathMutationStub(),
     ]);
 
