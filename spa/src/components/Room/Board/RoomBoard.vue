@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section v-bind:data-room-name="roomId">
     <ul>
       <room-board-item
         v-for="item in itemsData"
@@ -18,35 +18,17 @@
 import Vue from 'vue';
 import RoomBoardItem from './RoomBoardItem.vue';
 import {
-  LOCK_ROOM_BOARD_ITEM_MUTATION,
-  LockRoomBoardItemInput,
-  UNLOCK_ROOM_BOARD_ITEM_MUTATION,
-  UnlockRoomBoardItemInput,
-  MOVE_BOARD_ITEM_MUTATION,
-  MoveBoardItemInput,
   ADD_ROOM_BOARD_ITEM_MUTATION,
   AddRoomBoardItemInput,
+  LOCK_ROOM_BOARD_ITEM_MUTATION,
+  LockRoomBoardItemInput,
+  MOVE_BOARD_ITEM_MUTATION,
+  MoveBoardItemInput,
+  UNLOCK_ROOM_BOARD_ITEM_MUTATION,
+  UnlockRoomBoardItemInput,
 } from './boardItemsGraphQL';
 import buildItem, { Item } from '@/components/Room/Board/itemBuilder';
-
-interface MovingItemReference {
-  itemId: string;
-}
-
-interface ItemMoveStartedEventPayload {
-  itemId: string;
-  pointerId: number;
-}
-
-interface ItemMovedEventPayload {
-  pointerId: string;
-  movementX: number;
-  movementY: number;
-}
-
-interface ItemMoveEndedEventPayload {
-  pointerId: string;
-}
+import { updateElementFieldsInArray } from '@/components/Room/Board/arrays';
 
 export default Vue.extend({
   name: 'board',
@@ -160,32 +142,29 @@ export default Vue.extend({
       if (!itemReference || (movementX === 0 && movementY === 0)) {
         return;
       }
-
-      const itemIndex = this.itemsData.findIndex(
+      const { posX, posY } = this.itemsData.find(
         (e) => e.id === itemReference.itemId
-      );
-      this.itemsData = [
-        ...this.itemsData.slice(0, itemIndex),
+      ) as Item;
+
+      this.itemsData = updateElementFieldsInArray(
+        this.itemsData,
         {
-          ...this.itemsData[itemIndex],
-          posX: Math.max(0, this.itemsData[itemIndex].posX + movementX),
-          posY: Math.max(0, this.itemsData[itemIndex].posY + movementY),
+          posX: Math.max(0, posX + movementX),
+          posY: Math.max(0, posY + movementY),
           lockedBy: this.myId,
         },
-        ...this.itemsData.slice(itemIndex + 1),
-      ];
+        (e) => e.id === itemReference.itemId
+      );
     },
     _onBoardItemStoppedMoving: function ({
       pointerId,
     }: ItemMoveEndedEventPayload): void {
       const itemRef = this.movingItemsByPointer[pointerId];
-
       if (!itemRef) {
         return;
       }
 
       const item = this.itemsData.find((i) => i.id === itemRef.itemId);
-
       if (!item) {
         return;
       }
@@ -226,6 +205,25 @@ export default Vue.extend({
     },
   },
 });
+
+interface MovingItemReference {
+  itemId: string;
+}
+
+interface ItemMoveStartedEventPayload {
+  itemId: string;
+  pointerId: number;
+}
+
+interface ItemMovedEventPayload {
+  pointerId: string;
+  movementX: number;
+  movementY: number;
+}
+
+interface ItemMoveEndedEventPayload {
+  pointerId: string;
+}
 </script>
 
 <style scoped>
@@ -246,6 +244,17 @@ button {
 }
 
 section section {
-  display: block;
+  height: 100vh;
+}
+
+section::before {
+  position: absolute;
+  padding-left: calc(4 * var(--unit-base-rem));
+  padding-bottom: calc(4 * var(--unit-base-rem));
+  bottom: 0;
+  font-size: calc(12 * var(--unit-base-rem));
+  font-style: italic;
+  filter: opacity(15%);
+  content: attr(data-room-name);
 }
 </style>
