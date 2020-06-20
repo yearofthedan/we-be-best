@@ -1,8 +1,10 @@
 <template>
   <aside>
-    <label aria-label="room details" for="toggle-details">👤</label>
     <input id="toggle-details" aria-label="room details" type="checkbox" />
     <section>
+      <label aria-label="room details" for="toggle-details">
+        👤
+      </label>
       <room-members v-bind:members="members" />
     </section>
   </aside>
@@ -29,17 +31,33 @@ export default Vue.extend({
 <style scoped>
 label {
   font-size: calc(6 * var(--unit-base-rem));
-  height: 40px;
-  width: 40px;
   margin-left: auto;
   z-index: 2000;
+  position: absolute;
+  left: -28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+label::before {
+  width: 0;
+  height: 0;
+  left: calc(-2 * var(--unit-base-rem));
+  border-top: calc(2 * var(--unit-base-rem)) solid transparent;
+  border-bottom: calc(2 * var(--unit-base-rem)) solid transparent;
+  border-right: calc(2 * var(--unit-base-rem)) solid
+    var(--colour-primary-emphasis);
+  position: absolute;
+  content: '';
 }
 
 aside {
+  --content-width: 160px;
   position: absolute;
   top: 0;
-  right: 20px;
-  width: 160px;
+  right: 0;
+  width: var(--content-width);
   display: grid;
   z-index: 1000;
 }
@@ -52,14 +70,12 @@ aside > input {
 
 aside > input:checked ~ section {
   transform: translateX(0);
-  opacity: 1;
 }
 
 aside > section {
-  transform: translateX(200px);
-  transition-property: transform, opacity;
+  transform: translateX(calc(var(--content-width) - 4px));
+  transition-property: transform;
   transition-duration: 0.2s;
-  opacity: 0;
   z-index: 1001;
 }
 </style>
