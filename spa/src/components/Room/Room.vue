@@ -8,10 +8,7 @@
         v-bind:room-id="roomId"
         v-bind:items="room.items"
       />
-      <div>
-        <span>{{ roomId }}</span>
-        <room-members v-bind:members="room.members" />
-      </div>
+      <room-details v-bind:members="room.members" />
     </template>
   </section>
 </template>
@@ -21,16 +18,16 @@ import Vue from 'vue';
 import {
   GET_ROOM_QUERY,
   GetRoomQueryData,
+  ROOM_ITEM_UPDATES_SUBSCRIPTION,
   ROOM_MEMBER_UPDATES_SUBSCRIPTION,
   RoomData,
-  RoomMemberUpdatesSubscriptionData,
-  ROOM_ITEM_UPDATES_SUBSCRIPTION,
   RoomItemUpdatesSubscriptionData,
+  RoomMemberUpdatesSubscriptionData,
 } from '@/components/Room/roomGraphQLQuery';
-import RoomMembers from '@/components/Room/RoomMembers.vue';
 import { ApolloError } from 'apollo-client';
 import { Item } from '@/components/Room/Board/itemBuilder';
 import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
+import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
 
 interface RoomComponentProps {
   roomId: string;
@@ -60,7 +57,7 @@ export default Vue.extend({
   name: 'room' as string,
   components: {
     'room-board': RoomBoard,
-    'room-members': RoomMembers,
+    'room-details': RoomDetails,
   },
   props: {
     myId: {
@@ -154,13 +151,5 @@ export default Vue.extend({
 <style scoped>
 section {
   background-color: var(--colour-background);
-  display: grid;
-  grid-template-columns: 1fr max-content;
-}
-
-section > div {
-  background-color: var(--colour-primary);
-  display: flex;
-  flex-direction: column;
 }
 </style>

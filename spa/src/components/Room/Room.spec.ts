@@ -14,7 +14,7 @@ describe('<room />', () => {
       successData: {
         room: {
           id: '123',
-          members: [makeRoomMember('my-name')],
+          members: [makeRoomMember('me')],
           items: [makeItem({ id: 'ITEM123' })],
         },
       },
@@ -25,7 +25,7 @@ describe('<room />', () => {
       successData: {
         roomMemberUpdates: {
           id: '123',
-          members: [makeRoomMember('my-name'), makeRoomMember('my-name2')],
+          members: [makeRoomMember('me'), makeRoomMember('my-mother')],
         },
       },
     };
@@ -49,8 +49,8 @@ describe('<room />', () => {
       }
     );
 
-    expect(await screen.findByText('my-name')).toBeInTheDocument();
-    expect(screen.getByText('my-name2')).toBeInTheDocument();
+    expect(await screen.findByText(/me/)).toBeInTheDocument();
+    expect(screen.getByText(/my-mother/)).toBeInTheDocument();
     expect(await screen.findAllByText('placeholder text')).toHaveLength(2);
   });
 });
