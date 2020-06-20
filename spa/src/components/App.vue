@@ -67,6 +67,7 @@ h2 {
   --unit-base-rem: calc(1rem / 4);
 
   --font-size-interactive: calc(4 * var(--unit-base-rem));
+  --font-size-fab: calc(8 * var(--unit-base-rem));
   --font-size-label: calc(4 * var(--unit-base-rem));
   --font-size-aside: calc(3 * var(--unit-base-rem));
 

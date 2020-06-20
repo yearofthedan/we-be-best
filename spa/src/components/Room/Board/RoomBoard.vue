@@ -10,7 +10,7 @@
         :key="item.id"
       />
     </ul>
-    <button v-on:click="_onAddItem" aria-label="Add" type="button">+</button>
+    <button v-on:click="_onAddItem" aria-label="Add" type="button" />
   </section>
 </template>
 
@@ -238,9 +238,24 @@ button {
   height: calc(16 * var(--unit-base-rem));
   bottom: calc(8 * var(--unit-base-rem));
   right: calc(8 * var(--unit-base-rem));
-  border-radius: 100%;
-  border-width: var(--unit-base-rem);
+  /*border-radius: 100%;*/
+  /*border-width: var(--unit-base-rem);*/
   font-size: var(--font-size-interactive);
+}
+button::before {
+  content: '+';
+  position: absolute;
+  font-size: var(--font-size-fab);
+  top: -12px;
+  right: -12px;
+  border-radius: 100%;
+  border: 1px solid;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--colour-primary);
 }
 
 section section {
