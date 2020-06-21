@@ -53,6 +53,20 @@ describe('RoomsDataSource', () => {
       expect(roomModel).toEqual(existingRoomModel);
     });
 
+    it('does not return deleted items', async () => {
+      const deletedItem = buildItemModel({ id: '1', isDeleted: true });
+      const activeItem = buildItemModel({id: '2'});
+      const activeItemWithIsDeletedKey = buildItemModel({ isDeleted: undefined, id: '3', });
+      const existingRoomModel = buildRoomModel({id: 'ROOM_123', members: ['me'], items: [deletedItem, activeItem]});
+      await roomsCollection.insertOne(existingRoomModel);
+
+      const roomModel = await rooms.getRoom('ROOM_123');
+
+      expect(roomModel.items).toContainEqual(activeItem);
+      expect(roomModel.items).not.toContainEqual(deletedItem);
+      expect(roomModel.items).not.toContainEqual(activeItemWithIsDeletedKey);
+    });
+
     it('throws an error if the room is not there', async () => {
       const expectedError = new UserInputError('could not find room', { invalidArgs: ['id']});
 

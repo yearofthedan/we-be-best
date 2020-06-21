@@ -60,7 +60,6 @@ export const GET_ROOM_QUERY = gql`
         posY
         lockedBy
         text
-        isDeleted
       }
     }
   }
@@ -81,7 +80,6 @@ export const JOIN_ROOM_MUTATION = gql`
         posY
         lockedBy
         text
-        isDeleted
       }
     }
   }

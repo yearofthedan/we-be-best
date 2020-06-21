@@ -28,6 +28,7 @@ import { ApolloError } from 'apollo-client';
 import { Item } from '@/components/Room/Board/itemBuilder';
 import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
+import { removeArrayElement, upsertArrayElement } from '@/common/arrays';
 
 interface RoomComponentProps {
   roomId: string;
@@ -39,18 +40,12 @@ interface RoomComponentData {
   room?: RoomData | null;
 }
 
-const upsertItem = (array: Item[], item: Item) => {
-  const index = array.findIndex((e) => e.id === item.id);
-
-  if (item.isDeleted) {
-    return [...array.slice(0, index), ...array.slice(index + 1)];
+const resolveUpdate = (items: Item[], update: Item) => {
+  if (update.isDeleted) {
+    return removeArrayElement(items, (e) => e.id === update.id);
   }
 
-  if (index == -1) {
-    return [...array, item];
-  }
-
-  return [...array.slice(0, index), item, ...array.slice(index + 1)];
+  return upsertArrayElement(items, update, (e) => e.id === update.id);
 };
 
 export default Vue.extend({
@@ -128,7 +123,7 @@ export default Vue.extend({
               return {
                 room: {
                   ...currentRoom,
-                  items: upsertItem(
+                  items: resolveUpdate(
                     currentRoom.items,
                     subscriptionData.data.itemUpdates
                   ),

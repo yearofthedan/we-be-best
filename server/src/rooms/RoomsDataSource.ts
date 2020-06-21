@@ -40,7 +40,9 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
     if (!room) {
       throw new UserInputError('could not find room', { invalidArgs: ['id']});
     }
-    return room;
+
+    const items = room.items.filter(item => !item.isDeleted);
+    return { ...room, items };
   }
 
   async deleteItem(itemId: string): Promise<ItemModel> {

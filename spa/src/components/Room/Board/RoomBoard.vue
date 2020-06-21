@@ -28,7 +28,7 @@ import {
   UnlockRoomBoardItemInput,
 } from './boardItemsGraphQL';
 import buildItem, { Item } from '@/components/Room/Board/itemBuilder';
-import { updateElementFieldsInArray } from '@/components/Room/Board/arrays';
+import { patchArrayElement } from '@/common/arrays';
 
 export default Vue.extend({
   name: 'board',
@@ -146,7 +146,7 @@ export default Vue.extend({
         (e) => e.id === itemReference.itemId
       ) as Item;
 
-      this.itemsData = updateElementFieldsInArray(
+      this.itemsData = patchArrayElement(
         this.itemsData,
         {
           posX: Math.max(0, posX + movementX),
@@ -238,8 +238,6 @@ button {
   height: calc(16 * var(--unit-base-rem));
   bottom: calc(8 * var(--unit-base-rem));
   right: calc(8 * var(--unit-base-rem));
-  /*border-radius: 100%;*/
-  /*border-width: var(--unit-base-rem);*/
   font-size: var(--font-size-interactive);
 }
 button::before {
