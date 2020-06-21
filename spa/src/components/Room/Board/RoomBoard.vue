@@ -1,5 +1,8 @@
 <template>
-  <section v-bind:data-room-name="roomId">
+  <section
+    v-bind:data-room-name="roomId"
+    v-on:pointermove="this._onPointerMove"
+  >
     <ul>
       <room-board-item
         v-for="item in itemsData"
@@ -56,24 +59,19 @@ export default Vue.extend({
   },
   data: function (): {
     itemsData: Item[];
-    movingItemsByPointer: { [pointerId: string]: MovingItemReference };
+    movingItemReference: string | null;
   } {
     return {
       itemsData: this.$props.items.filter((item: Item) => !item.isDeleted),
-      movingItemsByPointer: {},
+      movingItemReference: null,
     };
   },
   mounted() {
-    window.addEventListener('pointermove', this._onPointerMove);
     window.addEventListener('pointerup', this._onPointerUp);
   },
   methods: {
     _getIsMoving: function (itemId: string): boolean {
-      //todo would rather this be reactive
-      const result = Object.values(this.movingItemsByPointer).find(
-        (itemRefs) => itemRefs.itemId === itemId
-      );
-      return !!result;
+      return itemId === this.movingItemReference;
     },
     _onAddItem: function (): void {
       const newItem = buildItem();
@@ -96,27 +94,24 @@ export default Vue.extend({
           console.error(error);
         });
     },
-    _onPointerUp: function ({ pointerId }: PointerEvent): void {
-      this._onBoardItemStoppedMoving({
-        pointerId: pointerId.toString(),
-      });
+    _onPointerUp: function (): void {
+      this._onBoardItemStoppedMoving();
     },
-    _onPointerMove: function ({
-      pointerId,
-      movementX,
-      movementY,
-    }: PointerEvent): void {
+    _onPointerMove: function (event: MouseEvent): void {
+      const { movementX, movementY } = event;
+
+      if (!this.movingItemReference) {
+        return;
+      }
+
       this._onBoardItemMoved({
-        pointerId: pointerId.toString(),
+        itemReference: this.movingItemReference,
         movementX,
         movementY,
       });
     },
     _onBoardItemMoveStart: function (payload: ItemMoveStartedEventPayload) {
-      this.movingItemsByPointer = {
-        ...this.movingItemsByPointer,
-        [payload.pointerId]: { itemId: payload.itemId },
-      };
+      this.movingItemReference = payload.itemId;
 
       const mutationPayload: LockRoomBoardItemInput = {
         id: payload.itemId,
@@ -134,16 +129,16 @@ export default Vue.extend({
         });
     },
     _onBoardItemMoved: function ({
-      pointerId,
+      itemReference,
       movementX,
       movementY,
     }: ItemMovedEventPayload) {
-      const itemReference = this.movingItemsByPointer[pointerId];
       if (!itemReference || (movementX === 0 && movementY === 0)) {
         return;
       }
+
       const { posX, posY } = this.itemsData.find(
-        (e) => e.id === itemReference.itemId
+        (e) => e.id === itemReference
       ) as Item;
 
       this.itemsData = patchArrayElement(
@@ -153,24 +148,21 @@ export default Vue.extend({
           posY: Math.max(0, posY + movementY),
           lockedBy: this.myId,
         },
-        (e) => e.id === itemReference.itemId
+        (e) => e.id === itemReference
       );
     },
-    _onBoardItemStoppedMoving: function ({
-      pointerId,
-    }: ItemMoveEndedEventPayload): void {
-      const itemRef = this.movingItemsByPointer[pointerId];
+    _onBoardItemStoppedMoving: function (): void {
+      const itemRef = this.movingItemReference;
       if (!itemRef) {
         return;
       }
 
-      const item = this.itemsData.find((i) => i.id === itemRef.itemId);
+      const item = this.itemsData.find((i) => i.id === itemRef);
       if (!item) {
         return;
       }
 
-      //todo this doesn't support multiple items, so bother with an object?
-      this.movingItemsByPointer = {};
+      this.movingItemReference = null;
 
       const updateRoomBoardItemsPayload: MoveBoardItemInput = {
         id: item.id,
@@ -216,13 +208,9 @@ interface ItemMoveStartedEventPayload {
 }
 
 interface ItemMovedEventPayload {
-  pointerId: string;
+  itemReference: string;
   movementX: number;
   movementY: number;
-}
-
-interface ItemMoveEndedEventPayload {
-  pointerId: string;
 }
 </script>
 
