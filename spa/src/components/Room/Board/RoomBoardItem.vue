@@ -12,14 +12,14 @@
       <colour-style-selector v-on:input="_onStyleChange" />
       <auto-expanding-text-box v-model="textData" />
       <button id="save-button" aria-label="save" v-on:click="_onSaveClick">
-        ✔️
+        <span>✔</span>️️
       </button>
       <button
         id="delete-button"
         aria-label="delete"
         v-on:click="_onDeleteClick"
       >
-        🗑️️
+        <span>🗑</span>️
       </button>
     </template>
     <template v-else>
@@ -189,23 +189,26 @@ li {
   position: absolute;
   border: calc(1 * var(--unit-base-rem)) var(--theme-primary-colour) solid;
   min-width: 100px;
-  min-height: 100px;
-  max-width: 140px;
+  min-height: 120px;
+  max-width: 200px;
   height: fit-content;
   display: inline-block;
   cursor: grab;
   user-select: none;
-  white-space: pre-wrap;
   text-overflow: ellipsis;
   touch-action: none;
-  word-break: break-all;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: var(--font-size-text);
 }
 
 button {
   position: absolute;
-  width: 20px;
   text-align: center;
-  height: 20px;
+  width: calc(12px + var(--font-size-icon-button));
+  height: calc(12px + var(--font-size-icon-button));
+  font-size: var(--font-size-icon-button);
+  line-height: var(--font-size-icon-button);
   border: solid 1px;
   padding: 0;
   border-radius: 100%;
@@ -213,12 +216,19 @@ button {
 }
 
 button#save-button {
-  right: -36px;
+  right: calc(-2 * (var(--font-size-icon-button)));
   bottom: 0;
 }
 
 button#delete-button {
-  right: -36px;
+  right: calc(-2 * (var(--font-size-icon-button)));
   top: 0;
+}
+
+button > span {
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
 }
 </style>

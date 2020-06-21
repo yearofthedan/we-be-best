@@ -243,7 +243,7 @@ button {
 button::before {
   content: '+';
   position: absolute;
-  font-size: var(--font-size-fab);
+  font-size: var(--font-size-icon-button);
   top: -12px;
   right: -12px;
   border-radius: 100%;

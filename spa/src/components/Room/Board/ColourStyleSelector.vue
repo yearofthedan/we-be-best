@@ -76,31 +76,30 @@ export default Vue.extend({
 <style scoped>
 div {
   --primary-color: placeholder;
-  top: -24px;
-  width: 100%;
+  left: -36px;
   position: absolute;
   cursor: default;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-direction: row;
+  flex-direction: column;
+  height: 160px;
 }
 input {
   position: relative;
   cursor: default;
   appearance: none;
-  width: 10px;
+  width: 0;
   margin: 0;
 }
 input::before {
   content: ' ';
+  position: absolute;
   border-radius: 100%;
   box-shadow: 2px 2px 4px 0px var(--colour-secondary);
   background-color: var(--primary-color);
-  width: 16px;
-  height: 16px;
-  left: calc(50% - 8px);
-  top: calc(50% - 8px);
-  position: absolute;
+  width: calc(6 * var(--unit-base-rem));
+  height: calc(6 * var(--unit-base-rem));
+  left: calc(-2 * var(--unit-base-rem));
 }
 </style>
