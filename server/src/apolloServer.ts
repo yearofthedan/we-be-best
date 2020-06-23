@@ -1,8 +1,11 @@
 import { MongoClient } from 'mongodb';
+import { join } from 'path';
 import {ApolloServer, PubSub, withFilter} from 'apollo-server-express';
-import typeDefs from './typeDefs';
-import RoomsDataSource from './rooms/RoomsDataSource';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { loadSchemaSync } from '@graphql-tools/load';
+import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
+import { addResolversToSchema } from '@graphql-tools/schema';
+import RoomsDataSource from './rooms/RoomsDataSource';
 import itemUpdatesSubscriptionFilter from './items/itemUpdatesSubscriptionFilter';
 import roomMemberSubscriptionFilter from './rooms/roomMemberSubscriptionFilter';
 import {
@@ -13,6 +16,8 @@ import {
   updateBoardItemText,
 } from './items/itemResolvers';
 import {joinRoom, resolveRoom} from './rooms/roomResolvers';
+import {ItemResult} from './items/queryDefinitions';
+import {RoomResult} from './rooms/queryDefinitions';
 
 export interface DataSources {
   Rooms: RoomsDataSource;
@@ -34,41 +39,48 @@ const initMongo = async () => {
   return client;
 };
 
+const schema = loadSchemaSync(join(__dirname, 'schema.graphql'), { loaders: [new GraphQLFileLoader()] });
+const resolvers = {
+  Query: {
+    room: resolveRoom,
+  },
+  Subscription: {
+    itemUpdates: {
+      subscribe: withFilter(
+        () => pubSub.asyncIterator(ITEM_CHANGED_TOPIC),
+        itemUpdatesSubscriptionFilter,
+      ),
+        resolve: (payload: ItemResult) => payload
+    },
+    roomMemberUpdates: {
+      subscribe: withFilter(
+        () => pubSub.asyncIterator(ROOM_MEMBER_CHANGED_TOPIC),
+        roomMemberSubscriptionFilter,
+      ),
+        resolve: (payload: RoomResult) => payload
+    }
+  },
+  Mutation: {
+    joinRoom: joinRoom,
+      lockRoomBoardItem: lockRoomBoardItem,
+      unlockRoomBoardItem: unlockRoomBoardItem,
+      moveBoardItem: moveBoardItem,
+      addRoomBoardItem: addRoomBoardItem,
+      updateBoardItemText: updateBoardItemText,
+      deleteBoardItem: deleteBoardItem,
+  }
+};
+
 const apolloServer = async () => {
   const mongoClient = await initMongo();
 
+  const schemaWithResolvers = addResolversToSchema({
+    schema,
+    resolvers,
+  });
+
   return new ApolloServer({
-    typeDefs,
-    resolvers: {
-      Query: {
-        room: resolveRoom,
-      },
-      Subscription: {
-        itemUpdates: {
-          subscribe: withFilter(
-            () => pubSub.asyncIterator(ITEM_CHANGED_TOPIC),
-            itemUpdatesSubscriptionFilter,
-          ),
-          resolve: (payload) => payload
-        },
-        roomMemberUpdates: {
-          subscribe: withFilter(
-            () => pubSub.asyncIterator(ROOM_MEMBER_CHANGED_TOPIC),
-            roomMemberSubscriptionFilter,
-          ),
-          resolve: (payload) => payload
-        }
-      },
-      Mutation: {
-        joinRoom: joinRoom,
-        lockRoomBoardItem: lockRoomBoardItem,
-        unlockRoomBoardItem: unlockRoomBoardItem,
-        moveBoardItem: moveBoardItem,
-        addRoomBoardItem: addRoomBoardItem,
-        updateBoardItemText: updateBoardItemText,
-        deleteBoardItem: deleteBoardItem,
-      }
-    },
+    schema: schemaWithResolvers,
     dataSources: () => ({
       Rooms: new RoomsDataSource(mongoClient.db().collection(ROOMS_COLLECTION))
     }),

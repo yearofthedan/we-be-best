@@ -11,7 +11,7 @@
     "watch-node": "nodemon dist/index.js",
     "watch-ts": "tsc -w",
     "build-ts": "tsc",
-    "build": "yarn run lint && yarn run build-ts",
+    "build": "yarn run build-ts && cp src/schema.graphql dist/server/src/schema.graphql",
     "lint": "tsc --noEmit && eslint \"src/**/*.{js,ts}\" --quiet --fix",
     "test": "jest --forceExit --coverage --verbose",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"yarn run watch-ts\" \"yarn run watch-node\"",
@@ -24,6 +24,7 @@
     "graphql": "^15.1.0",
     "graphql-subscriptions": "^1.1.0",
     "graphql-tag": "^2.10.3",
+    "graphql-tools": "^6.0.10",
     "mongodb-memory-server": "^6.6.1"
   },
   "devDependencies": {
