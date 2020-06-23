@@ -24,6 +24,10 @@ import {
 } from '@/testHelpers/testMutationStubs';
 import { resetAllWhenMocks } from 'jest-when';
 
+import { supportsTouchEvents } from '@/common/dom';
+
+jest.mock('@/common/dom');
+
 describe('<room-board />', () => {
   afterEach(() => {
     resetAllWhenMocks();
@@ -76,6 +80,7 @@ describe('<room-board />', () => {
   });
   describe('when locked', () => {
     it('allows moving a locked item if i locked it', async () => {
+      (supportsTouchEvents as jest.Mock).mockReturnValue(true);
       const { queryMocks } = renderWithApollo(
         RoomBoard,
         [makeHappyLockRoomBoardItemMutationStub()],
@@ -117,6 +122,7 @@ describe('<room-board />', () => {
     });
 
     it('does not move the item if it has been locked by somebody else', async () => {
+      (supportsTouchEvents as jest.Mock).mockReturnValue(true);
       renderWithApollo(RoomBoard, [], {
         propsData: {
           myId: MY_ID,
@@ -132,19 +138,13 @@ describe('<room-board />', () => {
         },
       });
 
-      await fireEvent(
-        screen.getByRole('listitem'),
-        new PointerDownEvent({
-          pointerId: 1000,
-        })
-      );
+      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
 
       await fireEvent(
         screen.getByRole('listitem'),
         new PointerMoveEvent({
           movementX: 20,
           movementY: 10,
-          pointerId: 1000,
         })
       );
 

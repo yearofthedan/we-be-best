@@ -18,7 +18,7 @@ const HAMSTER = '🐹';
 const BEAR = '🐻';
 
 export const getRandom = (): string => {
-  const random = (Number(Math.random() * AVATARS.length - 1).toFixed(
+  const random = (Number(Math.random() * (AVATARS.length - 1)).toFixed(
     0
   ) as unknown) as number;
   return AVATARS[random];

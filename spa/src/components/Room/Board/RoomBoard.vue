@@ -1,6 +1,7 @@
 <template>
   <section
     v-bind:data-room-name="roomId"
+    v-on:mousemove="this._onMouseMove"
     v-on:pointermove="this._onPointerMove"
   >
     <ul>
@@ -32,6 +33,7 @@ import {
 } from './boardItemsGraphQL';
 import buildItem, { Item } from '@/components/Room/Board/itemBuilder';
 import { patchArrayElement } from '@/common/arrays';
+import { supportsTouchEvents } from '@/common/dom';
 
 export default Vue.extend({
   name: 'board',
@@ -60,14 +62,17 @@ export default Vue.extend({
   data: function (): {
     itemsData: Item[];
     movingItemReference: string | null;
+    primaryTouchId: string | null;
   } {
     return {
       itemsData: this.$props.items.filter((item: Item) => !item.isDeleted),
       movingItemReference: null,
+      primaryTouchId: null,
     };
   },
   mounted() {
     window.addEventListener('pointerup', this._onPointerUp);
+    window.addEventListener('mouseup', this._onPointerUp);
   },
   methods: {
     _getIsMoving: function (itemId: string): boolean {
@@ -97,7 +102,26 @@ export default Vue.extend({
     _onPointerUp: function (): void {
       this._onBoardItemStoppedMoving();
     },
-    _onPointerMove: function (event: MouseEvent): void {
+    _onPointerMove: function (event: PointerEvent): void {
+      if (!supportsTouchEvents()) {
+        return;
+      }
+      const { movementX, movementY } = event;
+
+      if (!this.movingItemReference) {
+        return;
+      }
+
+      this._onBoardItemMoved({
+        itemReference: this.movingItemReference,
+        movementX,
+        movementY,
+      });
+    },
+    _onMouseMove: function (event: MouseEvent): void {
+      if (supportsTouchEvents()) {
+        return;
+      }
       const { movementX, movementY } = event;
 
       if (!this.movingItemReference) {

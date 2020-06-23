@@ -2,6 +2,7 @@
   <li
     v-bind:style="styleObject"
     v-bind:id="elementId"
+    v-on:mousedown="_onMouseDown"
     v-on:pointerdown="_onPointerDown"
     v-on:dblclick="_onEditClick"
     v-bind:data-moving="moving"
@@ -35,7 +36,7 @@ import {
   UpdateBoardItemTextInput,
 } from '@/components/Room/Board/boardItemsGraphQL';
 import AutoExpandingTextBox from '@/components/Room/Board/AutoExpandingTextBox.vue';
-import { PRIMARY_MOUSE_BUTTON_ID } from '@/common/dom';
+import { PRIMARY_MOUSE_BUTTON_ID, supportsTouchEvents } from '@/common/dom';
 import ColourStyleSelector from '@/components/Room/Board/ColourStyleSelector.vue';
 
 interface MoveStartEventPayload {
@@ -139,17 +140,31 @@ export default Vue.extend({
       this.editing = true;
     },
     _onPointerDown: function (event: PointerEvent): void {
-      if (this.lockedBy) {
+      if (!supportsTouchEvents()) {
+        // this is a hack because safari has experimental implementation of pointer events but not touch so I want it to use mouse events in Safari
         return;
       }
+      this._onMove(event);
+    },
+    _onMouseDown: function (event: MouseEvent): void {
+      console.log('moved');
 
-      if (event.button && event.button !== PRIMARY_MOUSE_BUTTON_ID) {
+      if (supportsTouchEvents()) {
+        return;
+      }
+      this._onMove(event);
+    },
+    _onMove: function (event: MouseEvent): void {
+      if (
+        this.lockedBy ||
+        (event.button && event.button !== PRIMARY_MOUSE_BUTTON_ID)
+      ) {
         return;
       }
 
       this.$emit('movestart', {
-        itemId: this.$props.id,
-        pointerId: event.pointerId,
+        itemId: this.id,
+        pointerId: 1,
       } as MoveStartEventPayload);
     },
     _onStyleChange: function (style: DataProperties['style']) {

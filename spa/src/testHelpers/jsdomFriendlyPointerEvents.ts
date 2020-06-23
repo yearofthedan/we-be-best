@@ -68,7 +68,6 @@ export class PointerMoveEvent extends FakePointerEvent {
     super('pointermove', {
       bubbles: true,
       cancelable: true,
-      pointerId: 1000,
       ...values,
     });
   }
@@ -79,7 +78,6 @@ export class PointerDownEvent extends FakePointerEvent {
     super('pointerdown', {
       bubbles: true,
       cancelable: true,
-      pointerId: 1000,
       ...values,
     });
   }
@@ -90,7 +88,6 @@ export class PointerUpEvent extends FakePointerEvent {
     super('pointerup', {
       bubbles: true,
       cancelable: true,
-      pointerId: 1000,
       ...values,
     });
   }
