@@ -15,7 +15,8 @@
     "lint": "tsc --noEmit && eslint \"src/**/*.{js,ts}\" --quiet --fix",
     "test": "jest --forceExit --coverage --verbose",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"yarn run watch-ts\" \"yarn run watch-node\"",
-    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"yarn run watch-ts\" \"yarn run serve-debug\""
+    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"yarn run watch-ts\" \"yarn run serve-debug\"",
+    "generate-graphql-types": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
     "apollo-datasource-mongodb": "^0.2.6",
@@ -28,6 +29,8 @@
     "mongodb-memory-server": "^6.6.1"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^1.15.4",
+    "@graphql-codegen/typescript": "^1.15.4",
     "@types/concurrently": "^5.2.1",
     "@types/eslint": "^7.2.0",
     "@types/jest": "^26.0.0",
