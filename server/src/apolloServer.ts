@@ -40,7 +40,7 @@ const initMongo = async () => {
 };
 
 const schema = loadSchemaSync(join(__dirname, 'schema.graphql'), { loaders: [new GraphQLFileLoader()] });
-const resolvers = {
+export const resolvers = {
   Query: {
     room: resolveRoom,
   },

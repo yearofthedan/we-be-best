@@ -1,17 +1,18 @@
 import {PubSub} from 'apollo-server-express';
 import {DataSources, ITEM_CHANGED_TOPIC} from '../apolloServer';
+import {ItemResult} from './queryDefinitions';
 import {
-  AddRoomBoardItemInput,
-  LockRoomBoardItemInput,
-  MoveBoardItemInput,
-  UnlockRoomBoardItemInput,
-  UpdateBoardItemTextInput,
-  ItemResult,
-} from './queryDefinitions';
+  MutationAddRoomBoardItemArgs,
+  MutationDeleteBoardItemArgs,
+  MutationLockRoomBoardItemArgs,
+  MutationMoveBoardItemArgs,
+  MutationUnlockRoomBoardItemArgs,
+  MutationUpdateBoardItemTextArgs,
+} from '../../../common/graphql';
 
 export const addRoomBoardItem = async (
   _: unknown,
-  { input }: { input: AddRoomBoardItemInput },
+  { input }: MutationAddRoomBoardItemArgs,
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
 ): Promise<ItemResult> => {
   const { itemId, roomId, posX, posY } = input;
@@ -24,7 +25,7 @@ export const addRoomBoardItem = async (
 
 export const updateBoardItemText = async (
   _: unknown,
-  { input }: { input: UpdateBoardItemTextInput },
+  { input }: MutationUpdateBoardItemTextArgs,
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
 ): Promise<ItemResult> => {
   const result = await dataSources.Rooms.updateItem({ id: input.id, text: input.text});
@@ -36,7 +37,7 @@ export const updateBoardItemText = async (
 
 export const lockRoomBoardItem = async (
   _: unknown,
-  { input }: { input: LockRoomBoardItemInput },
+  { input }: MutationLockRoomBoardItemArgs,
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
 ): Promise<ItemResult> => {
   const result = await dataSources.Rooms.updateItem({ id: input.id, lockedBy: input.lockedBy});
@@ -48,7 +49,7 @@ export const lockRoomBoardItem = async (
 
 export const unlockRoomBoardItem = async (
   _: unknown,
-  { input }: { input: UnlockRoomBoardItemInput },
+  { input }: MutationUnlockRoomBoardItemArgs,
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
 ): Promise<ItemResult> => {
   const result = await dataSources.Rooms.updateItem({ id: input.id, lockedBy: null});
@@ -60,7 +61,7 @@ export const unlockRoomBoardItem = async (
 
 export const moveBoardItem = async (
   _: unknown,
-  { input }: { input: MoveBoardItemInput },
+  { input }: MutationMoveBoardItemArgs,
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
 ): Promise<ItemResult> => {
   const result = await dataSources.Rooms.updateItem({ id: input.id, posX: input.posX, posY: input.posY});
@@ -72,7 +73,7 @@ export const moveBoardItem = async (
 
 export const deleteBoardItem = async (
   _: unknown,
-  { id }: { id: string },
+  { id }: MutationDeleteBoardItemArgs,
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
 ): Promise<ItemResult> => {
   const result = await dataSources.Rooms.deleteItem(id);

@@ -1,11 +1,9 @@
-import {AddRoomBoardItemInput, ItemResult, RoomResult} from '../rooms/queryDefinitions';
 import {
-  LockRoomBoardItemInput,
-  UnlockRoomBoardItemInput,
-  MoveBoardItemInput,
+  AddRoomBoardItemInput, Item,
+  JoinRoomInput,
+  LockRoomBoardItemInput, MoveBoardItemInput, Room, UnlockRoomBoardItemInput,
   UpdateBoardItemTextInput,
-} from '../../../spa/src/components/Room/Board/boardItemsGraphQL';
-import {JoinRoomInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
+} from '../../../common/graphql';
 
 export const buildAddItemInput = (overrides: Partial<AddRoomBoardItemInput> = {}): AddRoomBoardItemInput => ({
   roomId: 'ROOM_123',
@@ -46,18 +44,17 @@ export const buildJoinRoomInput = (overrides: Partial<JoinRoomInput> = {}): Join
   ...overrides
 });
 
-export const buildItemResult = (overrides: Partial<ItemResult> = {}): ItemResult => ({
+export const buildItemResult = (overrides: Partial<Item> = {}): Item => ({
   id: 'ITEM_123',
   posX: 0,
   posY: 0,
-  room: 'room_123',
   text: 'some text',
   ...overrides
 });
 
 export const buildMemberResult = (override?: string) => override || 'me';
 
-export const buildRoomResult = (overrides: Partial<RoomResult> = {}): RoomResult => ({
+export const buildRoomResult = (overrides: Partial<Room> = {}): Room => ({
   id: 'ROOM_123',
   members: [buildMemberResult()],
   items: [buildItemResult()],

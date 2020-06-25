@@ -3,7 +3,8 @@ WORKDIR /spa
 COPY spa/package.json ./
 ENV CYPRESS_INSTALL_BINARY=0
 RUN yarn
-COPY spa .
+COPY spa /spa
+COPY common /common
 RUN yarn lint
 RUN yarn test
 RUN yarn build
@@ -12,8 +13,10 @@ FROM node:latest as server-build-stage
 WORKDIR /server
 COPY server/package.json .
 RUN yarn
-COPY server .
+COPY server /server
+# TODO remove the requirement on spa files for server tests
 COPY spa /spa
+COPY common /common
 RUN yarn lint
 RUN yarn test
 RUN yarn build

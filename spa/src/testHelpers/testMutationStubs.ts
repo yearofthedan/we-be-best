@@ -1,12 +1,9 @@
 import {
-  ADD_ROOM_BOARD_ITEM_MUTATION,
-  AddRoomBoardItemInput,
-  LOCK_ROOM_BOARD_ITEM_MUTATION,
-  UNLOCK_ROOM_BOARD_ITEM_MUTATION,
-  MOVE_BOARD_ITEM_MUTATION,
-  MoveBoardItemInput, UPDATE_BOARD_ITEM_TEXT_MUTATION, DELETE_BOARD_ITEM_MUTATION,
-} from '@/components/Room/Board/boardItemsGraphQL';
+// @ts-ignore
+  addRoomBoardItem, lockRoomBoardItem, moveBoardItem, updateBoardItemText, deleteBoardItem, unlockRoomBoardItem,
+} from '@/components/Room/Board/boardQueries.graphql';
 import {makeItem} from '@/testHelpers/testData';
+import {AddRoomBoardItemInput, MoveBoardItemInput} from '../../../common/graphql';
 
 export const ITEM_ID = 'ITEM123';
 export const ROOM_ID = 'ROOM123';
@@ -22,7 +19,7 @@ export const makeHappyMoveBoardItemMutationStub = (inputOverrides: Partial<MoveB
     },
   };
   return {
-    query: MOVE_BOARD_ITEM_MUTATION,
+    query: moveBoardItem,
     variables: {
       input: { ...inputOverrides },
     },
@@ -39,7 +36,7 @@ export const makeHappyLockRoomBoardItemMutationStub = (
     lockRoomBoardItem: makeItem(),
   };
   return {
-    query: LOCK_ROOM_BOARD_ITEM_MUTATION,
+    query: lockRoomBoardItem,
     variables: {
       input: { ...inputOverrides },
     },
@@ -59,7 +56,7 @@ export const makeHappyAddRoomBoardItemMutationStub = (
     },
   };
   return {
-    query: ADD_ROOM_BOARD_ITEM_MUTATION,
+    query: addRoomBoardItem,
     variables: {
       input: {
         posX: 0,
@@ -78,7 +75,7 @@ export const makeHappyUnlockRoomBoardItemMutationStub = (inputOverrides = { id: 
     unlockRoomBoardItem: makeItem(),
   };
   return {
-    query: UNLOCK_ROOM_BOARD_ITEM_MUTATION,
+    query: unlockRoomBoardItem,
     variables: {
       input: { ...inputOverrides },
     },
@@ -93,7 +90,7 @@ export const makeHappyUpdateRoomBoardItemMutationStub = (
     updateBoardItemText: makeItem({ text: 'some content' })
   };
   return {
-    query: UPDATE_BOARD_ITEM_TEXT_MUTATION,
+    query: updateBoardItemText,
     variables: {
       input: {
         id: 'some-id',
@@ -112,7 +109,7 @@ export const makeSadUpdateRoomBoardItemMutationStub = (
     message: 'everything is broken',
   };
   return {
-    query: UPDATE_BOARD_ITEM_TEXT_MUTATION,
+    query: updateBoardItemText,
     variables: {
       input: {
         id: 'some-id',
@@ -135,7 +132,7 @@ export const makeHappyDeleteBoardItemMutationStub = (
     }
   };
   return {
-    query: DELETE_BOARD_ITEM_MUTATION,
+    query: deleteBoardItem,
     variables: {
       id: 'some-id',
       ...inputOverrides
@@ -151,7 +148,7 @@ export const makeSadDeleteBoardItemMutationStub = (
     message: 'everything is broken',
   };
   return {
-    query: DELETE_BOARD_ITEM_MUTATION,
+    query: deleteBoardItem,
     variables: {
       id: 'some-id',
       ...inputOverrides

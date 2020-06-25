@@ -1,5 +1,3 @@
-export {AddRoomBoardItemInput} from '../../../spa/src/components/Room/Board/boardItemsGraphQL';
-
 export interface ItemResult {
   id: string;
   posY: number;

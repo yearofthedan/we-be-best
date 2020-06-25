@@ -1,16 +1,13 @@
 import Room from '@/components/Room/Room.vue';
-import {
-  GET_ROOM_QUERY,
-  ROOM_ITEM_UPDATES_SUBSCRIPTION,
-  ROOM_MEMBER_UPDATES_SUBSCRIPTION,
-} from '@/components/Room/roomGraphQLQuery';
 import { renderWithApollo, screen } from '@/testHelpers/renderer';
 import { makeItem, makeRoomMember } from '@/testHelpers/testData';
+// @ts-ignore
+import { itemUpdates, room, roomMemberUpdates } from './roomQueries.graphql';
 
 describe('<room />', () => {
   it('queries and subscribes to the room details', async () => {
     const stubQuery = {
-      query: GET_ROOM_QUERY,
+      query: room,
       successData: {
         room: {
           id: '123',
@@ -21,7 +18,7 @@ describe('<room />', () => {
     };
 
     const stubRoomMemberUpdateSubscription = {
-      query: ROOM_MEMBER_UPDATES_SUBSCRIPTION,
+      query: roomMemberUpdates,
       successData: {
         roomMemberUpdates: {
           id: '123',
@@ -31,7 +28,7 @@ describe('<room />', () => {
     };
 
     const stubRoomItemUpdatesSubscription = {
-      query: ROOM_ITEM_UPDATES_SUBSCRIPTION,
+      query: itemUpdates,
       successData: {
         itemUpdates: makeItem({ id: 'ITEMM1234' }),
       },

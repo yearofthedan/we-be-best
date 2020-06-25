@@ -13,9 +13,9 @@ export interface Item {
   id: string;
   posX: number;
   posY: number;
-  lockedBy?: string;
+  lockedBy?: string | null;
   text: string;
-  isDeleted?: boolean;
+  isDeleted?: boolean | null;
 }
 
 const buildItem = (): Item => ({

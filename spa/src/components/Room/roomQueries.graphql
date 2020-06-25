@@ -1,0 +1,45 @@
+
+subscription roomMemberUpdates($id: ID!) {
+    roomMemberUpdates(id: $id) {
+        id
+        members
+    }
+}
+
+subscription itemUpdates($roomId: ID!) {
+    itemUpdates(roomId: $roomId) {
+        id
+        posX
+        posY
+        lockedBy
+        text
+        isDeleted
+    }
+}
+
+query room($id: ID!) {
+    room(id: $id) {
+        id
+        members
+        items {
+            id
+            posX
+            posY
+            lockedBy
+            text
+        }
+    }
+}
+
+mutation joinRoom($input: JoinRoomInput!) {
+    joinRoom(input: $input) {
+        id
+        items {
+            id
+            posX
+            posY
+            lockedBy
+            text
+        }
+    }
+}

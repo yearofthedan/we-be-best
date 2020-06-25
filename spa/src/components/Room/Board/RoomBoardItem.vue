@@ -31,13 +31,19 @@
 <script lang="ts">
 import Vue from 'vue';
 import {
-  DELETE_BOARD_ITEM_MUTATION,
-  UPDATE_BOARD_ITEM_TEXT_MUTATION,
-  UpdateBoardItemTextInput,
-} from '@/components/Room/Board/boardItemsGraphQL';
+  // @ts-ignore
+  deleteBoardItem,
+  // @ts-ignore
+  updateBoardItemText,
+} from '@/components/Room/Board/boardQueries.graphql';
 import AutoExpandingTextBox from '@/components/Room/Board/AutoExpandingTextBox.vue';
 import { PRIMARY_MOUSE_BUTTON_ID, supportsTouchEvents } from '@/common/dom';
 import ColourStyleSelector from '@/components/Room/Board/ColourStyleSelector.vue';
+import {
+  Item,
+  MutationDeleteBoardItemArgs,
+  MutationUpdateBoardItemTextArgs,
+} from '../../../../../common/graphql';
 
 interface MoveStartEventPayload {
   itemId: string;
@@ -104,8 +110,8 @@ export default Vue.extend({
   methods: {
     _onDeleteClick: async function (): Promise<void> {
       try {
-        await this.$apollo.mutate({
-          mutation: DELETE_BOARD_ITEM_MUTATION,
+        await this.$apollo.mutate<Item, MutationDeleteBoardItemArgs>({
+          mutation: deleteBoardItem,
           variables: {
             id: this.id,
           },
@@ -117,14 +123,14 @@ export default Vue.extend({
       }
     },
     _onSaveClick: async function (): Promise<void> {
-      const mutationPayload: UpdateBoardItemTextInput = {
+      const mutationPayload = {
         id: this.id,
         text: this.textData,
       };
 
       try {
-        await this.$apollo.mutate({
-          mutation: UPDATE_BOARD_ITEM_TEXT_MUTATION,
+        await this.$apollo.mutate<Item, MutationUpdateBoardItemTextArgs>({
+          mutation: updateBoardItemText,
           variables: {
             input: mutationPayload,
           },
@@ -147,8 +153,6 @@ export default Vue.extend({
       this._onMove(event);
     },
     _onMouseDown: function (event: MouseEvent): void {
-      console.log('moved');
-
       if (supportsTouchEvents()) {
         return;
       }

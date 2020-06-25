@@ -6,8 +6,8 @@ import {
 } from '@/testHelpers/renderer';
 import userEvent from '@testing-library/user-event';
 import Lobby from './Lobby.vue';
-import { JOIN_ROOM_MUTATION } from '@/components/Room/roomGraphQLQuery';
-
+// @ts-ignore
+import { joinRoom } from '@/components/Room/roomQueries.graphql';
 const ROOM_NAME = 'my-room';
 const MEMBER_NAME = 'me';
 
@@ -20,7 +20,7 @@ function makeHappyPathMutationStub() {
     },
   };
   return {
-    query: JOIN_ROOM_MUTATION,
+    query: joinRoom,
     variables: {
       input: {
         roomName: ROOM_NAME,

@@ -1,0 +1,51 @@
+mutation addRoomBoardItem($input: AddRoomBoardItemInput!) {
+    addRoomBoardItem(input: $input) {
+        id
+        posX
+        posY
+        lockedBy
+    }
+}
+
+mutation unlockRoomBoardItem($input: UnlockRoomBoardItemInput!) {
+    unlockRoomBoardItem(input: $input) {
+        id
+        posX
+        posY
+        lockedBy
+    }
+}
+
+mutation lockRoomBoardItem($input: LockRoomBoardItemInput!) {
+    lockRoomBoardItem(input: $input) {
+        id
+        posX
+        posY
+        lockedBy
+    }
+}
+
+mutation moveBoardItem($input: MoveBoardItemInput!) {
+    moveBoardItem(input: $input) {
+        id
+        posX
+        posY
+        lockedBy
+    }
+}
+
+mutation updateBoardItemText($input: UpdateBoardItemTextInput!) {
+    updateBoardItemText(input: $input) {
+        id
+        posX
+        posY
+        lockedBy
+    }
+}
+
+mutation deleteBoardItem($id: ID!) {
+    deleteBoardItem(id: $id)  {
+        id
+        isDeleted
+    }
+}

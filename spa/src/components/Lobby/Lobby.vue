@@ -1,9 +1,8 @@
 <script lang="ts">
 import Vue from 'vue';
-import {
-  JOIN_ROOM_MUTATION,
-  JoinRoomInput,
-} from '@/components/Room/roomGraphQLQuery';
+import { JoinRoomInput } from '../../../../common/graphql';
+// @ts-ignore
+import { joinRoom } from '@/components/Room/roomQueries.graphql';
 
 export default Vue.extend({
   name: 'lobby',
@@ -43,7 +42,7 @@ export default Vue.extend({
       };
       try {
         await this.$apollo.mutate({
-          mutation: JOIN_ROOM_MUTATION,
+          mutation: joinRoom,
           variables: mutationPayload,
         });
 

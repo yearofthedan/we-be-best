@@ -22,18 +22,24 @@
 import Vue from 'vue';
 import RoomBoardItem from './RoomBoardItem.vue';
 import {
-  ADD_ROOM_BOARD_ITEM_MUTATION,
-  AddRoomBoardItemInput,
-  LOCK_ROOM_BOARD_ITEM_MUTATION,
-  LockRoomBoardItemInput,
-  MOVE_BOARD_ITEM_MUTATION,
-  MoveBoardItemInput,
-  UNLOCK_ROOM_BOARD_ITEM_MUTATION,
-  UnlockRoomBoardItemInput,
-} from './boardItemsGraphQL';
+  // @ts-ignore
+  addRoomBoardItem,
+  // @ts-ignore
+  lockRoomBoardItem,
+  // @ts-ignore
+  moveBoardItem,
+  // @ts-ignore
+  unlockRoomBoardItem,
+} from './boardQueries.graphql';
 import buildItem, { Item } from '@/components/Room/Board/itemBuilder';
 import { patchArrayElement } from '@/common/arrays';
 import { supportsTouchEvents } from '@/common/dom';
+import {
+  AddRoomBoardItemInput,
+  LockRoomBoardItemInput,
+  MoveBoardItemInput,
+  UnlockRoomBoardItemInput,
+} from '../../../../../common/graphql';
 
 export default Vue.extend({
   name: 'board',
@@ -90,7 +96,7 @@ export default Vue.extend({
       };
       this.$apollo
         .mutate({
-          mutation: ADD_ROOM_BOARD_ITEM_MUTATION,
+          mutation: addRoomBoardItem,
           variables: {
             input: mutationPayload,
           },
@@ -143,7 +149,7 @@ export default Vue.extend({
       };
       this.$apollo
         .mutate({
-          mutation: LOCK_ROOM_BOARD_ITEM_MUTATION,
+          mutation: lockRoomBoardItem,
           variables: {
             input: mutationPayload,
           },
@@ -196,7 +202,7 @@ export default Vue.extend({
 
       this.$apollo
         .mutate({
-          mutation: MOVE_BOARD_ITEM_MUTATION,
+          mutation: moveBoardItem,
           variables: {
             input: updateRoomBoardItemsPayload,
           },
@@ -210,7 +216,7 @@ export default Vue.extend({
       };
       this.$apollo
         .mutate({
-          mutation: UNLOCK_ROOM_BOARD_ITEM_MUTATION,
+          mutation: unlockRoomBoardItem,
           variables: {
             input: mutationPayload,
           },
@@ -221,10 +227,6 @@ export default Vue.extend({
     },
   },
 });
-
-interface MovingItemReference {
-  itemId: string;
-}
 
 interface ItemMoveStartedEventPayload {
   itemId: string;

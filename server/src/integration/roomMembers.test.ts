@@ -3,7 +3,8 @@ import { ApolloServerBase } from 'apollo-server-core';
 import ApolloClient from 'apollo-client';
 import gql from 'graphql-tag';
 import testApolloServerAndClient from '../testHelpers/testApolloServerAndClient';
-import {JOIN_ROOM_MUTATION} from '../../../spa/src/components/Room/roomGraphQLQuery';
+// @ts-ignore
+import { joinRoom } from '../../../spa/src/components/Room/roomQueries.graphql';
 import server from '../apolloServer';
 
 describe('integration: room members', () => {
@@ -65,7 +66,7 @@ describe('integration: room members', () => {
 
   it('joins the room', async () => {
     const res = await query({
-      query: JOIN_ROOM_MUTATION,
+      query: joinRoom,
       variables: { input: { roomName: 'my-room',  memberName: 'me' } }
     });
 

@@ -1,9 +1,15 @@
 import ApolloClient from 'apollo-client';
 import gql from 'graphql-tag';
 import testApolloServerAndClient from '../testHelpers/testApolloServerAndClient';
-import {JoinRoomInput, RoomItemUpdatesSubscriptionData} from '../../../spa/src/components/Room/roomGraphQLQuery';
-import {AddRoomBoardItemInput, ItemResult, RoomResult} from '../rooms/queryDefinitions';
-import {LockRoomBoardItemInput, UpdateBoardItemTextInput} from '../../../spa/src/components/Room/Board/boardItemsGraphQL';
+import {
+  Item,
+  MutationAddRoomBoardItemArgs,
+  MutationDeleteBoardItemArgs,
+  MutationJoinRoomArgs,
+  MutationLockRoomBoardItemArgs,
+  MutationUpdateBoardItemTextArgs, Room,
+  Subscription,
+} from '../../../common/graphql';
 
 describe('integration: items', () => {
   let apolloClient: ApolloClient<any>;
@@ -20,8 +26,8 @@ describe('integration: items', () => {
   });
 
   function addAnItemUpdateSubscription() {
-    return new Promise<{ data: RoomItemUpdatesSubscriptionData }>((resolve, reject) => {
-      apolloClient.subscribe<{ data: RoomItemUpdatesSubscriptionData }>({
+    return new Promise<{ data: Pick<Subscription, 'itemUpdates'> }>((resolve, reject) => {
+      apolloClient.subscribe<{ data: Pick<Subscription, 'itemUpdates'> }>({
         query: gql`
             subscription itemUpdates($roomId: ID!) {
                 itemUpdates(roomId: $roomId) {
@@ -42,7 +48,7 @@ describe('integration: items', () => {
   }
 
   async function addARoom(roomName: string = '123') {
-    await apolloClient.mutate<RoomResult, { input: JoinRoomInput }>({
+    await apolloClient.mutate<Room, MutationJoinRoomArgs>({
       mutation: gql`
           mutation joinRoom($input: JoinRoomInput!) {
               joinRoom(input: $input)  {
@@ -59,7 +65,7 @@ describe('integration: items', () => {
   }
 
   async function addAnItemToARoom() {
-    await apolloClient.mutate<ItemResult, { input: AddRoomBoardItemInput }>({
+    await apolloClient.mutate<Item, MutationAddRoomBoardItemArgs>({
       mutation: gql`
           mutation addRoomBoardItem($input: AddRoomBoardItemInput!) {
               addRoomBoardItem(input: $input)  {
@@ -78,7 +84,7 @@ describe('integration: items', () => {
   }
 
   async function lockAnItemInARoom() {
-    await apolloClient.mutate<ItemResult, { input: LockRoomBoardItemInput }>({
+    await apolloClient.mutate<Item, MutationLockRoomBoardItemArgs>({
       mutation: gql`
           mutation lockRoomBoardItem($input: LockRoomBoardItemInput!) {
               lockRoomBoardItem(input: $input)  {
@@ -182,7 +188,7 @@ describe('integration: items', () => {
       await addAnItemToARoom();
 
       const subscriptionPromise = addAnItemUpdateSubscription();
-      await apolloClient.mutate<ItemResult, { input: UpdateBoardItemTextInput }>({
+      await apolloClient.mutate<Item, MutationUpdateBoardItemTextArgs>({
         mutation: gql`
             mutation updateBoardItemText($input: UpdateBoardItemTextInput!) {
                 updateBoardItemText(input: $input)  {
@@ -209,7 +215,7 @@ describe('integration: items', () => {
       await addAnItemToARoom();
 
       const subscriptionPromise = addAnItemUpdateSubscription();
-      await apolloClient.mutate<ItemResult, { id: string }>({
+      await apolloClient.mutate<Item, MutationDeleteBoardItemArgs>({
         mutation: gql`
             mutation deleteBoardItem($id: ID!) {
                 deleteBoardItem(id: $id)  {

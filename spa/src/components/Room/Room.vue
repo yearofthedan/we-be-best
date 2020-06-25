@@ -15,20 +15,23 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import {
-  GET_ROOM_QUERY,
-  GetRoomQueryData,
-  ROOM_ITEM_UPDATES_SUBSCRIPTION,
-  ROOM_MEMBER_UPDATES_SUBSCRIPTION,
-  RoomData,
-  RoomItemUpdatesSubscriptionData,
-  RoomMemberUpdatesSubscriptionData,
-} from '@/components/Room/roomGraphQLQuery';
 import { ApolloError } from 'apollo-client';
 import { Item } from '@/components/Room/Board/itemBuilder';
 import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
 import { removeArrayElement, upsertArrayElement } from '@/common/arrays';
+
+// @ts-ignore
+import { itemUpdates, room, roomMemberUpdates } from './roomQueries.graphql';
+
+import {
+  Query,
+  Subscription,
+  Room,
+  QueryRoomArgs,
+  SubscriptionRoomMemberUpdatesArgs,
+  SubscriptionItemUpdatesArgs,
+} from '../../../../common/graphql';
 
 interface RoomComponentProps {
   roomId: string;
@@ -37,7 +40,7 @@ interface RoomComponentProps {
 interface RoomComponentData {
   loading?: boolean | null;
   error?: ApolloError | Error | null;
-  room?: RoomData | null;
+  room?: Room | null;
 }
 
 const resolveUpdate = (items: Item[], update: Item) => {
@@ -73,24 +76,28 @@ export default Vue.extend({
   },
   apollo: {
     room: {
-      query: GET_ROOM_QUERY,
-      variables(): { id: string } {
+      query: room,
+      variables(): QueryRoomArgs {
         return { id: this.roomId };
       },
       subscribeToMore: [
         {
-          document: ROOM_MEMBER_UPDATES_SUBSCRIPTION,
-          variables: function (): { id: string } {
+          document: roomMemberUpdates,
+          variables: function (): SubscriptionRoomMemberUpdatesArgs {
             return { id: ((this as unknown) as RoomComponentProps).roomId };
           },
           onError(error: ApolloError) {
             ((this as unknown) as RoomComponentData).error = error;
           },
           updateQuery(
-            previousResult: GetRoomQueryData,
+            previousResult: Pick<Query, 'room'>,
             {
               subscriptionData,
-            }: { subscriptionData: { data: RoomMemberUpdatesSubscriptionData } }
+            }: {
+              subscriptionData: {
+                data: Pick<Subscription, 'roomMemberUpdates'>;
+              };
+            }
           ) {
             return {
               room: {
@@ -101,18 +108,18 @@ export default Vue.extend({
           },
         },
         {
-          document: ROOM_ITEM_UPDATES_SUBSCRIPTION,
-          variables: function (): { roomId: string } {
+          document: itemUpdates,
+          variables: function (): SubscriptionItemUpdatesArgs {
             return { roomId: ((this as unknown) as RoomComponentProps).roomId };
           },
           onError(error: ApolloError) {
             ((this as unknown) as RoomComponentData).error = error;
           },
           updateQuery(
-            previousResult: GetRoomQueryData,
+            previousResult: Pick<Query, 'room'>,
             {
               subscriptionData,
-            }: { subscriptionData: { data: RoomItemUpdatesSubscriptionData } }
+            }: { subscriptionData: { data: Pick<Subscription, 'itemUpdates'> } }
           ) {
             const currentRoom = ((this as unknown) as RoomComponentData).room;
             if (!currentRoom?.items) {

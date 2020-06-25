@@ -1,6 +1,6 @@
 import {PubSub} from 'apollo-server-express';
 import {DataSources, ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
-import {JoinRoomInput} from '../../../spa/src/components/Room/roomGraphQLQuery';
+import {JoinRoomInput} from '../../../common/graphql';
 import {RoomResult} from './queryDefinitions';
 
 export const resolveRoom = async (
