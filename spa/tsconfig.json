@@ -17,6 +17,9 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "@type-definitions/*": [
+        "../types/*"
       ]
     },
     "lib": [
@@ -31,6 +34,8 @@
     "src/**/*.tsx",
     "src/**/*.vue"
   ],
+  "files": ["../types/graphql-file-modules.d.ts"],
+
   "exclude": [
     "node_modules"
   ]

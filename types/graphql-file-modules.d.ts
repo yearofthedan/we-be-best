@@ -1,5 +1,5 @@
 
-declare module '*/boardQueries.graphql' {
+declare module '@/graphql/boardQueries.graphql' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
   export const addRoomBoardItem: DocumentNode;
@@ -7,12 +7,13 @@ export const unlockRoomBoardItem: DocumentNode;
 export const lockRoomBoardItem: DocumentNode;
 export const moveBoardItem: DocumentNode;
 export const updateBoardItemText: DocumentNode;
+export const deleteBoardItem: DocumentNode;
 
   export default defaultDocument;
 }
     
 
-declare module '*/roomQueries.graphql' {
+declare module '@/graphql/roomQueries.graphql' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
   export const roomMemberUpdates: DocumentNode;

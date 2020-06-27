@@ -31,11 +31,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import {
-  // @ts-ignore
   deleteBoardItem,
-  // @ts-ignore
   updateBoardItemText,
-} from '@/components/Room/Board/boardQueries.graphql';
+} from '@/graphql/boardQueries.graphql';
 import AutoExpandingTextBox from '@/components/Room/Board/AutoExpandingTextBox.vue';
 import { PRIMARY_MOUSE_BUTTON_ID, supportsTouchEvents } from '@/common/dom';
 import ColourStyleSelector from '@/components/Room/Board/ColourStyleSelector.vue';
@@ -43,7 +41,7 @@ import {
   Item,
   MutationDeleteBoardItemArgs,
   MutationUpdateBoardItemTextArgs,
-} from '../../../../../common/graphql';
+} from '@type-definitions/graphql';
 
 interface MoveStartEventPayload {
   itemId: string;

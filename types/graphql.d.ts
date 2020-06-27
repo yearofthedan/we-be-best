@@ -151,12 +151,12 @@ export type AddRoomBoardItemMutation = (
   ) }
 );
 
-export type unlockRoomBoardItemMutationVariables = Exact<{
+export type UnlockRoomBoardItemMutationVariables = Exact<{
   input: UnlockRoomBoardItemInput;
 }>;
 
 
-export type unlockRoomBoardItemMutation = (
+export type UnlockRoomBoardItemMutation = (
   { __typename?: 'Mutation' }
   & { unlockRoomBoardItem: (
     { __typename?: 'Item' }
@@ -200,6 +200,19 @@ export type UpdateBoardItemTextMutation = (
   & { updateBoardItemText: (
     { __typename?: 'Item' }
     & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy'>
+  ) }
+);
+
+export type DeleteBoardItemMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type DeleteBoardItemMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteBoardItem: (
+    { __typename?: 'Item' }
+    & Pick<Item, 'id' | 'isDeleted'>
   ) }
 );
 

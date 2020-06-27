@@ -3,7 +3,7 @@ import {
   JoinRoomInput,
   LockRoomBoardItemInput, MoveBoardItemInput, Room, UnlockRoomBoardItemInput,
   UpdateBoardItemTextInput,
-} from '../../../common/graphql';
+} from '@type-definitions/graphql';
 
 export const buildAddItemInput = (overrides: Partial<AddRoomBoardItemInput> = {}): AddRoomBoardItemInput => ({
   roomId: 'ROOM_123',

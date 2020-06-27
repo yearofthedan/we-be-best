@@ -21,8 +21,11 @@ import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
 import { removeArrayElement, upsertArrayElement } from '@/common/arrays';
 
-// @ts-ignore
-import { itemUpdates, room, roomMemberUpdates } from './roomQueries.graphql';
+import {
+  itemUpdates,
+  room,
+  roomMemberUpdates,
+} from '@/graphql/roomQueries.graphql';
 
 import {
   Query,
@@ -31,7 +34,7 @@ import {
   QueryRoomArgs,
   SubscriptionRoomMemberUpdatesArgs,
   SubscriptionItemUpdatesArgs,
-} from '../../../../common/graphql';
+} from '@type-definitions/graphql';
 
 interface RoomComponentProps {
   roomId: string;

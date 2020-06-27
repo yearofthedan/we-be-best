@@ -3,9 +3,8 @@ import { ApolloServerBase } from 'apollo-server-core';
 import ApolloClient from 'apollo-client';
 import gql from 'graphql-tag';
 import testApolloServerAndClient from '../testHelpers/testApolloServerAndClient';
-// @ts-ignore
-import { joinRoom } from '../../../spa/src/components/Room/roomQueries.graphql';
 import server from '../apolloServer';
+import {joinRoom} from '../../../spa/src/graphql/roomQueries.graphql';
 
 describe('integration: room members', () => {
   let query: ApolloServerTestClient['query'];

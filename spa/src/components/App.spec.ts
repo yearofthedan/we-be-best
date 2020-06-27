@@ -1,8 +1,7 @@
 import { renderWithApollo, screen } from '@/testHelpers/renderer';
 import userEvent from '@testing-library/user-event';
 import App from './App.vue';
-// @ts-ignore
-import { joinRoom } from './Room/roomQueries.graphql';
+import { joinRoom } from '@/graphql/roomQueries.graphql';
 
 const ROOM_NAME = 'my-room';
 const MEMBER_NAME = 'me';

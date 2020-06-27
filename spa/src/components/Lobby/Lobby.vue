@@ -1,8 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
-import { JoinRoomInput } from '../../../../common/graphql';
-// @ts-ignore
-import { joinRoom } from '@/components/Room/roomQueries.graphql';
+import { JoinRoomInput } from '@type-definitions/graphql';
+import { joinRoom } from '@/graphql/roomQueries.graphql';
 
 export default Vue.extend({
   name: 'lobby',

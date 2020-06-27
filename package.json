@@ -3,10 +3,11 @@
   "scripts": {
     "generate-graphql-types": "graphql-codegen --config codegen.yml"
   },
-  "dependencies": {
+  "devDependencies": {
     "@graphql-codegen/cli": "^1.15.4",
     "@graphql-codegen/typescript": "^1.15.4",
     "@graphql-codegen/typescript-operations": "^1.15.4",
-    "graphql": "^15.1.0"
+    "graphql": "^15.1.0",
+    "@graphql-codegen/typescript-graphql-files-modules": "^1.15.4"
   }
 }

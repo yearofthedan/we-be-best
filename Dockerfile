@@ -1,30 +1,29 @@
-FROM node:alpine as spa-build-stage
-WORKDIR /spa
-COPY spa/package.json ./
+FROM node:latest as build-stage
 ENV CYPRESS_INSTALL_BINARY=0
+WORKDIR /app
+COPY package.json package.json
+COPY spa spa
+COPY server server
+COPY types types
+COPY codegen.yml codegen.yml
 RUN yarn
-COPY spa /spa
-COPY common /common
+RUN yarn generate-graphql-types
+
+WORKDIR /app/spa
+RUN yarn
 RUN yarn lint
 RUN yarn test
 RUN yarn build
-
-FROM node:latest as server-build-stage
-WORKDIR /server
-COPY server/package.json .
+WORKDIR /app/server
 RUN yarn
-COPY server /server
-# TODO remove the requirement on spa files for server tests
-COPY spa /spa
-COPY common /common
 RUN yarn lint
 RUN yarn test
 RUN yarn build
 
 FROM node:latest as production-stage
 WORKDIR /app
-COPY --from=server-build-stage /server/dist .
-COPY --from=server-build-stage /server/node_modules ./node_modules
-COPY --from=server-build-stage /server/launch.sh .
-COPY --from=spa-build-stage /spa/dist ./spa
+COPY --from=build-stage /app/server/dist .
+COPY --from=build-stage /app/server/node_modules ./node_modules
+COPY --from=build-stage /app/server/launch.sh .
+COPY --from=build-stage /app/spa/dist ./spa
 CMD ./launch.sh

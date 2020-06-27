@@ -1,9 +1,14 @@
 overwrite: true
 schema: "server/src/schema.graphql"
 generates:
-  common/graphql.ts:
+  types/graphql-file-modules.d.ts:
     plugins:
-      - "typescript"
-      - "typescript-operations"
+      - typescript-graphql-files-modules
+    config:
+      modulePathPrefix: "@/graphql/"
+      prefix: ""
+  types/graphql.d.ts:
+    plugins:
+      - typescript
+      - typescript-operations
 documents: "./**/*.graphql"
-

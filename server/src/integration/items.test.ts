@@ -7,9 +7,8 @@ import {
   MutationDeleteBoardItemArgs,
   MutationJoinRoomArgs,
   MutationLockRoomBoardItemArgs,
-  MutationUpdateBoardItemTextArgs, Room,
-  Subscription,
-} from '../../../common/graphql';
+  MutationUpdateBoardItemTextArgs, Room, Subscription,
+} from '@type-definitions/graphql';
 
 describe('integration: items', () => {
   let apolloClient: ApolloClient<any>;

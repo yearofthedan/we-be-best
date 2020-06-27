@@ -22,15 +22,11 @@
 import Vue from 'vue';
 import RoomBoardItem from './RoomBoardItem.vue';
 import {
-  // @ts-ignore
   addRoomBoardItem,
-  // @ts-ignore
   lockRoomBoardItem,
-  // @ts-ignore
   moveBoardItem,
-  // @ts-ignore
   unlockRoomBoardItem,
-} from './boardQueries.graphql';
+} from '@/graphql/boardQueries.graphql';
 import buildItem, { Item } from '@/components/Room/Board/itemBuilder';
 import { patchArrayElement } from '@/common/arrays';
 import { supportsTouchEvents } from '@/common/dom';
@@ -39,7 +35,7 @@ import {
   LockRoomBoardItemInput,
   MoveBoardItemInput,
   UnlockRoomBoardItemInput,
-} from '../../../../../common/graphql';
+} from '@type-definitions/graphql';
 
 export default Vue.extend({
   name: 'board',

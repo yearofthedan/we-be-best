@@ -8,7 +8,7 @@ import {
   MutationMoveBoardItemArgs,
   MutationUnlockRoomBoardItemArgs,
   MutationUpdateBoardItemTextArgs,
-} from '../../../common/graphql';
+} from '@type-definitions/graphql';
 
 export const addRoomBoardItem = async (
   _: unknown,

@@ -6,8 +6,7 @@ import {
 } from '@/testHelpers/renderer';
 import userEvent from '@testing-library/user-event';
 import Lobby from './Lobby.vue';
-// @ts-ignore
-import { joinRoom } from '@/components/Room/roomQueries.graphql';
+import { joinRoom } from '@/graphql/roomQueries.graphql';
 const ROOM_NAME = 'my-room';
 const MEMBER_NAME = 'me';
 

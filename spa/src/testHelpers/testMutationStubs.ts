@@ -1,9 +1,8 @@
 import {
-// @ts-ignore
   addRoomBoardItem, lockRoomBoardItem, moveBoardItem, updateBoardItemText, deleteBoardItem, unlockRoomBoardItem,
-} from '@/components/Room/Board/boardQueries.graphql';
+} from '@/graphql/boardQueries.graphql';
 import {makeItem} from '@/testHelpers/testData';
-import {AddRoomBoardItemInput, MoveBoardItemInput} from '../../../common/graphql';
+import {AddRoomBoardItemInput, MoveBoardItemInput} from '@type-definitions/graphql';
 
 export const ITEM_ID = 'ITEM123';
 export const ROOM_ID = 'ROOM123';

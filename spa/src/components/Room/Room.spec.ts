@@ -1,8 +1,11 @@
 import Room from '@/components/Room/Room.vue';
 import { renderWithApollo, screen } from '@/testHelpers/renderer';
 import { makeItem, makeRoomMember } from '@/testHelpers/testData';
-// @ts-ignore
-import { itemUpdates, room, roomMemberUpdates } from './roomQueries.graphql';
+import {
+  itemUpdates,
+  room,
+  roomMemberUpdates,
+} from '@/graphql/roomQueries.graphql';
 
 describe('<room />', () => {
   it('queries and subscribes to the room details', async () => {
