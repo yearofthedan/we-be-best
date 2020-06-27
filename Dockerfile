@@ -6,16 +6,8 @@ COPY spa spa
 COPY server server
 COPY types types
 COPY codegen.yml codegen.yml
-RUN yarn
+RUN yarn install
 RUN yarn generate-graphql-types
-
-WORKDIR /app/spa
-RUN yarn
-RUN yarn lint
-RUN yarn test
-RUN yarn build
-WORKDIR /app/server
-RUN yarn
 RUN yarn lint
 RUN yarn test
 RUN yarn build

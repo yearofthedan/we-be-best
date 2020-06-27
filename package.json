@@ -1,6 +1,12 @@
 {
   "license": "MIT",
   "scripts": {
+    "install": "yarn --cwd server install && yarn --cwd spa install",
+    "test": "yarn --cwd server test && yarn --cwd spa test",
+    "lint": "yarn --cwd server lint && yarn --cwd spa lint",
+    "build": "yarn --cwd server build && yarn --cwd spa build",
+    "serve": "yarn --cwd spa serve",
+    "server": "yarn --cwd server start",
     "generate-graphql-types": "graphql-codegen --config codegen.yml"
   },
   "devDependencies": {
