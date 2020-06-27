@@ -4,6 +4,7 @@ import ApolloClient from 'apollo-client';
 import gql from 'graphql-tag';
 import testApolloServerAndClient from '../testHelpers/testApolloServerAndClient';
 import server from '../apolloServer';
+// @ts-ignore
 import {joinRoom} from '../../../spa/src/graphql/roomQueries.graphql';
 
 describe('integration: room members', () => {
