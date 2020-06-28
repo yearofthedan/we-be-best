@@ -1,6 +1,6 @@
 import Room from '@/components/Room/Room.vue';
 import { renderWithApollo, screen } from '@/testHelpers/renderer';
-import { makeItem, makeRoomMember } from '@/testHelpers/testData';
+import { makeItem, buildMemberResult } from '@/testHelpers/testData';
 import {
   itemUpdates,
   room,
@@ -14,7 +14,7 @@ describe('<room />', () => {
       successData: {
         room: {
           id: '123',
-          members: [makeRoomMember('me')],
+          members: [buildMemberResult({ name: 'me' })],
           items: [makeItem({ id: 'ITEM123' })],
         },
       },
@@ -25,7 +25,10 @@ describe('<room />', () => {
       successData: {
         roomMemberUpdates: {
           id: '123',
-          members: [makeRoomMember('me'), makeRoomMember('my-mother')],
+          members: [
+            buildMemberResult({ id: '1', name: 'me' }),
+            buildMemberResult({ id: '2', name: 'my-mother' }),
+          ],
         },
       },
     };

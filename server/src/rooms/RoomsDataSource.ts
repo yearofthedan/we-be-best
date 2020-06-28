@@ -1,11 +1,17 @@
 import {MongoDataSource} from 'apollo-datasource-mongodb';
 import {UserInputError} from 'apollo-server-express';
+import { v4 } from 'uuid';
 
 export interface RoomModel {
   _id: string;
   id: string;
-  members: string[];
+  members: MemberModel[];
   items: ItemModel[];
+}
+
+export interface MemberModel {
+  id: string;
+  name: string;
 }
 
 export interface ItemModel {
@@ -14,14 +20,13 @@ export interface ItemModel {
   posX: number;
   text: string;
   lockedBy?: string;
-  room: string;
+  room?: string;
   isDeleted?: boolean;
   style?: number;
 }
 
 export type NewItemParam = Pick<ItemModel, 'id'|'posX'|'posY'|'text'>
 export type UpdateItemParam = Partial<ItemModel> & Pick<ItemModel, 'id'>;
-export type NewMemberParam = string;
 
 const buildItem = ({id, posX, posY, text, lockedBy, room}: ItemModel): ItemModel => ({
   id,
@@ -46,7 +51,7 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
     return { ...room, items };
   }
 
-  async deleteItem(itemId: string): Promise<ItemModel> {
+  async deleteItem(itemId: string): Promise<ItemModel | undefined> {
     const result = await this.collection.findOneAndUpdate(
       {
         'items.id': itemId
@@ -62,13 +67,14 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
       throw new UserInputError('could not find item to update', { invalidArgs: ['id']});
     }
 
-    return result.value.items.find(i => i.id === itemId);
+    return result.value?.items.find(i => i.id === itemId);
   }
 
   async updateItem(item: UpdateItemParam): Promise<ItemModel> {
     const updateSpecification = Object.entries(item)
       .filter(([, value]) => value !== undefined)
       .reduce(
+        // @ts-ignore //todo this is erroring on SPA build needs investigation
         (accumulator: { [key: string]: keyof ItemModel }, [key, value]: [string, ValueOf<ItemModel>]) => ({
           ...accumulator,
           [`items.$.${[key]}`]: value,
@@ -91,10 +97,10 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
       throw new UserInputError('could not find item to update', { invalidArgs: ['id']});
     }
 
-    return result.value.items.find(i => i.id === item.id);
+    return result.value?.items.find(i => i.id === item.id) as ItemModel;
   }
 
-  async addItem(roomId: string, item: NewItemParam): Promise<ItemModel> {
+  async addItem(roomId: string, item: NewItemParam): Promise<ItemModel | undefined> {
     const result = await this.collection.findOneAndUpdate(
       {id: roomId},
       {$push: {items: buildItem({...item, room: roomId})}},
@@ -108,10 +114,15 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
       },
     );
 
-    return result.value.items[0];
+    return result.value?.items[0];
   }
 
-  async addMember(roomId: string, member: NewMemberParam): Promise<RoomModel> {
+  async addMember(roomId: string, memberName: string): Promise<RoomModel | undefined> {
+    const member: MemberModel = {
+      id: v4(),
+      name: memberName
+    };
+
     return (await this.collection.findOneAndUpdate(
       {id: roomId},
       {

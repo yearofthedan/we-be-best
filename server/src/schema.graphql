@@ -44,7 +44,7 @@ input JoinRoomInput {
 
 type Room {
     id: ID!
-    members: [String!]!
+    members: [Member!]!
     items: [Item!]!
 }
 
@@ -57,6 +57,11 @@ type Item {
     text: String!
     isDeleted: Boolean
     style: Int
+}
+
+type Member {
+    id: ID!
+    name: String!
 }
 
 type Query {

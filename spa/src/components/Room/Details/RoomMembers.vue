@@ -1,7 +1,7 @@
 <template>
   <ul>
-    <li v-for="member in this.members" :key="member">
-      {{ _getAvatar() }} {{ member }}
+    <li v-for="member in this.members" :key="member.id">
+      {{ _getAvatar() }} {{ member.name }}
     </li>
   </ul>
 </template>
@@ -14,7 +14,7 @@ export default Vue.extend({
   name: 'room-members',
   props: {
     members: {
-      type: Array,
+      type: Array as () => { id: string; name: string }[],
       required: true,
     },
   },

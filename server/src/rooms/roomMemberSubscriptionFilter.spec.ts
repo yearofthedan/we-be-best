@@ -1,15 +1,15 @@
 import roomMemberSubscriptionFilter from './roomMemberSubscriptionFilter';
-import {buildRoomModel} from '../testHelpers/storedTestDataBuilder';
+import {buildRoomResult} from '../testHelpers/queryTestDataBuilder';
 
 describe('roomMemberSubscriptionFilter', () => {
   it('returns true when the rooms are the same', () => {
     expect(
-      roomMemberSubscriptionFilter(buildRoomModel({ id: 'ROOM123'}), { id: 'ROOM123' })
+      roomMemberSubscriptionFilter(buildRoomResult({ id: 'ROOM123'}), { id: 'ROOM123' })
     ).toBeTruthy();
   });
   it('returns false when the rooms are different', () => {
     expect(
-      roomMemberSubscriptionFilter(buildRoomModel({ id: 'ROOM123'}), { id: 'UNKNOWN_ROOM' })
+      roomMemberSubscriptionFilter(buildRoomResult({ id: 'ROOM123'}), { id: 'UNKNOWN_ROOM' })
     ).not.toBeTruthy();
   });
 });

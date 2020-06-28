@@ -56,7 +56,7 @@ export type JoinRoomInput = {
 export type Room = {
   __typename?: 'Room';
   id: Scalars['ID'];
-  members: Array<Scalars['String']>;
+  members: Array<Member>;
   items: Array<Item>;
 };
 
@@ -70,6 +70,12 @@ export type Item = {
   text: Scalars['String'];
   isDeleted?: Maybe<Scalars['Boolean']>;
   style?: Maybe<Scalars['Int']>;
+};
+
+export type Member = {
+  __typename?: 'Member';
+  id: Scalars['ID'];
+  name: Scalars['String'];
 };
 
 export type Query = {
@@ -151,7 +157,7 @@ export type MutationDeleteBoardItemArgs = {
 };
 
 export type ItemBitsFragment = (
-  { __typename?: 'Item' }
+  { __typename: 'Item' }
   & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy'>
 );
 
@@ -255,7 +261,11 @@ export type RoomMemberUpdatesSubscription = (
   { __typename?: 'Subscription' }
   & { roomMemberUpdates: (
     { __typename?: 'Room' }
-    & Pick<Room, 'id' | 'members'>
+    & Pick<Room, 'id'>
+    & { members: Array<(
+      { __typename?: 'Member' }
+      & Pick<Member, 'id' | 'name'>
+    )> }
   ) }
 );
 
@@ -281,8 +291,11 @@ export type RoomQuery = (
   { __typename?: 'Query' }
   & { room?: Maybe<(
     { __typename?: 'Room' }
-    & Pick<Room, 'id' | 'members'>
-    & { items: Array<(
+    & Pick<Room, 'id'>
+    & { members: Array<(
+      { __typename?: 'Member' }
+      & Pick<Member, 'id' | 'name'>
+    )>, items: Array<(
       { __typename?: 'Item' }
       & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy' | 'text'>
     )> }

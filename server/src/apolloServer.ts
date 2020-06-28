@@ -16,8 +16,7 @@ import {
   updateBoardItemText,
 } from './items/itemResolvers';
 import {joinRoom, resolveRoom} from './rooms/roomResolvers';
-import {ItemResult} from './items/queryDefinitions';
-import {RoomResult} from './rooms/queryDefinitions';
+import {Item, Room} from '@type-definitions/graphql';
 
 export interface DataSources {
   Rooms: RoomsDataSource;
@@ -50,14 +49,14 @@ export const resolvers = {
         () => pubSub.asyncIterator(ITEM_CHANGED_TOPIC),
         itemUpdatesSubscriptionFilter,
       ),
-        resolve: (payload: ItemResult) => payload
+        resolve: (payload: Item) => payload
     },
     roomMemberUpdates: {
       subscribe: withFilter(
         () => pubSub.asyncIterator(ROOM_MEMBER_CHANGED_TOPIC),
         roomMemberSubscriptionFilter,
       ),
-        resolve: (payload: RoomResult) => payload
+        resolve: (payload: Room) => payload
     }
   },
   Mutation: {

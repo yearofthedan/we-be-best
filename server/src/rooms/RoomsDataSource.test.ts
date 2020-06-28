@@ -1,7 +1,7 @@
 import {Collection} from 'apollo-datasource-mongodb';
 import {Db, MongoClient} from 'mongodb';
 import {MongoMemoryServer} from 'mongodb-memory-server';
-import {buildItemModel, buildRoomModel} from '../testHelpers/storedTestDataBuilder';
+import {buildItemModel, buildRoomMemberModel, buildRoomModel} from '../testHelpers/storedTestDataBuilder';
 import RoomsDataSource, {NewItemParam, RoomModel, UpdateItemParam} from './RoomsDataSource';
 import {UserInputError} from 'apollo-server-express';
 
@@ -45,7 +45,12 @@ describe('RoomsDataSource', () => {
 
   describe('getRoom', () => {
     it('gets a room when it exists', async () => {
-      const existingRoomModel = buildRoomModel({id: 'ROOM_123', members: ['me']});
+      const existingRoomModel = buildRoomModel(
+        {
+          id: 'ROOM_123',
+          members: [buildRoomMemberModel({ name: 'me'})]
+        }
+      );
       await roomsCollection.insertOne(existingRoomModel);
 
       const roomModel = await rooms.getRoom('ROOM_123');
@@ -57,7 +62,11 @@ describe('RoomsDataSource', () => {
       const deletedItem = buildItemModel({ id: '1', isDeleted: true });
       const activeItem = buildItemModel({id: '2'});
       const activeItemWithIsDeletedKey = buildItemModel({ isDeleted: undefined, id: '3', });
-      const existingRoomModel = buildRoomModel({id: 'ROOM_123', members: ['me'], items: [deletedItem, activeItem]});
+      const existingRoomModel = buildRoomModel({
+        id: 'ROOM_123',
+        members: [buildRoomMemberModel({ name: 'me'})],
+        items: [deletedItem, activeItem]
+      });
       await roomsCollection.insertOne(existingRoomModel);
 
       const roomModel = await rooms.getRoom('ROOM_123');
@@ -220,14 +229,17 @@ describe('RoomsDataSource', () => {
 
   describe('addMember', () => {
     it('adds a member to an existing room', async () => {
-      const existingRoomModel = buildRoomModel({id: 'ROOM_123', members: ['me']});
+      const existingRoomModel = buildRoomModel({
+        id: 'ROOM_123',
+        members: [buildRoomMemberModel({ name: 'me'})]
+      });
       await roomsCollection.insertOne(existingRoomModel);
 
       const roomModel = await rooms.addMember(existingRoomModel.id, 'my-mum');
 
       expect(roomModel).toEqual({
         ...existingRoomModel,
-        members: ['me', 'my-mum']
+        members: [ ...existingRoomModel.members, expect.objectContaining({ name: 'my-mum' }) ]
       });
     });
 
@@ -238,7 +250,7 @@ describe('RoomsDataSource', () => {
         _id: expect.anything(),
         id: 'new-room',
         items: [],
-        members: ['my-mum']
+        members: [expect.objectContaining({ name: 'my-mum' })]
       });
     });
   });

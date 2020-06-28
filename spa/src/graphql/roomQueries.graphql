@@ -2,7 +2,10 @@
 subscription roomMemberUpdates($id: ID!) {
     roomMemberUpdates(id: $id) {
         id
-        members
+        members {
+            id
+            name
+        }
     }
 }
 
@@ -20,7 +23,10 @@ subscription itemUpdates($roomId: ID!) {
 query room($id: ID!) {
     room(id: $id) {
         id
-        members
+        members {
+            id
+            name
+        }
         items {
             id
             posX

@@ -6,7 +6,7 @@ import {joinRoom, resolveRoom} from './roomResolvers';
 import RoomsDataSource, {RoomModel} from './RoomsDataSource';
 import {ROOM_MEMBER_CHANGED_TOPIC} from '../apolloServer';
 import {buildJoinRoomInput} from '../testHelpers/queryTestDataBuilder';
-import {buildRoomModel} from '../testHelpers/storedTestDataBuilder';
+import {buildRoomMemberModel, buildRoomModel} from '../testHelpers/storedTestDataBuilder';
 
 const ROOMS_COLLECTION = 'rooms';
 
@@ -16,7 +16,7 @@ describe('roomResolvers', () => {
   let roomsCollection: Collection<RoomModel>;
 
   beforeAll(async () => {
-    connection = await MongoClient.connect(await new MongoMemoryServer().getUri());
+    connection = await MongoClient.connect(await new MongoMemoryServer().getUri(), { useUnifiedTopology: true });
     const db = await connection.db();
     roomsCollection = await db.createCollection(ROOMS_COLLECTION);
     await roomsCollection.createIndex({'items.id': 1});
@@ -42,11 +42,11 @@ describe('roomResolvers', () => {
       );
 
       expect(result.id).toEqual('new-room');
-      expect(result.members).toEqual(['me']);
+      expect(result.members).toEqual([expect.objectContaining({name: 'me'})]);
     });
 
     it('joins the room if it exists', async () => {
-      const room = buildRoomModel({ items: [], members: ['my-mother']});
+      const room = buildRoomModel({ items: [], members: [buildRoomMemberModel({ name: 'my-mother'})]});
       await roomsCollection.insertOne({...room});
 
       const publishStub = jest.fn();
@@ -60,7 +60,11 @@ describe('roomResolvers', () => {
         },
       );
 
-      expect(result.members).toEqual(['my-mother', 'me']);
+      expect(result.members)
+        .toEqual([
+          expect.objectContaining({ name: 'my-mother'}),
+          expect.objectContaining({ name: 'me'}),
+        ]);
     });
 
     it('publishes an update after joining a room', async () => {

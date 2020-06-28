@@ -1,4 +1,6 @@
 import {Item} from '@/components/Room/Board/itemBuilder';
+import {Member} from '@type-definitions/graphql';
+import {MemberModel} from '../../../server/src/rooms/RoomsDataSource';
 
 export const makeItem = (overrides: Partial<Item> = {}): Item => ({
     id: 'ITEM123',
@@ -11,4 +13,8 @@ export const makeItem = (overrides: Partial<Item> = {}): Item => ({
     ...overrides,
 });
 
-export const makeRoomMember = (overrides: String) => overrides || 'PERSON';
+export const buildMemberResult = (override: Partial<Member> = {}): Member => ({
+    id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+    name: 'PERSON',
+    ...override
+});

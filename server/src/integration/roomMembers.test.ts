@@ -1,11 +1,12 @@
 import {createTestClient, ApolloServerTestClient} from 'apollo-server-testing';
-import { ApolloServerBase } from 'apollo-server-core';
+import {ApolloServerBase} from 'apollo-server-core';
 import ApolloClient from 'apollo-client';
 import gql from 'graphql-tag';
 import testApolloServerAndClient from '../testHelpers/testApolloServerAndClient';
 import server from '../apolloServer';
 // @ts-ignore
 import {joinRoom} from '../../../spa/src/graphql/roomQueries.graphql';
+import {sleep} from '../testHelpers/timeout';
 
 describe('integration: room members', () => {
   let query: ApolloServerTestClient['query'];
@@ -25,39 +26,40 @@ describe('integration: room members', () => {
   });
 
   describe('room members subscription', () => {
-    it('sends an update when the members change for a room I am subscribed to', async function() {
+    it('sends an update when the members change for a room I am subscribed to', async function () {
       const subscriptionPromise = new Promise((resolve, reject) => {
         apolloClient.subscribe({
           query: gql`
               subscription roomMemberUpdates($id: ID!) {
                   roomMemberUpdates(id: $id) {
                       id
-                      members
+                      members {
+                          id
+                          name
+                      }
                   }
               }`,
-          variables: { id: '123'}
+          variables: {id: '123'},
         }).subscribe({
           next: resolve,
-          error: reject
+          error: reject,
         });
       });
-      //TODO work out an approach which doesn't require a timeout
-      setTimeout(async () => {
-        await apolloClient.mutate({
-          mutation: gql`
-              mutation joinRoom($input: JoinRoomInput!) {
-                  joinRoom(input: $input)  {
-                      id
-                  }
-              }`,
-          variables: {
-            input: {
-              roomName: '123',
-              memberName: 'me'
-            }
-          }
-        });
-      }, 1000);
+      await sleep(1000);
+      await apolloClient.mutate({
+        mutation: gql`
+            mutation joinRoom($input: JoinRoomInput!) {
+                joinRoom(input: $input)  {
+                    id
+                }
+            }`,
+        variables: {
+          input: {
+            roomName: '123',
+            memberName: 'me',
+          },
+        },
+      });
 
       const result: any = await subscriptionPromise;
       expect(result?.data?.roomMemberUpdates?.id).toEqual('123');
@@ -67,12 +69,12 @@ describe('integration: room members', () => {
   it('joins the room', async () => {
     const res = await query({
       query: joinRoom,
-      variables: { input: { roomName: 'my-room',  memberName: 'me' } }
+      variables: {input: {roomName: 'my-room', memberName: 'me'}},
     });
 
     expect(res.data).toHaveProperty('joinRoom', {
       id: 'my-room',
-      items: []
+      items: [],
     });
   });
 });

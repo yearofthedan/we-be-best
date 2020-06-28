@@ -1,5 +1,8 @@
-import {ItemResult} from './queryDefinitions';
+import {Item} from '@type-definitions/graphql';
 
-export default (payload: ItemResult, variables: { roomId: string }): boolean => {
-  return payload.room === variables.roomId;
+export default (payload: Item, variables: { roomId: string }): boolean => {
+  if (!payload.room) {
+    return false;
+  }
+  return payload.room.id === variables.roomId;
 };

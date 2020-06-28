@@ -1,7 +1,7 @@
 import {
   AddRoomBoardItemInput, Item,
   JoinRoomInput,
-  LockRoomBoardItemInput, MoveBoardItemInput, Room, UnlockRoomBoardItemInput, UpdateBoardItemStyleInput,
+  LockRoomBoardItemInput, Member, MoveBoardItemInput, Room, UnlockRoomBoardItemInput, UpdateBoardItemStyleInput,
   UpdateBoardItemTextInput,
 } from '@type-definitions/graphql';
 
@@ -57,7 +57,11 @@ export const buildItemResult = (overrides: Partial<Item> = {}): Item => ({
   ...overrides
 });
 
-export const buildMemberResult = (override?: string) => override || 'me';
+export const buildMemberResult = (override: Partial<Member> = {}): Member => ({
+  id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+  name: 'me',
+  ...override
+});
 
 export const buildRoomResult = (overrides: Partial<Room> = {}): Room => ({
   id: 'ROOM_123',

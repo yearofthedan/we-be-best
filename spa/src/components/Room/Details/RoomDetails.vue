@@ -21,7 +21,7 @@ export default Vue.extend({
   },
   props: {
     members: {
-      type: Array,
+      type: Array as () => { id: string; name: string }[],
       required: true,
     },
   },

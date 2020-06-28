@@ -28,7 +28,7 @@ describe('itemResolvers', () => {
   let roomsCollection: Collection<RoomModel>;
 
   beforeAll(async () => {
-    connection = await MongoClient.connect(await new MongoMemoryServer().getUri());
+    connection = await MongoClient.connect(await new MongoMemoryServer().getUri(), { useUnifiedTopology: true });
     const db = await connection.db();
     roomsCollection = await db.createCollection(ROOMS_COLLECTION);
     await roomsCollection.createIndex({'items.id': 1});
@@ -57,7 +57,7 @@ describe('itemResolvers', () => {
         },
       );
 
-      const expected = { ...existingItemModel, text: 'yolo' };
+      const expected = { ...existingItemModel, room: { id: existingItemModel.room }, text: 'yolo' };
       expect(result).toEqual(expected);
       expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, expected);
     });
@@ -79,7 +79,7 @@ describe('itemResolvers', () => {
         },
       );
 
-      const expected = { ...existingItemModel, style: 4 };
+      const expected = { ...existingItemModel, room: { id: existingItemModel.room }, style: 4 };
       expect(result).toEqual(expected);
       expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, expected);
     });
@@ -105,7 +105,7 @@ describe('itemResolvers', () => {
         posY: itemInput.posY,
         lockedBy: null,
         text: '',
-        room: 'ROOM_123'
+        room: { id: 'ROOM_123' },
       });
       expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, {
         id: itemInput.itemId,
@@ -113,7 +113,7 @@ describe('itemResolvers', () => {
         posY: itemInput.posY,
         lockedBy: null,
         text: '',
-        room: 'ROOM_123'
+        room: { id: 'ROOM_123' },
       });
     });
   });
@@ -135,7 +135,7 @@ describe('itemResolvers', () => {
         },
       );
 
-      const expected = { ...existingItemModel, lockedBy: 'me' };
+      const expected = { ...existingItemModel, room: { id: existingItemModel.room }, lockedBy: 'me' };
 
       expect(result).toEqual(expected);
       expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, expected);
@@ -158,7 +158,7 @@ describe('itemResolvers', () => {
         },
       );
 
-      const expected = { ...roomItemData, lockedBy: null as string };
+      const expected = { ...roomItemData, room: { id: roomItemData.room }, lockedBy: null as string };
 
       expect(result).toEqual(expected);
     });
@@ -199,7 +199,8 @@ describe('itemResolvers', () => {
         },
       );
 
-      expect(result).toEqual({ ...existingItemModel, posX: 100, posY: 33 });
+      const expected = { ...existingItemModel, room: { id: existingItemModel.room }, posX: 100, posY: 33 };
+      expect(result).toEqual(expected);
     });
 
     it('publishes an update after updating', async () => {
@@ -219,7 +220,8 @@ describe('itemResolvers', () => {
         },
       );
 
-      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, { ...existingItemModel, posX: 100, posY: 33 });
+      const expected = { ...existingItemModel, room: { id: existingItemModel.room }, posX: 100, posY: 33 };
+      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, expected);
 
     });
   });
@@ -237,7 +239,8 @@ describe('itemResolvers', () => {
         },
       );
 
-      expect(result).toEqual({ ...existingItemModel, isDeleted: true });
+      const expected = { ...existingItemModel, room: { id: existingItemModel.room }, isDeleted: true };
+      expect(result).toEqual(expected);
     });
 
     it('publishes an update after deleting', async () => {
@@ -255,7 +258,8 @@ describe('itemResolvers', () => {
         },
       );
 
-      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, { ...existingItemModel, isDeleted: true });
+      const expected = { ...existingItemModel, room: { id: existingItemModel.room }, isDeleted: true };
+      expect(publishStub).toHaveBeenCalledWith(ITEM_CHANGED_TOPIC, expected);
     });
   });
 });
