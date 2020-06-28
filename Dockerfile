@@ -1,4 +1,4 @@
-FROM node:latest as build-stage
+FROM node:14.4 as build-stage
 ENV CYPRESS_INSTALL_BINARY=0
 WORKDIR /app
 COPY package.json package.json
@@ -12,7 +12,7 @@ RUN yarn lint
 RUN yarn test
 RUN yarn build
 
-FROM node:latest as production-stage
+FROM node:14.4 as production-stage
 WORKDIR /app
 COPY --from=build-stage /app/server/dist .
 COPY --from=build-stage /app/server/node_modules ./node_modules
