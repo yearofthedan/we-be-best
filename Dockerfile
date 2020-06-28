@@ -1,5 +1,4 @@
 FROM node:14.4 as build-stage
-ENV CYPRESS_INSTALL_BINARY=0
 WORKDIR /app
 COPY package.json package.json
 COPY spa spa

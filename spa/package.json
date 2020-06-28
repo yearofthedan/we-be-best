@@ -6,7 +6,6 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test": "vue-cli-service test:unit",
-    "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -27,7 +26,6 @@
     "vue-toasted": "^1.1.28"
   },
   "devDependencies": {
-    "@testing-library/cypress": "^6.0.0",
     "@testing-library/dom": "^7.15.0",
     "@testing-library/jest-dom": "^5.10.1",
     "@testing-library/user-event": "^11.4.2",
@@ -40,7 +38,6 @@
     "@typescript-eslint/eslint-plugin": "^3.2.0",
     "@typescript-eslint/parser": "^3.2.0",
     "@vue/cli-plugin-babel": "~4.4.4",
-    "@vue/cli-plugin-e2e-cypress": "~4.4.4",
     "@vue/cli-plugin-eslint": "~4.4.4",
     "@vue/cli-plugin-typescript": "~4.4.4",
     "@vue/cli-plugin-unit-jest": "~4.4.4",
