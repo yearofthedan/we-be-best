@@ -50,7 +50,9 @@ export default Vue.extend({
           memberName: this.memberName,
         });
       } catch (error) {
-        console.error(error);
+        this.$toasted?.global?.apollo_error(
+          `Was not able to join the room: ${error.message}`
+        );
       }
     },
   },

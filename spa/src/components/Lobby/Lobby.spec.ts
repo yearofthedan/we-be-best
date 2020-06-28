@@ -7,10 +7,11 @@ import {
 import userEvent from '@testing-library/user-event';
 import Lobby from './Lobby.vue';
 import { joinRoom } from '@/graphql/roomQueries.graphql';
+import { sleep } from '@/testHelpers/timeout';
 const ROOM_NAME = 'my-room';
 const MEMBER_NAME = 'me';
 
-function makeHappyPathMutationStub() {
+function makeHappyJoinRoomMutationStub() {
   const successData = {
     joinRoom: {
       id: ROOM_NAME,
@@ -27,6 +28,22 @@ function makeHappyPathMutationStub() {
       },
     },
     successData,
+  };
+}
+
+function makeSadJoinRoomMutationStub() {
+  const errorData = {
+    message: 'everything is broken',
+  };
+  return {
+    query: joinRoom,
+    variables: {
+      input: {
+        roomName: ROOM_NAME,
+        memberName: MEMBER_NAME,
+      },
+    },
+    errorData,
   };
 }
 
@@ -49,7 +66,7 @@ describe('<lobby />', () => {
 
   it('joins the room and emits a joined event', async () => {
     const { queryMocks, emitted } = renderWithApollo(Lobby, [
-      makeHappyPathMutationStub(),
+      makeHappyJoinRoomMutationStub(),
     ]);
 
     await userEvent.type(screen.getByLabelText('Your name'), MEMBER_NAME);
@@ -73,5 +90,33 @@ describe('<lobby />', () => {
         memberName: MEMBER_NAME,
       },
     ]);
+  });
+
+  it('displays an error message when joining fails unexpectedly', async () => {
+    const $toasted = {
+      global: {
+        apollo_error: jest.fn(),
+      },
+    };
+
+    const { emitted } = renderWithApollo(
+      Lobby,
+      [makeSadJoinRoomMutationStub()],
+      {
+        mocks: {
+          $toasted: $toasted,
+        },
+      }
+    );
+
+    await userEvent.type(screen.getByLabelText('Your name'), MEMBER_NAME);
+    await userEvent.type(screen.getByLabelText('Room name'), ROOM_NAME);
+    await userEvent.click(screen.getByRole('button', { name: /join room/i }));
+
+    await sleep(5);
+    expect(emitted().joined).toBeUndefined();
+    expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+      'Was not able to join the room: GraphQL error: everything is broken'
+    );
   });
 });
