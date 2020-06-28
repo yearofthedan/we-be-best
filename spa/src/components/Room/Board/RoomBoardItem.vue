@@ -15,16 +15,18 @@
         v-on:input="_onStyleChange"
       />
       <auto-expanding-text-box v-model="text" />
-      <button id="save-button" aria-label="save" v-on:click="_onSaveClick">
-        <span>✔</span>️️
-      </button>
+      <button
+        id="save-button"
+        aria-label="save"
+        v-on:click="_onSaveClick"
+        v-text="this.saveButtonText"
+      />
       <button
         id="delete-button"
         aria-label="delete"
         v-on:click="_onDeleteClick"
-      >
-        <span>🗑</span>️
-      </button>
+        v-text="this.deleteButtonText"
+      />
     </template>
     <template v-else>
       {{ text }}
@@ -65,6 +67,8 @@ type DataProperties = {
     backgroundColour: string;
     textColour: string;
   }[];
+  saveButtonText: string;
+  deleteButtonText: string;
 };
 
 export default Vue.extend({
@@ -93,6 +97,8 @@ export default Vue.extend({
       selectedStyle: this.item.style || 0,
       styleOptions: itemTheme,
       lockedByMe: this.item.lockedBy === this.myId,
+      saveButtonText: '✔',
+      deleteButtonText: '🗑',
     };
   },
   computed: {
