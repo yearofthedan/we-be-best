@@ -7,11 +7,11 @@
     v-on:dblclick="_onEditClick"
     v-bind:data-moving="moving"
     v-bind:data-editing="editing"
-    v-bind:data-locked-by="lockedBy"
+    v-bind:data-locked-by="item.lockedBy"
   >
     <template v-if="editing">
       <colour-style-selector v-on:input="_onStyleChange" />
-      <auto-expanding-text-box v-model="textData" />
+      <auto-expanding-text-box v-model="text" />
       <button id="save-button" aria-label="save" v-on:click="_onSaveClick">
         <span>✔</span>️️
       </button>
@@ -50,8 +50,9 @@ interface MoveStartEventPayload {
 
 type DataProperties = {
   editing: boolean;
-  textData: string;
+  text: string;
   style: { backgroundColour?: string; textColour?: string };
+  lockedByMe: boolean;
 };
 export default Vue.extend({
   name: 'room-board-item',
@@ -60,30 +61,25 @@ export default Vue.extend({
     'colour-style-selector': ColourStyleSelector,
   },
   props: {
-    id: {
-      type: String,
-      required: true,
-    },
-    posX: {
-      type: Number,
-      required: true,
-    },
-    posY: {
-      type: Number,
+    item: {
+      type: Object as () => Item,
       required: true,
     },
     moving: {
       type: Boolean,
     },
-    text: {
+    myId: {
       type: String,
-    },
-    lockedBy: {
-      type: String,
+      required: true,
     },
   },
   data(): DataProperties {
-    return { editing: false, textData: this.text, style: {} };
+    return {
+      editing: false,
+      text: this.item.text,
+      style: {},
+      lockedByMe: this.item.lockedBy === this.myId,
+    };
   },
   computed: {
     styleObject: function (): {
@@ -93,8 +89,8 @@ export default Vue.extend({
       '--theme-text-colour': string;
     } {
       return {
-        left: `${this.posX}px`,
-        top: `${this.posY}px`,
+        left: `${this.item.posX}px`,
+        top: `${this.item.posY}px`,
         '--theme-primary-colour':
           this.style.backgroundColour || 'var(--colour-primary-emphasis)',
         '--theme-text-colour':
@@ -102,7 +98,7 @@ export default Vue.extend({
       };
     },
     elementId: function () {
-      return `item-${this.id}`;
+      return `item-${this.item.id}`;
     },
   },
   methods: {
@@ -111,7 +107,7 @@ export default Vue.extend({
         await this.$apollo.mutate<Item, MutationDeleteBoardItemArgs>({
           mutation: deleteBoardItem,
           variables: {
-            id: this.id,
+            id: this.item.id,
           },
         });
       } catch (e) {
@@ -122,8 +118,8 @@ export default Vue.extend({
     },
     _onSaveClick: async function (): Promise<void> {
       const mutationPayload = {
-        id: this.id,
-        text: this.textData,
+        id: this.item.id,
+        text: this.text,
       };
 
       try {
@@ -158,14 +154,14 @@ export default Vue.extend({
     },
     _onMove: function (event: MouseEvent): void {
       if (
-        this.lockedBy ||
+        (this.item.lockedBy && !this.lockedByMe) ||
         (event.button && event.button !== PRIMARY_MOUSE_BUTTON_ID)
       ) {
         return;
       }
 
       this.$emit('movestart', {
-        itemId: this.id,
+        itemId: this.item.id,
         pointerId: 1,
       } as MoveStartEventPayload);
     },

@@ -24,6 +24,7 @@ import {
   BLACKEST_BLACK,
   LIGHT_ORANGE,
 } from '@/components/Room/Board/itemBuilder';
+import { makeItem } from '@/testHelpers/testData';
 
 jest.mock('@/common/dom');
 
@@ -31,9 +32,8 @@ describe('<room-board-item />', () => {
   it('renders the positioning based upon the x and y props', () => {
     render(RoomBoardItem, {
       propsData: {
-        id: 'item123',
-        posX: 2,
-        posY: 1,
+        myId: 'me',
+        item: makeItem({ posX: 2, posY: 1 }),
         moving: false,
       },
     });
@@ -47,9 +47,8 @@ describe('<room-board-item />', () => {
   it('renders a default themed style', () => {
     render(RoomBoardItem, {
       propsData: {
-        id: 'item123',
-        posX: 2,
-        posY: 1,
+        myId: 'me',
+        item: makeItem(),
         moving: false,
       },
     });
@@ -63,11 +62,9 @@ describe('<room-board-item />', () => {
   it('renders the text', () => {
     render(RoomBoardItem, {
       propsData: {
-        id: 'item123',
-        posX: 2,
-        posY: 1,
+        myId: 'me',
+        item: makeItem({ text: 'some text' }),
         moving: false,
-        text: 'some text',
       },
     });
 
@@ -79,9 +76,8 @@ describe('<room-board-item />', () => {
       (supportsTouchEvents as jest.Mock).mockReturnValue(true);
       const { emitted } = render(RoomBoardItem, {
         propsData: {
-          id: 'item123',
-          posX: 2,
-          posY: 1,
+          myId: 'me',
+          item: makeItem({ id: 'item123', posX: 2, posY: 1 }),
           moving: true,
         },
       });
@@ -101,9 +97,8 @@ describe('<room-board-item />', () => {
       (supportsTouchEvents as jest.Mock).mockReturnValue(false);
       const { emitted } = render(RoomBoardItem, {
         propsData: {
-          id: 'item123',
-          posX: 2,
-          posY: 1,
+          myId: 'me',
+          item: makeItem({ id: 'item123', posX: 2, posY: 1 }),
           moving: true,
         },
       });
@@ -120,9 +115,8 @@ describe('<room-board-item />', () => {
       (supportsTouchEvents as jest.Mock).mockReturnValue(false);
       const { emitted } = render(RoomBoardItem, {
         propsData: {
-          id: 'item123',
-          posX: 2,
-          posY: 1,
+          myId: 'me',
+          item: makeItem({ id: 'item123', posX: 2, posY: 1 }),
           moving: true,
         },
       });
@@ -144,9 +138,8 @@ describe('<room-board-item />', () => {
       (supportsTouchEvents as jest.Mock).mockReturnValue(true);
       const { emitted } = render(RoomBoardItem, {
         propsData: {
-          id: 'item123',
-          posX: 2,
-          posY: 1,
+          myId: 'me',
+          item: makeItem({ id: 'item123', posX: 2, posY: 1 }),
           moving: true,
         },
       });
@@ -156,14 +149,29 @@ describe('<room-board-item />', () => {
       expect(emitted().movestart).toBeUndefined();
     });
 
-    it('does not fire the moving start event when the item is locked', async () => {
+    it('fires a moving start event when the item is locked by me', async () => {
       const { emitted } = render(RoomBoardItem, {
         propsData: {
-          id: 'item123',
-          posX: 2,
-          posY: 1,
+          myId: 'me',
+          item: makeItem({ lockedBy: 'someone' }),
           moving: true,
-          lockedBy: 'someone',
+        },
+      });
+
+      await fireEvent(
+        screen.getByRole('listitem'),
+        new PointerDownEvent({ pointerId: 1000 })
+      );
+
+      expect(emitted().movestart).toBeUndefined();
+    });
+
+    it('does not fire the moving start event when the item is locked by someone else', async () => {
+      const { emitted } = render(RoomBoardItem, {
+        propsData: {
+          myId: 'me',
+          item: makeItem({ lockedBy: 'someone' }),
+          moving: true,
         },
       });
 
@@ -178,9 +186,8 @@ describe('<room-board-item />', () => {
     it('does not fire the moving start event for a mouse click which is not the primary button', async () => {
       const { emitted } = render(RoomBoardItem, {
         propsData: {
-          id: 'item123',
-          posX: 2,
-          posY: 1,
+          myId: 'me',
+          item: makeItem(),
         },
       });
 
@@ -210,10 +217,13 @@ describe('<room-board-item />', () => {
       ],
       {
         propsData: {
-          id: itemId,
-          posX: 2,
-          posY: 1,
-          text: 'some text',
+          myId: 'me',
+          item: makeItem({
+            id: itemId,
+            posX: 2,
+            posY: 1,
+            text: 'some text',
+          }),
         },
         mocks: {
           $toasted: { global: { apollo_error: jest.fn() } },
@@ -239,9 +249,11 @@ describe('<room-board-item />', () => {
   it('lets me edit the item and update the themed style', async () => {
     render(RoomBoardItem, {
       propsData: {
-        id: 'item123',
-        posX: 2,
-        posY: 1,
+        myId: 'me',
+        item: makeItem({
+          id: 'item123',
+          posX: 2,
+        }),
         moving: false,
       },
     });
@@ -273,10 +285,13 @@ describe('<room-board-item />', () => {
       ],
       {
         propsData: {
-          id: itemId,
-          posX: 2,
-          posY: 1,
-          text: 'some text',
+          myId: 'me',
+          item: makeItem({
+            id: itemId,
+            posX: 2,
+            posY: 1,
+            text: 'some text',
+          }),
         },
         mocks: {
           $toasted: $toasted,
@@ -307,10 +322,13 @@ describe('<room-board-item />', () => {
       ],
       {
         propsData: {
-          id: itemId,
-          posX: 2,
-          posY: 1,
-          text: 'some text',
+          myId: 'me',
+          item: makeItem({
+            id: itemId,
+            posX: 2,
+            posY: 1,
+            text: 'some text',
+          }),
         },
         mocks: {
           $toasted: { global: { apollo_error: jest.fn() } },
@@ -342,10 +360,13 @@ describe('<room-board-item />', () => {
       ],
       {
         propsData: {
-          id: itemId,
-          posX: 2,
-          posY: 1,
-          text: 'some text',
+          myId: 'me',
+          item: makeItem({
+            id: itemId,
+            posX: 2,
+            posY: 1,
+            text: 'some text',
+          }),
         },
         mocks: {
           $toasted: $toasted,

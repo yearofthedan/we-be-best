@@ -7,9 +7,9 @@
     <ul>
       <room-board-item
         v-for="item in itemsData"
-        v-bind="item"
-        v-bind:locked-by="item.lockedBy !== myId ? item.lockedBy : undefined"
+        v-bind:item="item"
         v-bind:moving="_getIsMoving(item.id)"
+        v-bind:my-id="myId"
         v-on:movestart="_onBoardItemMoveStart"
         :key="item.id"
       />
