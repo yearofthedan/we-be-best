@@ -27,7 +27,9 @@ import {
   moveBoardItem,
   unlockRoomBoardItem,
 } from '@/graphql/boardQueries.graphql';
-import makeNewItem, { Item } from '@/components/Room/Board/itemBuilder';
+import makeNewItem, {
+  ItemViewModel,
+} from '@/components/Room/Board/itemBuilder';
 import { patchArrayElement } from '@/common/arrays';
 import { supportsTouchEvents } from '@/common/dom';
 import {
@@ -52,7 +54,7 @@ export default Vue.extend({
       required: true,
     },
     items: {
-      type: Array as () => Item[],
+      type: Array as () => ItemViewModel[],
       required: true,
     },
   },
@@ -62,12 +64,14 @@ export default Vue.extend({
     },
   },
   data: function (): {
-    itemsData: Item[];
+    itemsData: ItemViewModel[];
     movingItemReference: string | null;
     primaryTouchId: string | null;
   } {
     return {
-      itemsData: this.$props.items.filter((item: Item) => !item.isDeleted),
+      itemsData: this.$props.items.filter(
+        (item: ItemViewModel) => !item.isDeleted
+      ),
       movingItemReference: null,
       primaryTouchId: null,
     };
@@ -169,7 +173,7 @@ export default Vue.extend({
 
       const { posX, posY } = this.itemsData.find(
         (e) => e.id === itemReference
-      ) as Item;
+      ) as ItemViewModel;
 
       this.itemsData = patchArrayElement(
         this.itemsData,

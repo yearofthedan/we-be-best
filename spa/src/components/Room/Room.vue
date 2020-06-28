@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { ApolloError } from 'apollo-client';
-import { Item } from '@/components/Room/Board/itemBuilder';
+import { ItemViewModel } from '@/components/Room/Board/itemBuilder';
 import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
 import { removeArrayElement, upsertArrayElement } from '@/common/arrays';
@@ -34,6 +34,7 @@ import {
   QueryRoomArgs,
   SubscriptionRoomMemberUpdatesArgs,
   SubscriptionItemUpdatesArgs,
+  Item,
 } from '@type-definitions/graphql';
 
 interface RoomComponentProps {
@@ -46,7 +47,7 @@ interface RoomComponentData {
   room?: Room | null;
 }
 
-const resolveUpdate = (items: Item[], update: Item) => {
+const resolveUpdate = (items: ItemViewModel[], update: Item) => {
   if (update.isDeleted) {
     return removeArrayElement(items, (e) => e.id === update.id);
   }
