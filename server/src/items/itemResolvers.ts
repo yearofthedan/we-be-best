@@ -6,7 +6,7 @@ import {
   MutationDeleteBoardItemArgs,
   MutationLockRoomBoardItemArgs,
   MutationMoveBoardItemArgs,
-  MutationUnlockRoomBoardItemArgs,
+  MutationUnlockRoomBoardItemArgs, MutationUpdateBoardItemStyleArgs,
   MutationUpdateBoardItemTextArgs,
 } from '@type-definitions/graphql';
 
@@ -29,6 +29,18 @@ export const updateBoardItemText = async (
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
 ): Promise<ItemResult> => {
   const result = await dataSources.Rooms.updateItem({ id: input.id, text: input.text});
+
+  await pubSub.publish(ITEM_CHANGED_TOPIC, result);
+
+  return result;
+};
+
+export const updateBoardItemStyle = async (
+  _: unknown,
+  { input }: MutationUpdateBoardItemStyleArgs,
+  { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
+): Promise<ItemResult> => {
+  const result = await dataSources.Rooms.updateItem({ id: input.id, style: input.style});
 
   await pubSub.publish(ITEM_CHANGED_TOPIC, result);
 

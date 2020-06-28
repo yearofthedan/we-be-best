@@ -1,45 +1,44 @@
+fragment ItemBits on Item {
+    __typename
+    id
+    posX
+    posY
+    lockedBy
+}
+
 mutation addRoomBoardItem($input: AddRoomBoardItemInput!) {
     addRoomBoardItem(input: $input) {
-        id
-        posX
-        posY
-        lockedBy
+        ...ItemBits
     }
 }
 
 mutation unlockRoomBoardItem($input: UnlockRoomBoardItemInput!) {
     unlockRoomBoardItem(input: $input) {
-        id
-        posX
-        posY
-        lockedBy
+        ...ItemBits
     }
 }
 
 mutation lockRoomBoardItem($input: LockRoomBoardItemInput!) {
     lockRoomBoardItem(input: $input) {
-        id
-        posX
-        posY
-        lockedBy
+        ...ItemBits
     }
 }
 
 mutation moveBoardItem($input: MoveBoardItemInput!) {
     moveBoardItem(input: $input) {
-        id
-        posX
-        posY
-        lockedBy
+        ...ItemBits
     }
 }
 
 mutation updateBoardItemText($input: UpdateBoardItemTextInput!) {
     updateBoardItemText(input: $input) {
-        id
-        posX
-        posY
-        lockedBy
+        ...ItemBits
+    }
+}
+
+mutation updateBoardItemStyle($input: UpdateBoardItemStyleInput!) {
+    updateBoardItemStyle(input: $input) {
+        ...ItemBits
     }
 }
 

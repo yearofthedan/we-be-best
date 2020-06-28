@@ -12,7 +12,7 @@ import {
   addRoomBoardItem, deleteBoardItem,
   lockRoomBoardItem,
   moveBoardItem,
-  unlockRoomBoardItem,
+  unlockRoomBoardItem, updateBoardItemStyle,
   updateBoardItemText,
 } from './items/itemResolvers';
 import {joinRoom, resolveRoom} from './rooms/roomResolvers';
@@ -62,12 +62,13 @@ export const resolvers = {
   },
   Mutation: {
     joinRoom: joinRoom,
-      lockRoomBoardItem: lockRoomBoardItem,
-      unlockRoomBoardItem: unlockRoomBoardItem,
-      moveBoardItem: moveBoardItem,
-      addRoomBoardItem: addRoomBoardItem,
-      updateBoardItemText: updateBoardItemText,
-      deleteBoardItem: deleteBoardItem,
+    lockRoomBoardItem: lockRoomBoardItem,
+    unlockRoomBoardItem: unlockRoomBoardItem,
+    moveBoardItem: moveBoardItem,
+    addRoomBoardItem: addRoomBoardItem,
+    updateBoardItemText: updateBoardItemText,
+    updateBoardItemStyle: updateBoardItemStyle,
+    deleteBoardItem: deleteBoardItem,
   }
 };
 

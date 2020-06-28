@@ -36,6 +36,11 @@ export type UpdateBoardItemTextInput = {
   text: Scalars['String'];
 };
 
+export type UpdateBoardItemStyleInput = {
+  id: Scalars['ID'];
+  style: Scalars['Int'];
+};
+
 export type AddRoomBoardItemInput = {
   roomId: Scalars['ID'];
   itemId: Scalars['String'];
@@ -64,6 +69,7 @@ export type Item = {
   room?: Maybe<Room>;
   text: Scalars['String'];
   isDeleted?: Maybe<Scalars['Boolean']>;
+  style?: Maybe<Scalars['Int']>;
 };
 
 export type Query = {
@@ -100,6 +106,7 @@ export type Mutation = {
   unlockRoomBoardItem: Item;
   addRoomBoardItem: Item;
   updateBoardItemText: Item;
+  updateBoardItemStyle: Item;
   deleteBoardItem: Item;
 };
 
@@ -134,9 +141,19 @@ export type MutationUpdateBoardItemTextArgs = {
 };
 
 
+export type MutationUpdateBoardItemStyleArgs = {
+  input: UpdateBoardItemStyleInput;
+};
+
+
 export type MutationDeleteBoardItemArgs = {
   id: Scalars['ID'];
 };
+
+export type ItemBitsFragment = (
+  { __typename?: 'Item' }
+  & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy'>
+);
 
 export type AddRoomBoardItemMutationVariables = Exact<{
   input: AddRoomBoardItemInput;
@@ -147,7 +164,7 @@ export type AddRoomBoardItemMutation = (
   { __typename?: 'Mutation' }
   & { addRoomBoardItem: (
     { __typename?: 'Item' }
-    & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy'>
+    & ItemBitsFragment
   ) }
 );
 
@@ -160,7 +177,7 @@ export type UnlockRoomBoardItemMutation = (
   { __typename?: 'Mutation' }
   & { unlockRoomBoardItem: (
     { __typename?: 'Item' }
-    & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy'>
+    & ItemBitsFragment
   ) }
 );
 
@@ -173,7 +190,7 @@ export type LockRoomBoardItemMutation = (
   { __typename?: 'Mutation' }
   & { lockRoomBoardItem: (
     { __typename?: 'Item' }
-    & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy'>
+    & ItemBitsFragment
   ) }
 );
 
@@ -186,7 +203,7 @@ export type MoveBoardItemMutation = (
   { __typename?: 'Mutation' }
   & { moveBoardItem: (
     { __typename?: 'Item' }
-    & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy'>
+    & ItemBitsFragment
   ) }
 );
 
@@ -199,7 +216,20 @@ export type UpdateBoardItemTextMutation = (
   { __typename?: 'Mutation' }
   & { updateBoardItemText: (
     { __typename?: 'Item' }
-    & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy'>
+    & ItemBitsFragment
+  ) }
+);
+
+export type UpdateBoardItemStyleMutationVariables = Exact<{
+  input: UpdateBoardItemStyleInput;
+}>;
+
+
+export type UpdateBoardItemStyleMutation = (
+  { __typename?: 'Mutation' }
+  & { updateBoardItemStyle: (
+    { __typename?: 'Item' }
+    & ItemBitsFragment
   ) }
 );
 

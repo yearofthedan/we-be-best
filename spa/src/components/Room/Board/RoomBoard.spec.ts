@@ -21,7 +21,7 @@ import {
   makeHappyUnlockRoomBoardItemMutationStub,
   MY_ID,
   ROOM_ID,
-} from '@/testHelpers/testMutationStubs';
+} from '@/testHelpers/itemQueryStubs';
 import { resetAllWhenMocks } from 'jest-when';
 
 import { supportsTouchEvents } from '@/common/dom';

@@ -10,7 +10,10 @@
     v-bind:data-locked-by="item.lockedBy"
   >
     <template v-if="editing">
-      <colour-style-selector v-on:input="_onStyleChange" />
+      <colour-style-selector
+        v-bind:options="styleOptions"
+        v-on:input="_onStyleChange"
+      />
       <auto-expanding-text-box v-model="text" />
       <button id="save-button" aria-label="save" v-on:click="_onSaveClick">
         <span>✔</span>️️
@@ -32,6 +35,7 @@
 import Vue from 'vue';
 import {
   deleteBoardItem,
+  updateBoardItemStyle,
   updateBoardItemText,
 } from '@/graphql/boardQueries.graphql';
 import AutoExpandingTextBox from '@/components/Room/Board/AutoExpandingTextBox.vue';
@@ -40,8 +44,10 @@ import ColourStyleSelector from '@/components/Room/Board/ColourStyleSelector.vue
 import {
   Item,
   MutationDeleteBoardItemArgs,
+  MutationUpdateBoardItemStyleArgs,
   MutationUpdateBoardItemTextArgs,
 } from '@type-definitions/graphql';
+import { itemTheme } from './itemTheme';
 
 interface MoveStartEventPayload {
   itemId: string;
@@ -51,9 +57,15 @@ interface MoveStartEventPayload {
 type DataProperties = {
   editing: boolean;
   text: string;
-  style: { backgroundColour?: string; textColour?: string };
   lockedByMe: boolean;
+  selectedStyle: number;
+  styleOptions: {
+    name: string;
+    backgroundColour: string;
+    textColour: string;
+  }[];
 };
+
 export default Vue.extend({
   name: 'room-board-item',
   components: {
@@ -77,7 +89,8 @@ export default Vue.extend({
     return {
       editing: false,
       text: this.item.text,
-      style: {},
+      selectedStyle: this.item.style || 0,
+      styleOptions: itemTheme,
       lockedByMe: this.item.lockedBy === this.myId,
     };
   },
@@ -88,13 +101,13 @@ export default Vue.extend({
       '--theme-primary-colour': string;
       '--theme-text-colour': string;
     } {
+      const style = this.styleOptions[this.selectedStyle];
       return {
         left: `${this.item.posX}px`,
         top: `${this.item.posY}px`,
         '--theme-primary-colour':
-          this.style.backgroundColour || 'var(--colour-primary-emphasis)',
-        '--theme-text-colour':
-          this.style.textColour || 'var(--colour-background)',
+          style.backgroundColour || 'var(--colour-primary-emphasis)',
+        '--theme-text-colour': style.textColour || 'var(--colour-background)',
       };
     },
     elementId: function () {
@@ -165,8 +178,23 @@ export default Vue.extend({
         pointerId: 1,
       } as MoveStartEventPayload);
     },
-    _onStyleChange: function (style: DataProperties['style']) {
-      this.style = style;
+    _onStyleChange: async function (style: string) {
+      this.selectedStyle = this.styleOptions.findIndex((s) => s.name === style);
+      try {
+        await this.$apollo.mutate<Item, MutationUpdateBoardItemStyleArgs>({
+          mutation: updateBoardItemStyle,
+          variables: {
+            input: {
+              id: this.item.id,
+              style: this.selectedStyle,
+            },
+          },
+        });
+      } catch (e) {
+        this.$toasted.global.apollo_error(
+          `Could not save item changes: ${e.message}`
+        );
+      }
     },
   },
 });

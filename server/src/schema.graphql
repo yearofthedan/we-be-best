@@ -25,6 +25,11 @@ input UpdateBoardItemTextInput {
     text: String!
 }
 
+input UpdateBoardItemStyleInput {
+    id: ID!
+    style: Int!
+}
+
 input AddRoomBoardItemInput {
     roomId: ID!
     itemId: String!
@@ -51,6 +56,7 @@ type Item {
     room: Room
     text: String!
     isDeleted: Boolean
+    style: Int
 }
 
 type Query {
@@ -69,5 +75,6 @@ type Mutation {
     unlockRoomBoardItem(input: UnlockRoomBoardItemInput!): Item!
     addRoomBoardItem(input: AddRoomBoardItemInput!): Item!
     updateBoardItemText(input: UpdateBoardItemTextInput!): Item!
+    updateBoardItemStyle(input: UpdateBoardItemStyleInput!): Item!
     deleteBoardItem(id: ID!): Item!
 }

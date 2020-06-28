@@ -6,7 +6,7 @@ import {
   MutationAddRoomBoardItemArgs,
   MutationDeleteBoardItemArgs,
   MutationJoinRoomArgs,
-  MutationLockRoomBoardItemArgs,
+  MutationLockRoomBoardItemArgs, MutationUpdateBoardItemStyleArgs,
   MutationUpdateBoardItemTextArgs, Room, Subscription,
 } from '@type-definitions/graphql';
 
@@ -36,6 +36,7 @@ describe('integration: items', () => {
                     lockedBy
                     text
                     isDeleted
+                    style
                 }
             }`,
         variables: {roomId: '123'},
@@ -205,6 +206,33 @@ describe('integration: items', () => {
       const result = await subscriptionPromise;
       expect(result.data.itemUpdates.id).toEqual('item123');
       expect(result.data.itemUpdates.text).toEqual('some-text');
+    });
+  });
+
+  describe('update item style subscription', () => {
+    it('sends an update when the item style is updated for a room I am subscribed to', async function () {
+      await addARoom();
+      await addAnItemToARoom();
+
+      const subscriptionPromise = addAnItemUpdateSubscription();
+      await apolloClient.mutate<Item, MutationUpdateBoardItemStyleArgs>({
+        mutation: gql`
+            mutation updateBoardItemStyle($input: UpdateBoardItemStyleInput!) {
+                updateBoardItemStyle(input: $input)  {
+                    id
+                }
+            }`,
+        variables: {
+          input: {
+            id: 'item123',
+            style: 4
+          },
+        },
+      });
+
+      const result = await subscriptionPromise;
+      expect(result.data.itemUpdates.id).toEqual('item123');
+      expect(result.data.itemUpdates.style).toEqual(4);
     });
   });
 

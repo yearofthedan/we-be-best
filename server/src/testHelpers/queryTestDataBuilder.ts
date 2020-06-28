@@ -1,7 +1,7 @@
 import {
   AddRoomBoardItemInput, Item,
   JoinRoomInput,
-  LockRoomBoardItemInput, MoveBoardItemInput, Room, UnlockRoomBoardItemInput,
+  LockRoomBoardItemInput, MoveBoardItemInput, Room, UnlockRoomBoardItemInput, UpdateBoardItemStyleInput,
   UpdateBoardItemTextInput,
 } from '@type-definitions/graphql';
 
@@ -19,6 +19,11 @@ export const buildUpdateBoardItemTextInput = (overrides: Partial<UpdateBoardItem
   ...overrides
 });
 
+export const buildUpdateBoardItemStyleInput = (overrides: Partial<UpdateBoardItemStyleInput> = {}): UpdateBoardItemStyleInput => ({
+  id: 'item1',
+  style: 1,
+  ...overrides
+});
 
 export const buildLockItemInput = (overrides: Partial<LockRoomBoardItemInput> = {}): LockRoomBoardItemInput => ({
   id: 'item1',

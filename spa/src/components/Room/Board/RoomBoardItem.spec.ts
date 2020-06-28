@@ -9,22 +9,24 @@ import { PointerDownEvent } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import userEvent from '@testing-library/user-event';
 import { waitFor, waitForElementToBeRemoved } from '@testing-library/dom';
 import {
-  makeHappyUpdateRoomBoardItemMutationStub,
+  makeHappyUpdateBoardItemTextMutationStub,
   makeSadUpdateRoomBoardItemMutationStub,
   makeHappyDeleteBoardItemMutationStub,
   makeSadDeleteBoardItemMutationStub,
-} from '@/testHelpers/testMutationStubs';
+  makeHappyUpdateBoardItemStyleMutationStub,
+} from '@/testHelpers/itemQueryStubs';
 import {
   PRIMARY_MOUSE_BUTTON_ID,
   SECONDARY_MOUSE_BUTTON_ID,
   supportsTouchEvents,
 } from '@/common/dom';
 import { sleep } from '@/testHelpers/timeout';
+import { makeItem } from '@/testHelpers/testData';
 import {
   BLACKEST_BLACK,
+  LIGHT_CYAN,
   LIGHT_ORANGE,
-} from '@/components/Room/Board/itemBuilder';
-import { makeItem } from '@/testHelpers/testData';
+} from '@/components/Room/Board/itemTheme';
 
 jest.mock('@/common/dom');
 
@@ -54,8 +56,8 @@ describe('<room-board-item />', () => {
     });
 
     expect(screen.getByRole('listitem')).toHaveStyle(`
-      --theme-primary-colour: var(--colour-primary-emphasis);
-      --theme-text-colour: var(--colour-background);
+      --theme-primary-colour: ${LIGHT_CYAN};
+      --theme-text-colour: ${BLACKEST_BLACK};
     `);
   });
 
@@ -203,6 +205,48 @@ describe('<room-board-item />', () => {
     });
   });
 
+  describe('themed style', () => {
+    it('lets me edit the item and update the themed style', async () => {
+      const { queryMocks } = renderWithApollo(
+        RoomBoardItem,
+        [
+          makeHappyUpdateBoardItemStyleMutationStub({
+            id: 'item123',
+            style: 3,
+          }),
+        ],
+        {
+          propsData: {
+            myId: 'me',
+            item: makeItem({
+              id: 'item123',
+              posX: 2,
+              posY: 1,
+            }),
+            moving: false,
+          },
+          mocks: {
+            $toasted: { global: { apollo_error: jest.fn() } },
+          },
+        }
+      );
+
+      await userEvent.dblClick(screen.getByRole('listitem'));
+      await userEvent.click(screen.getByRole('radio', { name: /style-3/i }));
+
+      expect(screen.getByRole('listitem')).toHaveStyle(`
+      --theme-primary-colour: ${LIGHT_ORANGE};
+      --theme-text-colour: ${BLACKEST_BLACK};
+    `);
+
+      await waitFor(() =>
+        expect(queryMocks[0]).toHaveBeenCalledWith({
+          input: { id: 'item123', style: 2 },
+        })
+      );
+    });
+  });
+
   it('lets me edit the item and sends the update', async () => {
     const itemId = 'item123';
     const updatedText = 'updated content';
@@ -210,7 +254,7 @@ describe('<room-board-item />', () => {
     const { queryMocks } = renderWithApollo(
       RoomBoardItem,
       [
-        makeHappyUpdateRoomBoardItemMutationStub({
+        makeHappyUpdateBoardItemTextMutationStub({
           id: itemId,
           text: updatedText,
         }),
@@ -244,27 +288,6 @@ describe('<room-board-item />', () => {
         input: { id: itemId, text: updatedText },
       })
     );
-  });
-
-  it('lets me edit the item and update the themed style', async () => {
-    render(RoomBoardItem, {
-      propsData: {
-        myId: 'me',
-        item: makeItem({
-          id: 'item123',
-          posX: 2,
-        }),
-        moving: false,
-      },
-    });
-
-    await userEvent.dblClick(screen.getByRole('listitem'));
-    await userEvent.click(screen.getByRole('radio', { name: /style-3/i }));
-
-    expect(screen.getByRole('listitem')).toHaveStyle(`
-      --theme-primary-colour: ${LIGHT_ORANGE};
-      --theme-text-colour: ${BLACKEST_BLACK};
-    `);
   });
 
   it('displays a toast update when an error occurs while updating', async () => {

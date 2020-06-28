@@ -16,6 +16,7 @@ export interface ItemModel {
   lockedBy?: string;
   room: string;
   isDeleted?: boolean;
+  style?: number;
 }
 
 export type NewItemParam = Pick<ItemModel, 'id'|'posX'|'posY'|'text'>
