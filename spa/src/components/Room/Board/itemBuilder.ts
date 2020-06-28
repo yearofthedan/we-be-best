@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 export const DEFAULT_X = 100;
 export const DEFAULT_Y = 100;
 
-export interface Item {
+export interface ItemViewModel {
   id: string;
   posX: number;
   posY: number;
@@ -11,14 +11,16 @@ export interface Item {
   text: string;
   style?: number | null;
   isDeleted?: boolean | null;
+  isNew?: boolean | null;
 }
 
-const buildItem = (): Item => ({
+const makeNewItem = (): ItemViewModel => ({
   id: v4(),
   posX: DEFAULT_X,
   posY: DEFAULT_Y,
   text: '',
   style: 1,
+  isNew: true,
 });
 
-export default buildItem;
+export default makeNewItem;

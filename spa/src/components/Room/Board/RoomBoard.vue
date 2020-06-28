@@ -27,7 +27,7 @@ import {
   moveBoardItem,
   unlockRoomBoardItem,
 } from '@/graphql/boardQueries.graphql';
-import buildItem, { Item } from '@/components/Room/Board/itemBuilder';
+import makeNewItem, { Item } from '@/components/Room/Board/itemBuilder';
 import { patchArrayElement } from '@/common/arrays';
 import { supportsTouchEvents } from '@/common/dom';
 import {
@@ -81,7 +81,7 @@ export default Vue.extend({
       return itemId === this.movingItemReference;
     },
     _onAddItem: function (): void {
-      const newItem = buildItem();
+      const newItem = makeNewItem();
       this.itemsData = [...this.itemsData, newItem];
 
       const mutationPayload: AddRoomBoardItemInput = {

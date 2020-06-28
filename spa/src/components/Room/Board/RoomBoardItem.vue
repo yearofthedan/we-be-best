@@ -48,6 +48,7 @@ import {
   MutationUpdateBoardItemTextArgs,
 } from '@type-definitions/graphql';
 import { itemTheme } from './itemTheme';
+import { ItemViewModel } from '@/components/Room/Board/itemBuilder';
 
 interface MoveStartEventPayload {
   itemId: string;
@@ -74,7 +75,7 @@ export default Vue.extend({
   },
   props: {
     item: {
-      type: Object as () => Item,
+      type: Object as () => ItemViewModel,
       required: true,
     },
     moving: {
@@ -87,7 +88,7 @@ export default Vue.extend({
   },
   data(): DataProperties {
     return {
-      editing: false,
+      editing: this.item.isNew || false,
       text: this.item.text,
       selectedStyle: this.item.style || 0,
       styleOptions: itemTheme,

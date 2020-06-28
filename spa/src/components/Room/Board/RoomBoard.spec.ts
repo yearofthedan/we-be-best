@@ -68,7 +68,8 @@ describe('<room-board />', () => {
       expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
       await userEvent.click(screen.getByRole('button', { name: /add/i }));
 
-      expect(await screen.findAllByRole('listitem')).toHaveLength(1);
+      await screen.findByRole('listitem');
+      expect(await screen.findByRole('textbox')).toBeInTheDocument();
     });
 
     it('sends an update when an item is created', async () => {
