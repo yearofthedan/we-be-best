@@ -1,8 +1,7 @@
-import {Item} from '@/components/Room/Board/itemBuilder';
+import {ItemViewModel} from '@/components/Room/Board/itemBuilder';
 import {Member} from '@type-definitions/graphql';
-import {MemberModel} from '../../../server/src/rooms/RoomsDataSource';
 
-export const makeItem = (overrides: Partial<Item> = {}): Item => ({
+export const makeItem = (overrides: Partial<ItemViewModel> = {}): ItemViewModel => ({
     id: 'ITEM123',
     lockedBy: 'me',
     posY: 20,
