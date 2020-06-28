@@ -47,6 +47,20 @@ export const makeHappyMoveBoardItemMutationStub = (inputOverrides: Partial<MoveB
     successData,
   };
 }
+
+export const makeSadMoveBoardItemMutationStub = (inputOverrides: Partial<MoveBoardItemInput> = {}) => {
+  const errorData = {
+    message: 'everything is broken',
+  };
+  return {
+    query: moveBoardItem,
+    variables: {
+      input: { ...inputOverrides },
+    },
+    errorData,
+  };
+}
+
 export const makeHappyLockRoomBoardItemMutationStub = (
   inputOverrides = {
     id: 'item1',
@@ -62,6 +76,24 @@ export const makeHappyLockRoomBoardItemMutationStub = (
       input: { ...inputOverrides },
     },
     successData,
+  };
+}
+
+export const makeSadLockRoomBoardItemMutationStub = (
+  inputOverrides = {
+    id: 'item1',
+    lockedBy: 'me',
+  }
+) => {
+  const errorData = {
+    message: 'everything is broken',
+  };
+  return {
+    query: lockRoomBoardItem,
+    variables: {
+      input: { ...inputOverrides },
+    },
+    errorData,
   };
 }
 
@@ -91,6 +123,27 @@ export const makeHappyAddRoomBoardItemMutationStub = (
   };
 }
 
+export const makeSadAddRoomBoardItemMutationStub = (
+  overrides?: Partial<AddRoomBoardItemInput>
+) => {
+  const errorData = {
+    message: 'everything is broken',
+  };
+  return {
+    query: addRoomBoardItem,
+    variables: {
+      input: {
+        posX: 0,
+        posY: 0,
+        itemId: ITEM_ID,
+        roomId: ROOM_ID,
+        ...overrides,
+      },
+    },
+    errorData,
+  };
+}
+
 export const makeHappyUnlockRoomBoardItemMutationStub = (inputOverrides = { id: 'item1' }) => {
   const successData = {
     unlockRoomBoardItem: buildItemResponse(),
@@ -101,6 +154,19 @@ export const makeHappyUnlockRoomBoardItemMutationStub = (inputOverrides = { id: 
       input: { ...inputOverrides },
     },
     successData,
+  };
+}
+
+export const makeSadUnlockRoomBoardItemMutationStub = (inputOverrides = { id: 'item1' }) => {
+  const errorData = {
+    message: 'everything is broken',
+  };
+  return {
+    query: unlockRoomBoardItem,
+    variables: {
+      input: { ...inputOverrides },
+    },
+    errorData,
   };
 }
 

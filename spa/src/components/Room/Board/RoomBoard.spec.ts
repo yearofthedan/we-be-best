@@ -1,8 +1,8 @@
 import {
   fireEvent,
-  RenderResult,
   renderWithApollo,
   screen,
+  waitFor,
 } from '@/testHelpers/renderer';
 import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import {
@@ -19,19 +19,22 @@ import {
   makeHappyLockRoomBoardItemMutationStub,
   makeHappyMoveBoardItemMutationStub,
   makeHappyUnlockRoomBoardItemMutationStub,
+  makeSadAddRoomBoardItemMutationStub,
+  makeSadLockRoomBoardItemMutationStub,
+  makeSadMoveBoardItemMutationStub,
+  makeSadUnlockRoomBoardItemMutationStub,
   MY_ID,
   ROOM_ID,
 } from '@/testHelpers/itemQueryStubs';
-import { resetAllWhenMocks } from 'jest-when';
 
 import { supportsTouchEvents } from '@/common/dom';
+import { sleep } from '@/testHelpers/timeout';
 
-jest.mock('@/common/dom');
+jest.mock('@/common/dom', () => ({
+  supportsTouchEvents: jest.fn().mockReturnValue(true),
+}));
 
 describe('<room-board />', () => {
-  afterEach(() => {
-    resetAllWhenMocks();
-  });
   it('renders a item defaulting at 10px by 10px', () => {
     renderWithApollo(RoomBoard, [], {
       propsData: {
@@ -47,18 +50,21 @@ describe('<room-board />', () => {
     `);
   });
   describe('when adding an item', () => {
-    let renderedContext: RenderResult;
-
-    beforeEach(() => {
-      renderedContext = renderWithApollo(
+    const renderComponent = () => {
+      return renderWithApollo(
         RoomBoard,
         [makeHappyAddRoomBoardItemMutationStub()],
         {
           propsData: { myId: MY_ID, roomId: ROOM_ID, items: [] },
+          mocks: {
+            $toasted: { global: { apollo_error: jest.fn() } },
+          },
         }
       );
-    });
+    };
+
     it('lets me add an item', async () => {
+      renderComponent();
       expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
       await userEvent.click(screen.getByRole('button', { name: /add/i }));
 
@@ -66,9 +72,10 @@ describe('<room-board />', () => {
     });
 
     it('sends an update when an item is created', async () => {
+      const { queryMocks } = renderComponent();
       await userEvent.click(screen.getByRole('button', { name: /add/i }));
 
-      expect(renderedContext.queryMocks[0]).toHaveBeenCalledWith({
+      expect(queryMocks[0]).toHaveBeenCalledWith({
         input: {
           roomId: ROOM_ID,
           itemId: expect.any(String),
@@ -76,6 +83,28 @@ describe('<room-board />', () => {
           posY: DEFAULT_Y,
         },
       });
+    });
+
+    it('displays a toast update when an error occurs while adding', async () => {
+      const $toasted = {
+        global: {
+          apollo_error: jest.fn(),
+        },
+      };
+
+      renderWithApollo(RoomBoard, [makeSadAddRoomBoardItemMutationStub()], {
+        propsData: { myId: MY_ID, roomId: ROOM_ID, items: [] },
+        mocks: {
+          $toasted: $toasted,
+        },
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: /add/i }));
+      await sleep(5);
+
+      expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+        'Could not add a new item: GraphQL error: everything is broken'
+      );
     });
   });
   describe('when locked', () => {
@@ -174,6 +203,32 @@ describe('<room-board />', () => {
         input: { lockedBy: MY_ID, id: ITEM_ID },
       });
     });
+
+    it('displays a toast update when an error occurs while locking', async () => {
+      const $toasted = {
+        global: {
+          apollo_error: jest.fn(),
+        },
+      };
+
+      renderWithApollo(RoomBoard, [makeSadLockRoomBoardItemMutationStub()], {
+        propsData: {
+          myId: MY_ID,
+          roomId: ROOM_ID,
+          items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
+        },
+        mocks: {
+          $toasted: $toasted,
+        },
+      });
+
+      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+      await sleep(5);
+
+      expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+        'Could not move the item: GraphQL error: everything is broken'
+      );
+    });
   });
   describe('when moving', () => {
     beforeEach(() => {
@@ -213,10 +268,8 @@ describe('<room-board />', () => {
     });
   });
   describe('after moving', () => {
-    let renderedContext: RenderResult;
-
-    beforeEach(async () => {
-      renderedContext = renderWithApollo(
+    const renderMovingComponent = async () => {
+      const renderResult = renderWithApollo(
         RoomBoard,
         [
           makeHappyLockRoomBoardItemMutationStub(),
@@ -229,20 +282,59 @@ describe('<room-board />', () => {
             roomId: ROOM_ID,
             items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
           },
+          mocks: {
+            $toasted: { global: { apollo_error: jest.fn() } },
+          },
         }
       );
       await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-    });
+      return renderResult;
+    };
 
     it('unlocks the item', async () => {
+      const { queryMocks } = await renderMovingComponent();
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
 
-      expect(renderedContext.queryMocks[1]).toHaveBeenCalledWith({
-        input: { id: ITEM_ID },
+      await waitFor(() => {
+        return expect(queryMocks[1]).toHaveBeenCalledWith({
+          input: { id: ITEM_ID },
+        });
       });
     });
 
+    it('displays a toast update when an error occurs while unlocking', async () => {
+      const apolloErrorMock = jest.fn();
+
+      renderWithApollo(
+        RoomBoard,
+        [
+          makeHappyLockRoomBoardItemMutationStub(),
+          makeSadUnlockRoomBoardItemMutationStub(),
+          makeHappyMoveBoardItemMutationStub(),
+        ],
+        {
+          propsData: {
+            myId: MY_ID,
+            roomId: ROOM_ID,
+            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
+          },
+          mocks: {
+            $toasted: { global: { apollo_error: apolloErrorMock } },
+          },
+        }
+      );
+
+      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+      await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
+      await sleep(5);
+
+      expect(apolloErrorMock).toHaveBeenCalledWith(
+        'Could not update the item: GraphQL error: everything is broken'
+      );
+    });
+
     it('mutates the item position', async () => {
+      const { queryMocks } = await renderMovingComponent();
       await fireEvent(
         screen.getByRole('listitem'),
         new PointerMoveEvent({
@@ -252,12 +344,48 @@ describe('<room-board />', () => {
       );
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
 
-      expect(renderedContext.queryMocks[2]).toHaveBeenCalledWith({
+      expect(queryMocks[2]).toHaveBeenCalledWith({
         input: { id: ITEM_ID, posX: 30, posY: 20 },
       });
     });
 
+    it('displays a toast update when an error occurs while mutating the position', async () => {
+      const $toasted = {
+        global: {
+          apollo_error: jest.fn(),
+        },
+      };
+
+      renderWithApollo(
+        RoomBoard,
+        [
+          makeHappyLockRoomBoardItemMutationStub(),
+          makeHappyUnlockRoomBoardItemMutationStub(),
+          makeSadMoveBoardItemMutationStub(),
+        ],
+        {
+          propsData: {
+            myId: MY_ID,
+            roomId: ROOM_ID,
+            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
+          },
+          mocks: {
+            $toasted: $toasted,
+          },
+        }
+      );
+
+      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+      await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
+      await sleep(5);
+
+      expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+        'Could not update the item: GraphQL error: everything is broken'
+      );
+    });
+
     it('no longer has the data-moving attribute (vue-jest / jsdom do not support style tags)', async () => {
+      await renderMovingComponent();
       expect(screen.getByRole('listitem')).toHaveAttribute('data-moving');
       await fireEvent(
         screen.getByRole('listitem'),

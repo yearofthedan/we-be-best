@@ -98,7 +98,9 @@ export default Vue.extend({
           },
         })
         .catch((error) => {
-          console.error(error);
+          this.$toasted.global.apollo_error(
+            `Could not add a new item: ${error.message}`
+          );
         });
     },
     _onPointerUp: function (): void {
@@ -151,7 +153,9 @@ export default Vue.extend({
           },
         })
         .catch((error) => {
-          console.error(error);
+          this.$toasted.global.apollo_error(
+            `Could not move the item: ${error.message}`
+          );
         });
     },
     _onBoardItemMoved: function ({
@@ -177,7 +181,7 @@ export default Vue.extend({
         (e) => e.id === itemReference
       );
     },
-    _onBoardItemStoppedMoving: function (): void {
+    _onBoardItemStoppedMoving: async function (): Promise<void> {
       const itemRef = this.movingItemReference;
       if (!itemRef) {
         return;
@@ -196,7 +200,7 @@ export default Vue.extend({
         posY: item.posY,
       };
 
-      this.$apollo
+      await this.$apollo
         .mutate({
           mutation: moveBoardItem,
           variables: {
@@ -204,13 +208,16 @@ export default Vue.extend({
           },
         })
         .catch((error) => {
-          console.error(error);
+          //todo investigate why these are causing flakiness in tests when not optional
+          this.$toasted?.global?.apollo_error(
+            `Could not update the item: ${error.message}`
+          );
         });
 
       const mutationPayload: UnlockRoomBoardItemInput = {
         id: item.id,
       };
-      this.$apollo
+      await this.$apollo
         .mutate({
           mutation: unlockRoomBoardItem,
           variables: {
@@ -218,7 +225,9 @@ export default Vue.extend({
           },
         })
         .catch((error) => {
-          console.error(error);
+          this.$toasted?.global?.apollo_error(
+            `Could not update the item: ${error.message}`
+          );
         });
     },
   },
