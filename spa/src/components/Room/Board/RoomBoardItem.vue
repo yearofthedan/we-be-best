@@ -117,6 +117,7 @@ export default Vue.extend({
   methods: {
     _onDeleteClick: async function (): Promise<void> {
       try {
+        this.editing = false;
         await this.$apollo.mutate<Item, MutationDeleteBoardItemArgs>({
           mutation: deleteBoardItem,
           variables: {

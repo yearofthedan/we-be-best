@@ -4,7 +4,7 @@
     v-on:mousemove="this._onMouseMove"
     v-on:pointermove="this._onPointerMove"
   >
-    <ul>
+    <transition-group name="list" tag="ul">
       <room-board-item
         v-for="item in itemsData"
         v-bind:item="item"
@@ -13,7 +13,7 @@
         v-on:movestart="_onBoardItemMoveStart"
         :key="item.id"
       />
-    </ul>
+    </transition-group>
     <button v-on:click="_onAddItem" aria-label="Add" type="button" />
   </section>
 </template>
@@ -288,5 +288,14 @@ section::before {
   font-style: italic;
   filter: opacity(15%);
   content: attr(data-room-name);
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.3s;
+}
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateX(100%) translateY(100%) scale(1.4);
 }
 </style>
