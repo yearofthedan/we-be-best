@@ -253,6 +253,8 @@ interface ItemMovedEventPayload {
 ul {
   list-style-type: none;
   padding: 0;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
 }
 
 button {

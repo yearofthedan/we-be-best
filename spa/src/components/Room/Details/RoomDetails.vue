@@ -54,7 +54,7 @@ label::before {
 
 aside {
   --content-width: 160px;
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;
   width: var(--content-width);
