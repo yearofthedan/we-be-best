@@ -72,6 +72,7 @@ h2 {
   --font-size-text: calc(6 * var(--unit-base-rem));
   --font-size-icon-button: calc(8 * var(--unit-base-rem));
 
+  --z-index-fab: 10000;
   background-color: var(--colour-background);
 }
 article {

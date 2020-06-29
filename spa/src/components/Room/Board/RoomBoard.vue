@@ -257,6 +257,7 @@ ul {
 
 button {
   position: absolute;
+  z-index: var(--z-index-fab);
   width: calc(16 * var(--unit-base-rem));
   height: calc(16 * var(--unit-base-rem));
   bottom: calc(8 * var(--unit-base-rem));
