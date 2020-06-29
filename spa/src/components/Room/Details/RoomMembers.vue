@@ -26,6 +26,8 @@ export default Vue.extend({
 
 <style scoped>
 ul {
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
   list-style: none;
   display: grid;
   grid-template-columns: 1fr;
