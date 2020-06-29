@@ -35,11 +35,17 @@ ul {
   padding: calc(2 * var(--unit-base-rem));
   font-size: var(--font-size-label);
   background-color: var(--colour-primary);
+  box-shadow: 2px 2px 4px 0px var(--colour-secondary);
   margin: 0;
 }
 ul > li {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  background-color: var(--colour-background);
+  padding: calc(2 * var(--unit-base-rem));
+  border-radius: calc(2 * var(--unit-base-rem)) 0 0
+    calc(2 * var(--unit-base-rem));
+  border: solid 1px var(--colour-secondary);
 }
 </style>
