@@ -35,7 +35,6 @@ ul {
   padding: calc(2 * var(--unit-base-rem));
   font-size: var(--font-size-label);
   background-color: var(--colour-primary);
-  box-shadow: 2px 2px 4px 0px var(--colour-secondary);
   margin: 0;
 }
 ul > li {

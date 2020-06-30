@@ -8,7 +8,7 @@
         v-bind:room-id="roomId"
         v-bind:items="room.items"
       />
-      <room-details v-bind:members="room.members" />
+      <room-details v-bind:members="room.members" v-bind:room-id="roomId" />
     </template>
   </section>
 </template>
