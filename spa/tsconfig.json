@@ -14,6 +14,7 @@
       "vue/types/options",
       "webpack-env"
     ],
+    "skipLibCheck": true, // disabled due to vue-router and vue testing library type issues
     "paths": {
       "@/*": [
         "src/*"

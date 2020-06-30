@@ -8,6 +8,7 @@ import { getMainDefinition } from 'apollo-utilities';
 import VueApollo from 'vue-apollo';
 import Toasted from 'vue-toasted';
 import App from './components/App.vue';
+import router from './router/router';
 
 const GRAPHQL_URI_HTTP =
   process.env.VUE_APP_GRAPHQL_URI_HTTP ||
@@ -74,5 +75,6 @@ Vue.toasted.register(
 
 new Vue({
   render: (h) => h(App),
+  router,
   apolloProvider,
 }).$mount('#app');

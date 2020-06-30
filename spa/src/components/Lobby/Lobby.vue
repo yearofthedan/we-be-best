@@ -5,6 +5,12 @@ import { joinRoom } from '@/graphql/roomQueries.graphql';
 
 export default Vue.extend({
   name: 'lobby',
+  props: {
+    roomId: {
+      type: String,
+      required: false,
+    },
+  },
   data(): {
     errors: { name?: string; roomName?: string };
     memberName: string | null;
@@ -13,7 +19,7 @@ export default Vue.extend({
     return {
       errors: {},
       memberName: null,
-      roomName: null,
+      roomName: this.roomId || null,
     };
   },
   methods: {

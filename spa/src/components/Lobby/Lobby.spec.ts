@@ -64,6 +64,14 @@ describe('<lobby />', () => {
     expect(await screen.findByText('you need a room!')).toBeInTheDocument();
   });
 
+  it('auto fills the room name if provided', async () => {
+    render(Lobby, { propsData: { roomId: '11111' } });
+
+    expect(screen.getByRole('textbox', { name: /Room name/i })).toHaveValue(
+      '11111'
+    );
+  });
+
   it('joins the room and emits a joined event', async () => {
     const { queryMocks, emitted } = renderWithApollo(Lobby, [
       makeHappyJoinRoomMutationStub(),
