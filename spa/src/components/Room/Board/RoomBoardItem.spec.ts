@@ -29,7 +29,7 @@ import {
 } from '@/components/Room/Board/itemTheme';
 
 jest.mock('@/common/dom', () => ({
-  supportsTouchEvents: jest.fn().mockReturnValue(true)
+  supportsTouchEvents: jest.fn().mockReturnValue(true),
 }));
 
 describe('<room-board-item />', () => {
@@ -180,7 +180,6 @@ describe('<room-board-item />', () => {
         expect(emitted().movestart).toBeUndefined();
       });
     });
-
   });
 
   describe('themed style', () => {

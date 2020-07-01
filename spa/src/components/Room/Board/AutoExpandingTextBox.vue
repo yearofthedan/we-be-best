@@ -3,6 +3,7 @@
     v-once
     role="textbox"
     contenteditable
+    ref="textbox"
     v-on:input="$emit('input', $event.target.innerText)"
   >
     {{ value }}
@@ -19,6 +20,14 @@ export default Vue.extend({
   props: {
     value: {
       type: String,
+    },
+  },
+  mounted() {
+    this.focusInput();
+  },
+  methods: {
+    focusInput() {
+      (this.$refs.textbox as HTMLDivElement).focus();
     },
   },
 });
