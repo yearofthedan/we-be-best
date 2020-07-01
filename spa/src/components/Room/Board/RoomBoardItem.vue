@@ -7,7 +7,7 @@
     v-on:dblclick="_onEditClick"
     v-bind:data-moving="moving"
     v-bind:data-editing="editing"
-    v-bind:data-locked-by="item.lockedBy"
+    v-bind:data-locked-by="!lockedByMe && item.lockedBy"
   >
     <template v-if="editing">
       <colour-style-selector
@@ -60,7 +60,6 @@ interface MoveStartEventPayload {
 type DataProperties = {
   editing: boolean;
   text: string;
-  lockedByMe: boolean;
   selectedStyle: number;
   styleOptions: {
     name: string;
@@ -96,7 +95,6 @@ export default Vue.extend({
       text: this.item.text,
       selectedStyle: this.item.style || 0,
       styleOptions: itemTheme,
-      lockedByMe: this.item.lockedBy === this.myId,
       saveButtonText: '✔',
       deleteButtonText: '🗑',
     };
@@ -119,6 +117,9 @@ export default Vue.extend({
     },
     elementId: function () {
       return `item-${this.item.id}`;
+    },
+    lockedByMe: function () {
+      return this.item.lockedBy === this.myId;
     },
   },
   methods: {
@@ -210,16 +211,26 @@ export default Vue.extend({
 
 <style scoped>
 li[data-locked-by]::before {
-  content: attr(data-locked-by);
-  border-radius: 100%;
+  max-width: fit-content;
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  content: '🔒' attr(data-locked-by);
+  border-radius: 4px;
   padding: var(--unit-base-rem);
-  position: absolute;
-  top: calc(100% - 20px);
-  left: calc(100% - 20px);
+  font-size: var(--font-size-aside);
+  border: solid 1px var(--colour-primary-emphasis);
+  background-color: var(--colour-primary);
+}
+
+li[data-locked-by] {
+  background-color: var(--colour-secondary);
+  border-color: var(--colour-secondary);
 }
 
 li[data-moving] {
   border-color: var(--colour-primary-emphasis);
+  background-color: var(--colour-secondary);
   cursor: none;
 }
 
