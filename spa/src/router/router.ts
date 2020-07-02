@@ -10,7 +10,7 @@ export const routes: Array<RouteConfig> = [
     name: 'Home',
     component: Home,
     props: (route: Route): { roomId: string | null } => ({
-      roomId: String(route.query.room),
+      roomId: route.query.room ? String(route.query.room) : null,
     }),
   },
 ];
