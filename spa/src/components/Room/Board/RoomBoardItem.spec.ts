@@ -7,7 +7,7 @@ import {
 import RoomBoardItem from '@/components/Room/Board/RoomBoardItem.vue';
 import { PointerDownEvent } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import userEvent from '@testing-library/user-event';
-import { waitFor, waitForElementToBeRemoved } from '@testing-library/dom';
+import { waitFor } from '@testing-library/dom';
 import {
   makeHappyUpdateBoardItemTextMutationStub,
   makeSadUpdateRoomBoardItemMutationStub,
@@ -33,7 +33,7 @@ jest.mock('@/common/dom', () => ({
 }));
 
 describe('<room-board-item />', () => {
-  describe('moving', () => {
+  describe('default rendering', () => {
     it('renders the positioning based upon the x and y props', () => {
       render(RoomBoardItem, {
         propsData: {
@@ -49,6 +49,35 @@ describe('<room-board-item />', () => {
     `);
     });
 
+    it('renders the text', () => {
+      render(RoomBoardItem, {
+        propsData: {
+          myId: 'me',
+          item: makeItem({ text: 'some text' }),
+          moving: false,
+        },
+      });
+
+      expect(screen.getByText('some text')).toBeInTheDocument();
+    });
+
+    it('renders a default themed style', () => {
+      render(RoomBoardItem, {
+        propsData: {
+          myId: 'me',
+          item: makeItem(),
+          moving: false,
+        },
+      });
+
+      expect(screen.getByRole('listitem')).toHaveStyle(`
+      --theme-primary-colour: ${LIGHT_CYAN};
+      --theme-text-colour: ${BLACKEST_BLACK};
+    `);
+    });
+  });
+
+  describe('moving', () => {
     describe('touch not enabled', () => {
       it('does not fire anything when clicking with a pointer if touch is not enabled', async () => {
         (supportsTouchEvents as jest.Mock).mockReturnValue(false);
@@ -182,22 +211,8 @@ describe('<room-board-item />', () => {
     });
   });
 
-  describe('themed style', () => {
-    it('renders a default themed style', () => {
-      render(RoomBoardItem, {
-        propsData: {
-          myId: 'me',
-          item: makeItem(),
-          moving: false,
-        },
-      });
-
-      expect(screen.getByRole('listitem')).toHaveStyle(`
-      --theme-primary-colour: ${LIGHT_CYAN};
-      --theme-text-colour: ${BLACKEST_BLACK};
-    `);
-    });
-    it('lets me edit the item and update the themed style', async () => {
+  describe('editing', () => {
+    it('lets me update the themed style while editing', async () => {
       const { queryMocks } = renderWithApollo(
         RoomBoardItem,
         [
@@ -214,6 +229,7 @@ describe('<room-board-item />', () => {
               posX: 2,
               posY: 1,
             }),
+            editing: true,
             moving: false,
           },
           mocks: {
@@ -236,24 +252,28 @@ describe('<room-board-item />', () => {
         })
       );
     });
-  });
 
-  describe('text', () => {
-    it('renders the text', () => {
-      render(RoomBoardItem, {
+    it('sends an editing event when I double click', async () => {
+      const { emitted } = render(RoomBoardItem, {
         propsData: {
           myId: 'me',
-          item: makeItem({ text: 'some text' }),
-          moving: false,
+          item: makeItem({
+            id: 'item123',
+            posX: 2,
+            posY: 1,
+            text: 'some text',
+          }),
         },
       });
 
-      expect(screen.getByText('some text')).toBeInTheDocument();
+      await userEvent.dblClick(screen.getByRole('listitem'));
+      expect(emitted().editstart).not.toBeUndefined();
+      expect(emitted().editstart[0]).toEqual(['item123']);
     });
-    it('lets me edit the item and sends the update', async () => {
+
+    it('sends an update when I save while editing', async () => {
       const itemId = 'item123';
       const updatedText = 'updated content';
-
       const { queryMocks } = renderWithApollo(
         RoomBoardItem,
         [
@@ -271,6 +291,7 @@ describe('<room-board-item />', () => {
               posY: 1,
               text: 'some text',
             }),
+            editing: true,
           },
           mocks: {
             $toasted: { global: { apollo_error: jest.fn() } },
@@ -278,14 +299,10 @@ describe('<room-board-item />', () => {
         }
       );
 
-      await userEvent.dblClick(screen.getByRole('listitem'));
       await fireEvent.input(screen.getByRole('textbox'), {
         target: { innerText: updatedText },
       });
       await userEvent.click(screen.getByRole('button', { name: /save/i }));
-      await waitForElementToBeRemoved(() =>
-        screen.getByRole('button', { name: /save/i })
-      );
       await waitFor(() =>
         expect(queryMocks[0]).toHaveBeenCalledWith({
           input: { id: itemId, text: updatedText },
@@ -311,6 +328,7 @@ describe('<room-board-item />', () => {
         {
           propsData: {
             myId: 'me',
+            editing: true,
             item: makeItem({
               id: itemId,
               posX: 2,
@@ -324,7 +342,6 @@ describe('<room-board-item />', () => {
         }
       );
 
-      await userEvent.dblClick(screen.getByRole('listitem'));
       await fireEvent.input(screen.getByRole('textbox'), {
         target: { innerText: updatedText },
       });
@@ -335,10 +352,8 @@ describe('<room-board-item />', () => {
         'Could not save item changes: GraphQL error: everything is broken'
       );
     });
-  });
 
-  describe('deleting', () => {
-    it('lets me edit the item and delete', async () => {
+    it('lets me delete while editing', async () => {
       const itemId = 'item123';
 
       const { queryMocks } = renderWithApollo(
@@ -357,6 +372,7 @@ describe('<room-board-item />', () => {
               posY: 1,
               text: 'some text',
             }),
+            editing: true,
           },
           mocks: {
             $toasted: { global: { apollo_error: jest.fn() } },
@@ -394,6 +410,7 @@ describe('<room-board-item />', () => {
               posY: 1,
               text: 'some text',
             }),
+            editing: true,
           },
           mocks: {
             $toasted: $toasted,
@@ -401,7 +418,6 @@ describe('<room-board-item />', () => {
         }
       );
 
-      await userEvent.dblClick(screen.getByRole('listitem'));
       await userEvent.click(screen.getByRole('button', { name: /delete/i }));
       await sleep(5);
 

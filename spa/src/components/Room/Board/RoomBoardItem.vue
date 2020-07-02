@@ -51,6 +51,7 @@ import {
 } from '@type-definitions/graphql';
 import { itemTheme } from './itemTheme';
 import { ItemViewModel } from '@/components/Room/Board/itemBuilder';
+import { logError } from '@/common/logger';
 
 interface MoveStartEventPayload {
   itemId: string;
@@ -58,7 +59,6 @@ interface MoveStartEventPayload {
 }
 
 type DataProperties = {
-  editing: boolean;
   text: string;
   selectedStyle: number;
   styleOptions: {
@@ -81,8 +81,13 @@ export default Vue.extend({
       type: Object as () => ItemViewModel,
       required: true,
     },
+    editing: {
+      type: Boolean,
+      required: false,
+    },
     moving: {
       type: Boolean,
+      required: false,
     },
     myId: {
       type: String,
@@ -91,7 +96,6 @@ export default Vue.extend({
   },
   data(): DataProperties {
     return {
-      editing: this.item.isNew || false,
       text: this.item.text,
       selectedStyle: this.item.style || 0,
       styleOptions: itemTheme,
@@ -125,7 +129,7 @@ export default Vue.extend({
   methods: {
     _onDeleteClick: async function (): Promise<void> {
       try {
-        this.editing = false;
+        this.$emit('editfinish');
         await this.$apollo.mutate<Item, MutationDeleteBoardItemArgs>({
           mutation: deleteBoardItem,
           variables: {
@@ -133,6 +137,7 @@ export default Vue.extend({
           },
         });
       } catch (e) {
+        logError(e);
         this.$toasted.global.apollo_error(
           `Could not remove item: ${e.message}`
         );
@@ -151,15 +156,16 @@ export default Vue.extend({
             input: mutationPayload,
           },
         });
-        this.editing = false;
+        this.$emit('editfinish');
       } catch (e) {
+        logError(e);
         this.$toasted.global.apollo_error(
           `Could not save item changes: ${e.message}`
         );
       }
     },
     _onEditClick: function (): void {
-      this.editing = true;
+      this.$emit('editstart', this.item.id);
     },
     _onPointerDown: function (event: PointerEvent): void {
       if (!supportsTouchEvents()) {
@@ -200,6 +206,7 @@ export default Vue.extend({
           },
         });
       } catch (e) {
+        logError(e);
         this.$toasted.global.apollo_error(
           `Could not save item changes: ${e.message}`
         );

@@ -10,7 +10,10 @@
         v-bind:item="item"
         v-bind:moving="_getIsMoving(item.id)"
         v-bind:my-id="myId"
+        v-bind:editing="editingItemReference === item.id"
         v-on:movestart="_onBoardItemMoveStart"
+        v-on:editstart="_onBoardItemEditStart"
+        v-on:editfinish="_onBoardItemEditFinish"
         :key="item.id"
       />
     </transition-group>
@@ -66,6 +69,7 @@ export default Vue.extend({
   data: function (): {
     itemsData: ItemViewModel[];
     movingItemReference: string | null;
+    editingItemReference: string | null;
     primaryTouchId: string | null;
   } {
     return {
@@ -73,6 +77,7 @@ export default Vue.extend({
         (item: ItemViewModel) => !item.isDeleted
       ),
       movingItemReference: null,
+      editingItemReference: null,
       primaryTouchId: null,
     };
   },
@@ -87,6 +92,7 @@ export default Vue.extend({
     _onAddItem: function (): void {
       const newItem = makeNewItem();
       this.itemsData = [...this.itemsData, newItem];
+      this.editingItemReference = newItem.id;
 
       const mutationPayload: AddRoomBoardItemInput = {
         posY: newItem.posY,
@@ -142,6 +148,15 @@ export default Vue.extend({
         movementY,
       });
     },
+    _onBoardItemEditStart: function (itemId: string) {
+      if (this.editingItemReference) {
+        return;
+      }
+      this.editingItemReference = itemId;
+    },
+    _onBoardItemEditFinish: function () {
+      this.editingItemReference = null;
+    },
     _onBoardItemMoveStart: function (payload: ItemMoveStartedEventPayload) {
       this.movingItemReference = payload.itemId;
 
@@ -157,6 +172,7 @@ export default Vue.extend({
           },
         })
         .catch((error) => {
+          console.log(error);
           this.$toasted.global.apollo_error(
             `Could not move the item: ${error.message}`
           );

@@ -19,6 +19,7 @@ import {
   makeHappyLockRoomBoardItemMutationStub,
   makeHappyMoveBoardItemMutationStub,
   makeHappyUnlockRoomBoardItemMutationStub,
+  makeHappyUpdateBoardItemTextMutationStub,
   makeSadAddRoomBoardItemMutationStub,
   makeSadLockRoomBoardItemMutationStub,
   makeSadMoveBoardItemMutationStub,
@@ -29,6 +30,7 @@ import {
 
 import { supportsTouchEvents } from '@/common/dom';
 import { sleep } from '@/testHelpers/timeout';
+import { waitForElementToBeRemoved } from '@testing-library/dom';
 
 jest.mock('@/common/dom', () => ({
   supportsTouchEvents: jest.fn().mockReturnValue(true),
@@ -48,6 +50,72 @@ describe('<room-board />', () => {
       top:  10px;
       left: 10px;
     `);
+  });
+  describe('when editing an item', () => {
+    it('lets me edit an item', async () => {
+      renderWithApollo(RoomBoard, [], {
+        propsData: {
+          myId: MY_ID,
+          roomId: ROOM_ID,
+          items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
+        },
+      });
+
+      await userEvent.dblClick(screen.getByRole('listitem'));
+
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
+
+    it('does not let me edit an item if I am already editing one', async () => {
+      renderWithApollo(RoomBoard, [], {
+        propsData: {
+          myId: MY_ID,
+          roomId: ROOM_ID,
+          items: [
+            makeItem({ id: 'ITEM_1', posX: 10, posY: 10 }),
+            makeItem({ id: 'ITEM_2', posX: 10, posY: 10 }),
+          ],
+        },
+      });
+
+      const items = screen.getAllByRole('listitem');
+      await userEvent.dblClick(items[0]);
+      expect(screen.getAllByRole('textbox')).toHaveLength(1);
+      await userEvent.dblClick(items[1]);
+      expect(screen.getAllByRole('textbox')).toHaveLength(1);
+    });
+    it('lets me edit different items in sequence', async () => {
+      renderWithApollo(
+        RoomBoard,
+        [makeHappyUpdateBoardItemTextMutationStub()],
+        {
+          propsData: {
+            myId: MY_ID,
+            roomId: ROOM_ID,
+            items: [
+              makeItem({ id: 'ITEM_1', posX: 10, posY: 10 }),
+              makeItem({ id: 'ITEM_2', posX: 10, posY: 10 }),
+            ],
+          },
+          mocks: {
+            $toasted: {
+              global: {
+                apollo_error: jest.fn(),
+              },
+            },
+          },
+        }
+      );
+
+      const items = screen.getAllByRole('listitem');
+      await userEvent.dblClick(items[0]);
+      expect(screen.getAllByRole('textbox')).toHaveLength(1);
+      await userEvent.dblClick(screen.getByRole('button', { name: /save/i }));
+      await waitForElementToBeRemoved(screen.getByRole('textbox'));
+
+      await userEvent.dblClick(items[1]);
+      expect(screen.getAllByRole('textbox')).toHaveLength(1);
+    });
   });
   describe('when adding an item', () => {
     const renderComponent = () => {
