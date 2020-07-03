@@ -15,18 +15,20 @@
         v-on:input="_onStyleChange"
       />
       <auto-expanding-text-box v-model="text" />
-      <button
-        id="save-button"
-        aria-label="save"
-        v-on:click="_onSaveClick"
-        v-text="this.saveButtonText"
-      />
-      <button
-        id="delete-button"
-        aria-label="delete"
-        v-on:click="_onDeleteClick"
-        v-text="this.deleteButtonText"
-      />
+      <div id="action-button-group">
+        <button
+          id="delete-button"
+          aria-label="delete"
+          v-on:click="_onDeleteClick"
+          v-text="this.deleteButtonText"
+        />
+        <button
+          id="save-button"
+          aria-label="save"
+          v-on:click="_onSaveClick"
+          v-text="this.saveButtonText"
+        />
+      </div>
     </template>
     <template v-else>
       {{ text }}
@@ -270,26 +272,26 @@ li {
 }
 
 button {
-  position: absolute;
-  text-align: center;
-  width: calc(12px + var(--font-size-icon-button));
-  height: calc(12px + var(--font-size-icon-button));
-  font-size: var(--font-size-icon-button);
+  width: var(--font-size-icon-button);
+  height: var(--font-size-icon-button);
+  font-size: calc(0.5 * var(--font-size-icon-button));
   line-height: var(--font-size-icon-button);
+  text-align: center;
   border: solid 1px;
   padding: 0;
   border-radius: 100%;
   box-shadow: 2px 2px 4px 0px var(--colour-secondary);
 }
 
-button#save-button {
-  right: calc(-2 * (var(--font-size-icon-button)));
+#action-button-group {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  height: 100%;
+  right: calc(-1.5 * (var(--font-size-icon-button)));
+  width: var(--font-size-icon-button);
   bottom: 0;
-}
-
-button#delete-button {
-  right: calc(-2 * (var(--font-size-icon-button)));
-  top: 0;
 }
 
 button > span {
