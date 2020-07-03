@@ -64,12 +64,13 @@ button {
   border-width: 1px;
 }
 label {
+  --label-left-offset: -24px;
   font-size: calc(8 * var(--unit-base-rem));
   color: var(--colour-primary-emphasis);
   margin-left: auto;
   z-index: 2000;
   position: absolute;
-  left: -24px;
+  left: var(--label-left-offset);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -110,10 +111,11 @@ aside > input:checked ~ section {
 aside > section {
   text-align: right;
   background-color: var(--colour-primary);
-  box-shadow: 2px 2px 4px 0px var(--colour-secondary);
+  box-shadow: 2px 2px 4px 0 var(--colour-secondary);
   transform: translateX(calc(var(--content-width) - 4px));
   transition-property: transform;
   transition-duration: 0.2s;
+  clip-path: inset(0px var(--content-width) 0px var(--label-left-offset));
   z-index: 1001;
 }
 
