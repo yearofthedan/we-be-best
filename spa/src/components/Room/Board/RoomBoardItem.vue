@@ -14,7 +14,7 @@
         v-bind:options="styleOptions"
         v-on:input="_onStyleChange"
       />
-      <auto-expanding-text-box v-model="text" />
+      <auto-expanding-text-box v-model="text" ref="textbox" />
       <div id="action-button-group">
         <button
           id="delete-button"
@@ -197,6 +197,9 @@ export default Vue.extend({
     },
     _onStyleChange: async function (style: string) {
       this.selectedStyle = this.styleOptions.findIndex((s) => s.name === style);
+
+      ((this.$refs.textbox as Vue).$el as HTMLElement).focus();
+
       try {
         await this.$apollo.mutate<Item, MutationUpdateBoardItemStyleArgs>({
           mutation: updateBoardItemStyle,
