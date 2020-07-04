@@ -281,19 +281,17 @@ button {
   font-size: var(--font-size-interactive);
 }
 button::before {
-  content: '+';
+  content: '➕';
   position: absolute;
-  font-size: var(--font-size-icon-button);
-  top: -12px;
-  right: -12px;
+  font-size: calc(0.5 * var(--font-size-icon-button));
+  top: calc(-0.5 * var(--font-size-icon-button));
+  right: calc(-0.5 * var(--font-size-icon-button));
   border-radius: 100%;
   border: 1px solid;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: var(--font-size-icon-button);
+  height: var(--font-size-icon-button);
   background-color: var(--colour-primary);
+  line-height: var(--font-size-icon-button);
 }
 
 section section {
