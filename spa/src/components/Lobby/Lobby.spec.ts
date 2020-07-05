@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
 import Lobby from './Lobby.vue';
 import { joinRoom } from '@/graphql/roomQueries.graphql';
 import { sleep } from '@/testHelpers/timeout';
+import { ACTION_STATE } from '@/components/atoms/buttonStates';
 const ROOM_ID = 'my-room';
 const MEMBER_NAME = 'me';
 
@@ -147,6 +148,37 @@ describe('<lobby />', () => {
     expect(emitted().joined).toBeUndefined();
     expect($toasted.global.apollo_error).toHaveBeenCalledWith(
       'Was not able to join the room: GraphQL error: everything is broken'
+    );
+  });
+
+  it('displays loading indicator while submitting', async () => {
+    renderWithApollo(Lobby, []);
+
+    await userEvent.type(screen.getByLabelText('Your name'), MEMBER_NAME);
+    await userEvent.click(screen.getByRole('button', { name: /join room/i }));
+
+    expect(screen.getByRole('button')).toHaveAttribute(
+      'data-action-state',
+      ACTION_STATE.LOADING
+    );
+  });
+
+  it('displays success indicator after submitting', async () => {
+    renderWithApollo(Lobby, [makeHappyJoinRoomMutationStub()]);
+
+    await userEvent.type(screen.getByLabelText('Your name'), MEMBER_NAME);
+    await userEvent.type(
+      screen.getByRole('textbox', { name: /Room id/i }),
+      ROOM_ID,
+      { initialSelectionStart: 0, initialSelectionEnd: 100 }
+    );
+    await userEvent.click(screen.getByRole('button', { name: /join room/i }));
+
+    await waitFor(() =>
+      expect(screen.getByRole('button')).toHaveAttribute(
+        'data-action-state',
+        ACTION_STATE.SUCCESS
+      )
     );
   });
 });

@@ -1,11 +1,16 @@
 <script lang="ts">
 import Vue from 'vue';
+import { v4 } from 'uuid';
 import { JoinRoomInput } from '@type-definitions/graphql';
 import { joinRoom } from '@/graphql/roomQueries.graphql';
-import { v4 } from 'uuid';
+import ButtonContained from '@/components/atoms/ButtonContained.vue';
+import { ACTION_STATE } from '@/components/atoms/buttonStates';
 
 export default Vue.extend({
   name: 'lobby',
+  components: {
+    'button-contained': ButtonContained,
+  },
   props: {
     existingRoomId: {
       type: String,
@@ -16,15 +21,18 @@ export default Vue.extend({
     errors: { name?: string; roomId?: string };
     memberName: string | null;
     roomId: string | null;
+    submitState: ACTION_STATE;
   } {
     return {
       errors: {},
       memberName: null,
       roomId: this.existingRoomId || v4(),
+      submitState: ACTION_STATE.READY,
     };
   },
   methods: {
     async onFormSubmit(e: Event) {
+      this.submitState = ACTION_STATE.READY;
       this.errors = {};
       e.preventDefault();
 
@@ -40,6 +48,8 @@ export default Vue.extend({
         return false;
       }
 
+      this.submitState = ACTION_STATE.LOADING;
+
       const mutationPayload: { input: JoinRoomInput } = {
         input: {
           roomId: this.roomId as string,
@@ -52,11 +62,14 @@ export default Vue.extend({
           variables: mutationPayload,
         });
 
+        this.submitState = ACTION_STATE.SUCCESS;
+
         this.$emit('joined', {
           roomId: this.roomId,
           memberName: this.memberName,
         });
       } catch (error) {
+        this.submitState = ACTION_STATE.ERROR;
         this.$toasted?.global?.apollo_error(
           `Was not able to join the room: ${error.message}`
         );
@@ -95,7 +108,12 @@ export default Vue.extend({
           {{ this.errors.roomId }}
         </span>
       </label>
-      <button type="submit">join room</button>
+      <button-contained
+        aria-label="join room"
+        type="submit"
+        :state="submitState"
+        >join room
+      </button-contained>
     </form>
   </section>
 </template>

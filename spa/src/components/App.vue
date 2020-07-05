@@ -11,6 +11,10 @@ main {
   overflow: hidden;
 }
 
+button {
+  user-select: none;
+}
+
 body,
 h1,
 h2 {
@@ -26,6 +30,7 @@ h2 {
   --blue: hsla(215, 57%, 74%, 1);
   --red: hsl(343, 79%, 55%);
   --grey: hsla(180, 2%, 49%, 1);
+  --light-grey: hsl(180, 9%, 86%);
 
   --colour-primary: var(--light-blue);
   --colour-primary-emphasis: var(--blue);
@@ -33,6 +38,7 @@ h2 {
   --colour-shadow: var(--black);
   --colour-background: var(--mint);
   --colour-warning: var(--red);
+  --colour-disabled: var(--light-grey);
 
   --unit-base-px: 4px;
   --unit-base-rem: calc(1rem / 4);
