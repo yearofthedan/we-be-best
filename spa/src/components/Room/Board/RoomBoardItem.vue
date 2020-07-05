@@ -243,6 +243,7 @@ li[data-moving] {
   border-color: var(--colour-primary-emphasis);
   background-color: var(--colour-secondary);
   cursor: none;
+  z-index: var(--z-index-board-item-moving);
 }
 
 li[data-editing] {
@@ -271,6 +272,7 @@ li {
   white-space: pre-wrap;
   word-break: break-word;
   font-size: var(--font-size-text);
+  z-index: var(--z-index-board-item);
 }
 
 button {

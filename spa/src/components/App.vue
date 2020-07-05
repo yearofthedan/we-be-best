@@ -44,6 +44,8 @@ h2 {
   --font-size-icon-button: calc(8 * var(--unit-base-rem));
 
   --z-index-fab: 10000;
+  --z-index-board-item: 1000;
+  --z-index-board-item-moving: 2000;
   background-color: var(--colour-background);
 }
 </style>
