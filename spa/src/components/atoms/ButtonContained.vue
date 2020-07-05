@@ -31,7 +31,7 @@ export default Vue.extend({
   },
 });
 </script>
-<style>
+<style scoped>
 button {
   line-height: var(--font-size-interactive);
   height: calc(10 * var(--unit-base-rem));

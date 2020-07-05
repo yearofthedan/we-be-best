@@ -7,7 +7,7 @@ describe('routes', () => {
     // @ts-ignore
     render(App, { routes });
 
-    expect(screen.getByText('join room')).toBeInTheDocument();
+    expect(screen.getByText('create room')).toBeInTheDocument();
   });
 
   it('prefills the room field if the room id is in the query field', () => {

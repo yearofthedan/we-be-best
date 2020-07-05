@@ -5,6 +5,9 @@
 </template>
 
 <style>
+* {
+  box-sizing: border-box;
+}
 body,
 main {
   min-height: 100vh;
@@ -17,7 +20,10 @@ button {
 
 body,
 h1,
-h2 {
+h2,
+dd,
+dt,
+dl {
   margin: 0;
 }
 

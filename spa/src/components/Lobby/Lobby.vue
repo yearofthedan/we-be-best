@@ -1,3 +1,52 @@
+<template>
+  <section>
+    <form
+      id="lobby"
+      @submit="onFormSubmit"
+      action="https://vuejs.org/"
+      method="post"
+    >
+      <h2>Let's get a room going...</h2>
+      <div v-if="errors.length > 0">
+        <h3>Please correct the following errors:</h3>
+        <ul>
+          <li v-for="err in errors" :key="err">{{ err }}</li>
+        </ul>
+      </div>
+      <label for="your-name">
+        Your name
+        <input id="your-name" type="text" v-model="memberName" />
+        <span role="alert" v-if="errors.name">
+          {{ this.errors.name }}
+        </span>
+      </label>
+      <label v-if="!isCreating" for="room-id">
+        Room id to join
+        <button-text type="button" @click="switchToCreate"
+          >Create a room</button-text
+        >
+        <input id="room-id" type="text" v-model="roomId" />
+        <span role="alert" v-if="errors.roomId">
+          {{ this.errors.roomId }}
+        </span>
+      </label>
+      <dl v-if="isCreating">
+        <dt>Your room id</dt>
+        <button-text type="button" @click="switchToJoin"
+          >Join a room</button-text
+        >
+        <dd>{{ this.roomId }}</dd>
+      </dl>
+      <button-contained
+        :aria-label="isCreating ? 'create room' : 'join room'"
+        type="submit"
+        :state="submitState"
+        >{{ isCreating ? 'create room' : 'join room' }}
+      </button-contained>
+    </form>
+  </section>
+</template>
+
 <script lang="ts">
 import Vue from 'vue';
 import { v4 } from 'uuid';
@@ -5,11 +54,13 @@ import { JoinRoomInput } from '@type-definitions/graphql';
 import { joinRoom } from '@/graphql/roomQueries.graphql';
 import ButtonContained from '@/components/atoms/ButtonContained.vue';
 import { ACTION_STATE } from '@/components/atoms/buttonStates';
+import ButtonText from '@/components/atoms/ButtonText.vue';
 
 export default Vue.extend({
   name: 'lobby',
   components: {
     'button-contained': ButtonContained,
+    'button-text': ButtonText,
   },
   props: {
     existingRoomId: {
@@ -22,15 +73,25 @@ export default Vue.extend({
     memberName: string | null;
     roomId: string | null;
     submitState: ACTION_STATE;
+    isCreating: boolean;
   } {
     return {
       errors: {},
       memberName: null,
       roomId: this.existingRoomId || v4(),
       submitState: ACTION_STATE.READY,
+      isCreating: !this.existingRoomId,
     };
   },
   methods: {
+    switchToJoin() {
+      this.isCreating = false;
+      this.roomId = '';
+    },
+    switchToCreate() {
+      this.isCreating = true;
+      this.roomId = v4();
+    },
     async onFormSubmit(e: Event) {
       this.submitState = ACTION_STATE.READY;
       this.errors = {};
@@ -79,45 +140,6 @@ export default Vue.extend({
 });
 </script>
 
-<template>
-  <section>
-    <form
-      id="lobby"
-      @submit="onFormSubmit"
-      action="https://vuejs.org/"
-      method="post"
-    >
-      <h2>Join others</h2>
-      <div v-if="errors.length > 0">
-        <h3>Please correct the following errors:</h3>
-        <ul>
-          <li v-for="err in errors" :key="err">{{ err }}</li>
-        </ul>
-      </div>
-      <label for="your-name">
-        Your name
-        <input id="your-name" type="text" v-model="memberName" />
-        <span role="alert" v-if="errors.name">
-          {{ this.errors.name }}
-        </span>
-      </label>
-      <label for="room-id">
-        Room id
-        <input id="room-id" type="text" v-model="roomId" />
-        <span role="alert" v-if="errors.roomId">
-          {{ this.errors.roomId }}
-        </span>
-      </label>
-      <button-contained
-        aria-label="join room"
-        type="submit"
-        :state="submitState"
-        >join room
-      </button-contained>
-    </form>
-  </section>
-</template>
-
 <style scoped>
 form {
   justify-content: center;
@@ -140,26 +162,56 @@ section {
   justify-content: center;
   align-items: baseline;
 }
-label {
+label[for='room-id'] {
   font-size: var(--font-size-label);
-  max-width: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'a b'
+    'c c'
+    'd d';
+  align-items: flex-end;
 }
+
+label[for='room-id'] > button {
+  margin-bottom: var(--unit-base-rem);
+  grid-area: b;
+}
+label[for='room-id'] > input {
+  grid-area: c;
+}
+label[for='room-id'] > [role='alert'] {
+  grid-area: d;
+}
+
+form > dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'a b'
+    'c c';
+  align-items: flex-end;
+}
+
+form > dl > button {
+  margin-bottom: var(--unit-base-rem);
+  grid-area: b;
+}
+
+form > dl > dd {
+  grid-area: c;
+  color: var(--colour-secondary);
+}
+
 input {
   display: block;
   font-size: var(--font-size-interactive);
   padding: calc(2 * var(--unit-base-rem));
-  max-width: 100%;
+  min-width: 300px;
 }
 form {
-  width: calc(16 * var(--unit-base-rem));
+  min-width: 300px;
   padding-top: calc(8 * var(--unit-base-rem));
-}
-button {
-  max-width: 100%;
-  margin: calc(2 * var(--unit-base-rem));
-  padding: calc(2 * var(--unit-base-rem));
-  border-radius: calc(1 * var(--unit-base-rem));
-  font-size: var(--font-size-interactive);
-  text-transform: uppercase;
 }
 </style>

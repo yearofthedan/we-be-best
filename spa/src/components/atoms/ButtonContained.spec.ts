@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 
 describe('ButtonContained', () => {
   it('adds a data-attr for loading when loading', () => {
-    render<ButtonContained>(ButtonContained, {
+    render(ButtonContained, {
       propsData: {
         state: ACTION_STATE.LOADING,
       },
@@ -18,7 +18,7 @@ describe('ButtonContained', () => {
   });
 
   it('adds a data-attr for success when successfully loaded', () => {
-    render<ButtonContained>(ButtonContained, {
+    render(ButtonContained, {
       propsData: {
         state: ACTION_STATE.SUCCESS,
       },
@@ -31,7 +31,7 @@ describe('ButtonContained', () => {
   });
 
   it('emits the click event when clicked', () => {
-    const { emitted } = render<ButtonContained>(ButtonContained, {
+    const { emitted } = render(ButtonContained, {
       propsData: {
         state: ACTION_STATE.READY,
       },
@@ -43,7 +43,7 @@ describe('ButtonContained', () => {
   });
 
   it('disables the button while it is loading', () => {
-    render<ButtonContained>(ButtonContained, {
+    render(ButtonContained, {
       propsData: {
         state: ACTION_STATE.LOADING,
       },
@@ -53,7 +53,7 @@ describe('ButtonContained', () => {
   });
 
   it('disables the button once it is successful', () => {
-    render<ButtonContained>(ButtonContained, {
+    render(ButtonContained, {
       propsData: {
         state: ACTION_STATE.SUCCESS,
       },

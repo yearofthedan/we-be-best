@@ -23,6 +23,10 @@ function makeHappyPathMutationStub() {
   };
 }
 
+jest.mock('uuid', () => ({
+  v4: jest.fn().mockReturnValue('stub-uuid'),
+}));
+
 describe('Home', () => {
   it('creates a gathering when I input a valid name and continue', async () => {
     const { queryMocks } = renderWithApollo(
@@ -39,17 +43,14 @@ describe('Home', () => {
     );
 
     await userEvent.type(screen.getByLabelText('Your name'), 'me');
-    const idField = screen.getByLabelText('Room id');
-    await userEvent.clear(idField);
-    await userEvent.type(idField, 'my-room');
-    await userEvent.click(screen.getByRole('button'));
+    await userEvent.click(screen.getByRole('button', { name: /create room/i }));
     expect(queryMocks[0]).toHaveBeenCalledWith({
       input: {
-        roomId: 'my-room',
+        roomId: 'stub-uuid',
         memberName: 'me',
       },
     });
 
-    expect(await screen.findByText('my-room')).toBeInTheDocument();
+    expect(await screen.findByText('stub-uuid')).toBeInTheDocument();
   });
 });
