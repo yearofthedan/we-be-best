@@ -44,7 +44,7 @@ export const buildUpdateItemsInput = (overrides: Partial<MoveBoardItemInput> = {
 });
 
 export const buildJoinRoomInput = (overrides: Partial<JoinRoomInput> = {}): JoinRoomInput => ({
-  roomName: 'ROOM_123',
+  roomId: 'ROOM_123',
   memberName: 'me',
   ...overrides
 });

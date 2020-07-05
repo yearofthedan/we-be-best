@@ -9,8 +9,8 @@ export const routes: Array<RouteConfig> = [
     path: '/',
     name: 'Home',
     component: Home,
-    props: (route: Route): { roomId: string | null } => ({
-      roomId: route.query.room ? String(route.query.room) : null,
+    props: (route: Route): { existingRoomId: string | null } => ({
+      existingRoomId: route.query.room ? String(route.query.room) : null,
     }),
   },
 ];

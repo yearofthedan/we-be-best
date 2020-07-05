@@ -16,17 +16,8 @@ describe('routes', () => {
       router.push('/?room=aaaa-bbbb');
     });
 
-    expect(screen.getByRole('textbox', { name: /Room name/i })).toHaveValue(
+    expect(screen.getByRole('textbox', { name: /Room id/i })).toHaveValue(
       'aaaa-bbbb'
     );
-  });
-
-  it('does not prefill the room field if the id is not provided in the query field', () => {
-    // @ts-ignore
-    render(App, { routes }, (vue, store, router) => {
-      router.push('/?');
-    });
-
-    expect(screen.getByRole('textbox', { name: /Room name/i })).toHaveValue('');
   });
 });

@@ -55,7 +55,7 @@ describe('integration: room members', () => {
             }`,
         variables: {
           input: {
-            roomName: '123',
+            roomId: '123',
             memberName: 'me',
           },
         },
@@ -69,7 +69,7 @@ describe('integration: room members', () => {
   it('joins the room', async () => {
     const res = await query({
       query: joinRoom,
-      variables: {input: {roomName: 'my-room', memberName: 'me'}},
+      variables: {input: {roomId: 'my-room', memberName: 'me'}},
     });
 
     expect(res.data).toHaveProperty('joinRoom', {

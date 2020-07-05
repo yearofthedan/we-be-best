@@ -1,11 +1,11 @@
 <template>
   <article>
     <lobby
-      v-if="!memberName && !roomName"
+      v-if="!memberName && !roomId"
       v-on:joined="_onJoined"
-      v-bind:roomId="roomId"
+      v-bind:existingRoomId="existingRoomId"
     />
-    <room v-else v-bind:room-id="roomName" v-bind:my-id="memberName" />
+    <room v-else v-bind:room-id="roomId" v-bind:my-id="memberName" />
   </article>
 </template>
 
@@ -21,20 +21,20 @@ export default Vue.extend({
     room: Room,
   },
   props: {
-    roomId: {
+    existingRoomId: {
       type: String,
       required: false,
     },
   },
-  data(): { roomName: string | null; memberName: string | null } {
+  data(): { roomId: string | null; memberName: string | null } {
     return {
-      roomName: null,
+      roomId: null,
       memberName: null,
     };
   },
   methods: {
-    _onJoined: function (params: { roomName: string; memberName: string }) {
-      this.roomName = params.roomName;
+    _onJoined: function (params: { roomId: string; memberName: string }) {
+      this.roomId = params.roomId;
       this.memberName = params.memberName;
     },
   },

@@ -2,24 +2,25 @@
 import Vue from 'vue';
 import { JoinRoomInput } from '@type-definitions/graphql';
 import { joinRoom } from '@/graphql/roomQueries.graphql';
+import { v4 } from 'uuid';
 
 export default Vue.extend({
   name: 'lobby',
   props: {
-    roomId: {
+    existingRoomId: {
       type: String,
       required: false,
     },
   },
   data(): {
-    errors: { name?: string; roomName?: string };
+    errors: { name?: string; roomId?: string };
     memberName: string | null;
-    roomName: string | null;
+    roomId: string | null;
   } {
     return {
       errors: {},
       memberName: null,
-      roomName: this.roomId || null,
+      roomId: this.existingRoomId || v4(),
     };
   },
   methods: {
@@ -31,8 +32,8 @@ export default Vue.extend({
         this.errors.name = 'you need a name!';
       }
 
-      if (!this.roomName) {
-        this.errors.roomName = 'you need a room!';
+      if (!this.roomId) {
+        this.errors.roomId = 'you need a room!';
       }
 
       if (Object.keys(this.errors).length > 0) {
@@ -41,7 +42,7 @@ export default Vue.extend({
 
       const mutationPayload: { input: JoinRoomInput } = {
         input: {
-          roomName: this.roomName as string,
+          roomId: this.roomId as string,
           memberName: this.memberName as string,
         },
       };
@@ -52,7 +53,7 @@ export default Vue.extend({
         });
 
         this.$emit('joined', {
-          roomName: this.roomName,
+          roomId: this.roomId,
           memberName: this.memberName,
         });
       } catch (error) {
@@ -87,11 +88,11 @@ export default Vue.extend({
           {{ this.errors.name }}
         </span>
       </label>
-      <label for="room-name">
-        Room name
-        <input id="room-name" type="text" v-model="roomName" />
-        <span role="alert" v-if="errors.roomName">
-          {{ this.errors.roomName }}
+      <label for="room-id">
+        Room id
+        <input id="room-id" type="text" v-model="roomId" />
+        <span role="alert" v-if="errors.roomId">
+          {{ this.errors.roomId }}
         </span>
       </label>
       <button type="submit">join room</button>

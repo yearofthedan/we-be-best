@@ -71,7 +71,6 @@ type DataProperties = {
   saveButtonText: string;
   deleteButtonText: string;
 };
-
 export default Vue.extend({
   name: 'room-board-item',
   components: {

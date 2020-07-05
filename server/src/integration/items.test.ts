@@ -47,7 +47,7 @@ describe('integration: items', () => {
     });
   }
 
-  async function addARoom(roomName: string = '123') {
+  async function addARoom(roomId: string = '123') {
     await apolloClient.mutate<Room, MutationJoinRoomArgs>({
       mutation: gql`
           mutation joinRoom($input: JoinRoomInput!) {
@@ -57,7 +57,7 @@ describe('integration: items', () => {
           }`,
       variables: {
         input: {
-          roomName: roomName,
+          roomId: roomId,
           memberName: 'me',
         },
       },

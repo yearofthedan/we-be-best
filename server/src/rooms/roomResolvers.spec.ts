@@ -34,7 +34,7 @@ describe('roomResolvers', () => {
 
       const result = await joinRoom(
         undefined,
-        { input: buildJoinRoomInput({roomName: 'new-room', memberName: 'me'}) },
+        { input: buildJoinRoomInput({roomId: 'new-room', memberName: 'me'}) },
         {
           pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
           dataSources: {Rooms: rooms},
@@ -53,7 +53,7 @@ describe('roomResolvers', () => {
 
       const result = await joinRoom(
         undefined,
-        { input: buildJoinRoomInput({roomName: room.id, memberName: 'me'}) },
+        { input: buildJoinRoomInput({roomId: room.id, memberName: 'me'}) },
         {
           pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
           dataSources: {Rooms: rooms},
@@ -72,7 +72,7 @@ describe('roomResolvers', () => {
 
       const result = await joinRoom(
         undefined,
-        { input: buildJoinRoomInput({roomName: 'new-room', memberName: 'me'}) },
+        { input: buildJoinRoomInput({roomId: 'new-room', memberName: 'me'}) },
         {
           pubSub: { publish: publishStub, dataSource: {Rooms: rooms} } as unknown as PubSub,
           dataSources: {Rooms: rooms},

@@ -38,7 +38,7 @@ input AddRoomBoardItemInput {
 }
 
 input JoinRoomInput {
-    roomName: ID!
+    roomId: ID!
     memberName: String!
 }
 

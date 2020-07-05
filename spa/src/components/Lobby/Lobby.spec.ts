@@ -8,13 +8,17 @@ import userEvent from '@testing-library/user-event';
 import Lobby from './Lobby.vue';
 import { joinRoom } from '@/graphql/roomQueries.graphql';
 import { sleep } from '@/testHelpers/timeout';
-const ROOM_NAME = 'my-room';
+const ROOM_ID = 'my-room';
 const MEMBER_NAME = 'me';
+
+jest.mock('uuid', () => ({
+  v4: jest.fn().mockReturnValue('stub-uuid'),
+}));
 
 function makeHappyJoinRoomMutationStub() {
   const successData = {
     joinRoom: {
-      id: ROOM_NAME,
+      id: ROOM_ID,
       members: [MEMBER_NAME],
       items: [],
     },
@@ -23,7 +27,7 @@ function makeHappyJoinRoomMutationStub() {
     query: joinRoom,
     variables: {
       input: {
-        roomName: ROOM_NAME,
+        roomId: ROOM_ID,
         memberName: MEMBER_NAME,
       },
     },
@@ -39,7 +43,7 @@ function makeSadJoinRoomMutationStub() {
     query: joinRoom,
     variables: {
       input: {
-        roomName: ROOM_NAME,
+        roomId: ROOM_ID,
         memberName: MEMBER_NAME,
       },
     },
@@ -56,19 +60,33 @@ describe('<lobby />', () => {
     expect(await screen.findByText('you need a name!')).toBeInTheDocument();
   });
 
-  it('shows an error message when I try to submit without a room name', async () => {
+  it('shows an error message when I try to submit without a room id', async () => {
     render(Lobby);
 
+    await userEvent.type(screen.getByLabelText('Your name'), 'Me');
+    await userEvent.type(
+      screen.getByRole('textbox', { name: /Room id/i }),
+      '{backspace}',
+      { initialSelectionStart: 0, initialSelectionEnd: 100 }
+    );
     await userEvent.click(screen.getByRole('button', { name: /join room/i }));
 
-    expect(await screen.findByText('you need a room!')).toBeInTheDocument();
+    expect(screen.getByText('you need a room!')).toBeInTheDocument();
   });
 
-  it('auto fills the room name if provided', async () => {
-    render(Lobby, { propsData: { roomId: '11111' } });
+  it('auto fills the room id if provided', async () => {
+    render(Lobby, { propsData: { existingRoomId: '11111' } });
 
-    expect(screen.getByRole('textbox', { name: /Room name/i })).toHaveValue(
+    expect(screen.getByRole('textbox', { name: /Room id/i })).toHaveValue(
       '11111'
+    );
+  });
+
+  it('generates a room id if not provided', async () => {
+    render(Lobby);
+
+    expect(screen.getByRole('textbox', { name: /Room id/i })).toHaveValue(
+      'stub-uuid'
     );
   });
 
@@ -78,12 +96,16 @@ describe('<lobby />', () => {
     ]);
 
     await userEvent.type(screen.getByLabelText('Your name'), MEMBER_NAME);
-    await userEvent.type(screen.getByLabelText('Room name'), ROOM_NAME);
+    await userEvent.type(
+      screen.getByRole('textbox', { name: /Room id/i }),
+      ROOM_ID,
+      { initialSelectionStart: 0, initialSelectionEnd: 100 }
+    );
     await userEvent.click(screen.getByRole('button', { name: /join room/i }));
 
     expect(queryMocks[0]).toHaveBeenCalledWith({
       input: {
-        roomName: ROOM_NAME,
+        roomId: ROOM_ID,
         memberName: MEMBER_NAME,
       },
     });
@@ -94,7 +116,7 @@ describe('<lobby />', () => {
 
     expect(emitted().joined[0]).toEqual([
       {
-        roomName: ROOM_NAME,
+        roomId: ROOM_ID,
         memberName: MEMBER_NAME,
       },
     ]);
@@ -118,7 +140,7 @@ describe('<lobby />', () => {
     );
 
     await userEvent.type(screen.getByLabelText('Your name'), MEMBER_NAME);
-    await userEvent.type(screen.getByLabelText('Room name'), ROOM_NAME);
+    await userEvent.type(screen.getByLabelText('Room id'), ROOM_ID);
     await userEvent.click(screen.getByRole('button', { name: /join room/i }));
 
     await sleep(5);

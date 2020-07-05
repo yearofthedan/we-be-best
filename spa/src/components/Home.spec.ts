@@ -3,14 +3,11 @@ import userEvent from '@testing-library/user-event';
 import Home from './Home.vue';
 import { joinRoom } from '@/graphql/roomQueries.graphql';
 
-const ROOM_NAME = 'my-room';
-const MEMBER_NAME = 'me';
-
 function makeHappyPathMutationStub() {
   const successData = {
     joinRoom: {
-      id: ROOM_NAME,
-      members: [MEMBER_NAME],
+      id: 'my-room',
+      members: ['me'],
       items: [],
     },
   };
@@ -18,8 +15,8 @@ function makeHappyPathMutationStub() {
     query: joinRoom,
     variables: {
       input: {
-        roomName: ROOM_NAME,
-        memberName: MEMBER_NAME,
+        roomId: 'my-room',
+        memberName: 'me',
       },
     },
     successData,
@@ -41,16 +38,18 @@ describe('Home', () => {
       }
     );
 
-    await userEvent.type(screen.getByLabelText('Your name'), MEMBER_NAME);
-    await userEvent.type(screen.getByLabelText('Room name'), ROOM_NAME);
+    await userEvent.type(screen.getByLabelText('Your name'), 'me');
+    const idField = screen.getByLabelText('Room id');
+    await userEvent.clear(idField);
+    await userEvent.type(idField, 'my-room');
     await userEvent.click(screen.getByRole('button'));
     expect(queryMocks[0]).toHaveBeenCalledWith({
       input: {
-        roomName: ROOM_NAME,
-        memberName: MEMBER_NAME,
+        roomId: 'my-room',
+        memberName: 'me',
       },
     });
 
-    expect(await screen.findByText(`${ROOM_NAME}`)).toBeInTheDocument();
+    expect(await screen.findByText('my-room')).toBeInTheDocument();
   });
 });

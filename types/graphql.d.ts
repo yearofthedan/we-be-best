@@ -49,7 +49,7 @@ export type AddRoomBoardItemInput = {
 };
 
 export type JoinRoomInput = {
-  roomName: Scalars['ID'];
+  roomId: Scalars['ID'];
   memberName: Scalars['String'];
 };
 

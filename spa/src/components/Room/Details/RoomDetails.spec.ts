@@ -3,7 +3,7 @@ import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
 import userEvent from '@testing-library/user-event';
 
 describe('RoomDetails', () => {
-  it('shows the room name and lets me copy it', () => {
+  it('shows the room id and lets me copy it', () => {
     // @ts-ignore
     const clipboard = (global.navigator.clipboard = { writeText: jest.fn() });
 

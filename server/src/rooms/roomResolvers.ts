@@ -32,7 +32,7 @@ export const joinRoom = async (
   {input}: { input: JoinRoomInput },
   {dataSources, pubSub}: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub },
 ): Promise<Room | undefined> => {
-  const roomModel = await dataSources.Rooms.addMember(input.roomName, input.memberName);
+  const roomModel = await dataSources.Rooms.addMember(input.roomId, input.memberName);
 
   const result = mapToRoomResponse(roomModel);
   await pubSub.publish(ROOM_MEMBER_CHANGED_TOPIC, result);
