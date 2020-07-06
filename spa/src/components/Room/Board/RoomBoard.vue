@@ -30,9 +30,7 @@ import {
   moveBoardItem,
   unlockRoomBoardItem,
 } from '@/graphql/boardQueries.graphql';
-import makeNewItem, {
-  ItemViewModel,
-} from '@/components/Room/Board/itemBuilder';
+import makeNewItem, { ItemViewModel } from '@/components/Room/Board/items';
 import { patchArrayElement } from '@/common/arrays';
 import { supportsTouchEvents } from '@/common/dom';
 import {

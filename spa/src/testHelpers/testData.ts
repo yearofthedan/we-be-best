@@ -1,5 +1,5 @@
-import {ItemViewModel} from '@/components/Room/Board/itemBuilder';
-import {Member} from '@type-definitions/graphql';
+import {ItemViewModel} from '@/components/Room/Board/items';
+import {MembersViewModel} from '@/components/Room/Details/members';
 
 export const makeItem = (overrides: Partial<ItemViewModel> = {}): ItemViewModel => ({
     id: 'ITEM123',
@@ -12,7 +12,7 @@ export const makeItem = (overrides: Partial<ItemViewModel> = {}): ItemViewModel 
     ...overrides,
 });
 
-export const buildMemberResult = (override: Partial<Member> = {}): Member => ({
+export const makeMember = (override: Partial<MembersViewModel> = {}): MembersViewModel => ({
     id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
     name: 'PERSON',
     ...override

@@ -1,7 +1,12 @@
 import {itemUpdates, joinRoom, room, roomMemberUpdates} from '@/graphql/roomQueries.graphql';
-import {buildMemberResult} from '@/testHelpers/testData';
 import {buildItemResponse} from '@/testHelpers/itemQueryStubs';
-import {Item, Room} from '@type-definitions/graphql';
+import {Item, Member, Room} from '@type-definitions/graphql';
+
+export const buildMemberResult = (override: Partial<Member> = {}): Member => ({
+  id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+  name: 'PERSON',
+  ...override
+});
 
 export function makeHappyRoomItemUpdatesSubscription(
   override: { variables?: undefined; successData?: Partial<Item> } = {}

@@ -8,7 +8,11 @@
         v-bind:room-id="roomId"
         v-bind:items="room.items"
       />
-      <room-details v-bind:members="room.members" v-bind:room-id="roomId" />
+      <room-details
+        v-bind:items="room.items"
+        v-bind:members="room.members"
+        v-bind:room-id="roomId"
+      />
     </template>
   </section>
 </template>
@@ -16,7 +20,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { ApolloError } from 'apollo-client';
-import { ItemViewModel } from '@/components/Room/Board/itemBuilder';
+import { ItemViewModel } from '@/components/Room/Board/items';
 import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
 import { removeArrayElement, upsertArrayElement } from '@/common/arrays';

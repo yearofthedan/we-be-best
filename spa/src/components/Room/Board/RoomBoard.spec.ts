@@ -12,7 +12,7 @@ import {
 } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import { makeItem } from '@/testHelpers/testData';
 import userEvent from '@testing-library/user-event';
-import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/itemBuilder';
+import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/items';
 import {
   ITEM_ID,
   makeHappyAddRoomBoardItemMutationStub,

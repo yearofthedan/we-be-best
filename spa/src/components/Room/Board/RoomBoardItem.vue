@@ -54,7 +54,7 @@ import {
   UpdateBoardItemTextMutation,
 } from '@type-definitions/graphql';
 import { itemTheme } from './itemTheme';
-import { ItemViewModel } from '@/components/Room/Board/itemBuilder';
+import { ItemViewModel } from '@/components/Room/Board/items';
 import { logError } from '@/common/logger';
 
 interface MoveStartEventPayload {

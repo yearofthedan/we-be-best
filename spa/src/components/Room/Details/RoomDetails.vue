@@ -14,6 +14,11 @@
       <hr />
       <span>Members</span>
       <room-members v-bind:members="members" />
+      <hr />
+      <button-text aria-label="download data" v-on:click="onDownload">
+        ⬇️ Download data
+      </button-text>
+      <a ref="dataDownload" />
     </section>
   </aside>
 </template>
@@ -22,6 +27,8 @@
 import Vue from 'vue';
 import RoomMembers from '@/components/Room/Details/RoomMembers.vue';
 import ButtonText from '@/components/atoms/ButtonText.vue';
+import { ItemViewModel } from '@/components/Room/Board/items';
+import { mapToJsonString } from '@/components/Room/Details/roomExport';
 
 export default Vue.extend({
   name: 'room-details',
@@ -32,6 +39,10 @@ export default Vue.extend({
   props: {
     roomId: {
       type: String,
+      required: true,
+    },
+    items: {
+      type: Array as () => ItemViewModel[],
       required: true,
     },
     members: {
@@ -46,6 +57,18 @@ export default Vue.extend({
     onCopy: function () {
       const path = `${window.location.host}/?room=${this.roomId}`;
       navigator.clipboard.writeText(path);
+    },
+    onDownload: function () {
+      const dataStr =
+        'data:text/json;charset=utf-8,' +
+        encodeURIComponent(
+          mapToJsonString(this.roomId, this.items, this.members)
+        );
+
+      const dataDownload = this.$refs.dataDownload as HTMLAnchorElement;
+      dataDownload.setAttribute('href', dataStr);
+      dataDownload.setAttribute('download', `room-${this.roomId}.json`);
+      dataDownload.click();
     },
   },
 });
@@ -104,6 +127,7 @@ aside > section {
   text-align: right;
   background-color: var(--colour-primary);
   box-shadow: 2px 2px 4px 0 var(--colour-secondary);
+  padding: calc(2 * var(--unit-base-rem)) 0;
   transform: translateX(calc(var(--content-width) - 4px));
   transition-property: transform;
   transition-duration: 0.2s;

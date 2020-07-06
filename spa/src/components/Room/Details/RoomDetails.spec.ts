@@ -1,6 +1,10 @@
 import { render, screen } from '@/testHelpers/renderer';
 import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
 import userEvent from '@testing-library/user-event';
+import { makeItem, makeMember } from '@/testHelpers/testData';
+import { mapToJsonString } from '@/components/Room/Details/roomExport';
+
+jest.mock('@/components/Room/Details/roomExport');
 
 describe('RoomDetails', () => {
   it('shows the room id and lets me copy it', () => {
@@ -14,6 +18,7 @@ describe('RoomDetails', () => {
           { id: '5678', name: 'my mum' },
         ],
         roomId: 'ROOM123',
+        items: [],
       },
     });
 
@@ -29,10 +34,28 @@ describe('RoomDetails', () => {
           { id: '5678', name: 'my mum' },
         ],
         roomId: 'ROOM123',
+        items: [],
       },
     });
 
     expect(screen.getByText(/myself/i)).toBeInTheDocument();
     expect(screen.getByText(/my mum/i)).toBeInTheDocument();
+  });
+
+  it('lets me download all the data', () => {
+    const items = [makeItem()];
+    const members = [makeMember()];
+
+    render(RoomDetails, {
+      propsData: {
+        members: members,
+        roomId: 'ROOM123',
+        items: items,
+      },
+    });
+
+    userEvent.click(screen.getByRole('button', { name: /download data/i }));
+
+    expect(mapToJsonString).toHaveBeenCalledWith('ROOM123', items, members);
   });
 });
