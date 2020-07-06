@@ -16,7 +16,7 @@ button {
   text-transform: lowercase;
   border: 2px solid var(--colour-primary-emphasis);
   border-radius: var(--unit-base-rem);
-  height: calc(6 * var(--unit-base-rem));
+  min-height: calc(6 * var(--unit-base-rem));
   width: max-content;
   cursor: pointer;
   background: none;

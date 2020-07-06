@@ -17,9 +17,7 @@ describe('RoomDetails', () => {
       },
     });
 
-    userEvent.click(
-      screen.getByRole('button', { name: /copy room to clipboard/i })
-    );
+    userEvent.click(screen.getByRole('button', { name: /copy room link/i }));
     expect(clipboard.writeText).toHaveBeenCalledWith('localhost/?room=ROOM123');
   });
 

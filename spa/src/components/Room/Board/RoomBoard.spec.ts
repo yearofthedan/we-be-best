@@ -30,7 +30,6 @@ import {
 
 import { supportsTouchEvents } from '@/common/dom';
 import { sleep } from '@/testHelpers/timeout';
-import { waitForElementToBeRemoved } from '@testing-library/dom';
 
 jest.mock('@/common/dom', () => ({
   supportsTouchEvents: jest.fn().mockReturnValue(true),
@@ -87,7 +86,12 @@ describe('<room-board />', () => {
     it('lets me edit different items in sequence', async () => {
       renderWithApollo(
         RoomBoard,
-        [makeHappyUpdateBoardItemTextMutationStub()],
+        [
+          makeHappyUpdateBoardItemTextMutationStub({
+            id: 'ITEM_1',
+            text: 'placeholder text',
+          }),
+        ],
         {
           propsData: {
             myId: MY_ID,
@@ -110,9 +114,8 @@ describe('<room-board />', () => {
       const items = screen.getAllByRole('listitem');
       await userEvent.dblClick(items[0]);
       expect(screen.getAllByRole('textbox')).toHaveLength(1);
-      await userEvent.dblClick(screen.getByRole('button', { name: /save/i }));
-      await waitForElementToBeRemoved(screen.getByRole('textbox'));
-
+      await userEvent.click(screen.getByRole('button', { name: /save/i }));
+      expect(screen.queryAllByRole('textbox')).toHaveLength(0);
       await userEvent.dblClick(items[1]);
       expect(screen.getAllByRole('textbox')).toHaveLength(1);
     });

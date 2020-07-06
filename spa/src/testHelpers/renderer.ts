@@ -28,12 +28,12 @@ const renderWithApollo = <V extends Vue>(
     const queryMock = jest.fn();
     if (spec.variables) {
       queryMock
-        .mockResolvedValueOnce({
+        .mockResolvedValue({
           data: spec.successData,
           errors: spec.errorData ? [spec.errorData] : undefined,
         });
     } else {
-      queryMock.mockResolvedValueOnce({
+      queryMock.mockResolvedValue({
         data: spec.successData,
         errors: spec.errorData ? [spec.errorData] : undefined,
       });

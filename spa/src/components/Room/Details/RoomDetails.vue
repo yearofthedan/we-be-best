@@ -7,14 +7,10 @@
         for="toggle-details"
         v-text="toggleLabel"
       />
-      <div></div>
-      <button
-        v-bind:data-room="roomId"
-        aria-label="copy room to clipboard"
-        v-on:click="onCopy"
-      >
-        📄
-      </button>
+      <p>Room id: {{ roomId }}</p>
+      <button-text aria-label="copy room link" v-on:click="onCopy">
+        📄 Copy room link
+      </button-text>
       <hr />
       <span>Members</span>
       <room-members v-bind:members="members" />
@@ -25,11 +21,13 @@
 <script lang="ts">
 import Vue from 'vue';
 import RoomMembers from '@/components/Room/Details/RoomMembers.vue';
+import ButtonText from '@/components/atoms/ButtonText.vue';
 
 export default Vue.extend({
   name: 'room-details',
   components: {
     'room-members': RoomMembers,
+    'button-text': ButtonText,
   },
   props: {
     roomId: {
@@ -54,14 +52,8 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-button::before {
-  right: calc(100% + (8 * var(--unit-base-rem)));
-  position: absolute;
-  content: attr(data-room);
-}
-button {
-  position: relative;
-  border-width: 1px;
+section > p {
+  font-size: var(--font-size-aside);
 }
 label {
   --label-left-offset: -24px;
