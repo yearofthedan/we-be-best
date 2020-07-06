@@ -4,6 +4,9 @@ fragment ItemBits on Item {
     posX
     posY
     lockedBy
+    style
+    text
+    isDeleted
 }
 
 mutation addRoomBoardItem($input: AddRoomBoardItemInput!) {

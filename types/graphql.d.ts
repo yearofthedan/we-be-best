@@ -158,7 +158,7 @@ export type MutationDeleteBoardItemArgs = {
 
 export type ItemBitsFragment = (
   { __typename: 'Item' }
-  & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy'>
+  & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy' | 'style' | 'text' | 'isDeleted'>
 );
 
 export type AddRoomBoardItemMutationVariables = Exact<{
@@ -278,7 +278,7 @@ export type ItemUpdatesSubscription = (
   { __typename?: 'Subscription' }
   & { itemUpdates: (
     { __typename?: 'Item' }
-    & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy' | 'text' | 'isDeleted'>
+    & ItemBitsFragment
   ) }
 );
 
@@ -297,7 +297,7 @@ export type RoomQuery = (
       & Pick<Member, 'id' | 'name'>
     )>, items: Array<(
       { __typename?: 'Item' }
-      & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy' | 'text'>
+      & ItemBitsFragment
     )> }
   )> }
 );
@@ -314,7 +314,7 @@ export type JoinRoomMutation = (
     & Pick<Room, 'id'>
     & { items: Array<(
       { __typename?: 'Item' }
-      & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy' | 'text'>
+      & ItemBitsFragment
     )> }
   ) }
 );

@@ -1,3 +1,13 @@
+fragment ItemBits on Item {
+    __typename
+    id
+    posX
+    posY
+    lockedBy
+    style
+    text
+    isDeleted
+}
 
 subscription roomMemberUpdates($id: ID!) {
     roomMemberUpdates(id: $id) {
@@ -11,12 +21,7 @@ subscription roomMemberUpdates($id: ID!) {
 
 subscription itemUpdates($roomId: ID!) {
     itemUpdates(roomId: $roomId) {
-        id
-        posX
-        posY
-        lockedBy
-        text
-        isDeleted
+        ...ItemBits
     }
 }
 
@@ -28,11 +33,7 @@ query room($id: ID!) {
             name
         }
         items {
-            id
-            posX
-            posY
-            lockedBy
-            text
+            ...ItemBits
         }
     }
 }
@@ -41,11 +42,7 @@ mutation joinRoom($input: JoinRoomInput!) {
     joinRoom(input: $input) {
         id
         items {
-            id
-            posX
-            posY
-            lockedBy
-            text
+            ...ItemBits
         }
     }
 }

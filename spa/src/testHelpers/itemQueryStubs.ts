@@ -18,14 +18,14 @@ export const ITEM_ID = 'ITEM123';
 export const ROOM_ID = 'ROOM123';
 export const MY_ID = 'me';
 
-const buildItemResponse = (overrides: Partial<Item> = {}): Item => ({
+export const buildItemResponse = (overrides: Partial<Item> = {}): Item => ({
   __typename: 'Item',
   id: 'ITEM123',
   lockedBy: 'me',
   posY: 20,
   posX: 30,
   text: 'placeholder text',
-  style: null,
+  style: 2,
   isDeleted: null,
   ...overrides,
 });

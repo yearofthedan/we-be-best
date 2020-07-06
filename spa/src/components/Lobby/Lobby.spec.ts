@@ -6,50 +6,19 @@ import {
 } from '@/testHelpers/renderer';
 import userEvent from '@testing-library/user-event';
 import Lobby from './Lobby.vue';
-import { joinRoom } from '@/graphql/roomQueries.graphql';
 import { sleep } from '@/testHelpers/timeout';
 import { ACTION_STATE } from '@/components/atoms/buttonStates';
+import {
+  makeHappyJoinRoomMutationStub,
+  makeSadJoinRoomMutationStub,
+} from '@/testHelpers/roomQueryStubs';
+
 const ROOM_ID = 'my-room';
 const MEMBER_NAME = 'me';
 
 jest.mock('uuid', () => ({
   v4: jest.fn().mockReturnValue('stub-uuid'),
 }));
-
-function makeHappyJoinRoomMutationStub() {
-  const successData = {
-    joinRoom: {
-      id: ROOM_ID,
-      members: [MEMBER_NAME],
-      items: [],
-    },
-  };
-  return {
-    query: joinRoom,
-    variables: {
-      input: {
-        roomId: ROOM_ID,
-        memberName: MEMBER_NAME,
-      },
-    },
-    successData,
-  };
-}
-function makeSadJoinRoomMutationStub() {
-  const errorData = {
-    message: 'everything is broken',
-  };
-  return {
-    query: joinRoom,
-    variables: {
-      input: {
-        roomId: ROOM_ID,
-        memberName: MEMBER_NAME,
-      },
-    },
-    errorData,
-  };
-}
 
 describe('<lobby />', () => {
   describe('joining a room', () => {

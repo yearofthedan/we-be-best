@@ -1,51 +1,20 @@
 import Room from '@/components/Room/Room.vue';
 import { renderWithApollo, screen } from '@/testHelpers/renderer';
-import { makeItem, buildMemberResult } from '@/testHelpers/testData';
 import {
-  itemUpdates,
-  room,
-  roomMemberUpdates,
-} from '@/graphql/roomQueries.graphql';
+  makeHappyRoomItemUpdatesSubscription,
+  makeHappyRoomQueryStub,
+  makeHappyRoomMemberUpdateSubscription,
+} from '@/testHelpers/roomQueryStubs';
+import { buildItemResponse } from '@/testHelpers/itemQueryStubs';
 
 describe('<room />', () => {
-  it('queries and subscribes to the room details', async () => {
-    const stubQuery = {
-      query: room,
-      successData: {
-        room: {
-          id: '123',
-          members: [buildMemberResult({ name: 'me' })],
-          items: [makeItem({ id: 'ITEM123' })],
-        },
-      },
-    };
-
-    const stubRoomMemberUpdateSubscription = {
-      query: roomMemberUpdates,
-      successData: {
-        roomMemberUpdates: {
-          id: '123',
-          members: [
-            buildMemberResult({ id: '1', name: 'me' }),
-            buildMemberResult({ id: '2', name: 'my-mother' }),
-          ],
-        },
-      },
-    };
-
-    const stubRoomItemUpdatesSubscription = {
-      query: itemUpdates,
-      successData: {
-        itemUpdates: makeItem({ id: 'ITEMM1234' }),
-      },
-    };
-
+  it('renders the members in the room', async () => {
     renderWithApollo(
       Room,
       [
-        stubQuery,
-        stubRoomMemberUpdateSubscription,
-        stubRoomItemUpdatesSubscription,
+        makeHappyRoomQueryStub(),
+        makeHappyRoomMemberUpdateSubscription(),
+        makeHappyRoomItemUpdatesSubscription(),
       ],
       {
         propsData: { roomId: '123', myId: 'me' },
@@ -54,6 +23,37 @@ describe('<room />', () => {
 
     expect(await screen.findByText(/me/)).toBeInTheDocument();
     expect(screen.getByText(/my-mother/)).toBeInTheDocument();
-    expect(await screen.findAllByText('placeholder text')).toHaveLength(2);
+  });
+
+  it('renders the initial and updated items on the board', async () => {
+    const item = buildItemResponse({
+      id: 'ITEM1',
+      text: 'item-text',
+      style: null,
+    });
+    const itemToBeUpdated = buildItemResponse({
+      id: 'ITEM2',
+      text: 'item-text',
+      style: 2,
+    });
+
+    renderWithApollo(
+      Room,
+      [
+        makeHappyRoomQueryStub({
+          successData: { items: [item, itemToBeUpdated] },
+        }),
+        makeHappyRoomMemberUpdateSubscription(),
+        makeHappyRoomItemUpdatesSubscription({
+          successData: { ...itemToBeUpdated, text: 'more-item-text' },
+        }),
+      ],
+      {
+        propsData: { roomId: '123', myId: 'me' },
+      }
+    );
+
+    expect(await screen.findByText('item-text')).toBeInTheDocument();
+    expect(await screen.findByText('more-item-text')).toBeInTheDocument();
   });
 });

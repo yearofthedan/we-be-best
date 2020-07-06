@@ -1,8 +1,8 @@
-import { VueConstructor } from 'vue';
+import Vue, { VueConstructor } from 'vue';
 import { DocumentNode } from 'graphql';
 import { createMockClient } from 'mock-apollo-client';
 import VueApollo from 'vue-apollo';
-import {ComponentHarness, render} from '@testing-library/vue';
+import {ComponentHarness, ConfigurationCallback, render} from '@testing-library/vue';
 
 interface QuerySpec {
   query: DocumentNode;
@@ -14,10 +14,12 @@ interface QuerySpec {
 export interface RenderResult extends ComponentHarness  {
   queryMocks: Array<jest.Mock<any, any>>;
 }
-const renderWithApollo = (
+const renderWithApollo = <V extends Vue>(
   component: VueConstructor<Vue>,
   querySpec: QuerySpec | QuerySpec[],
-  options: { [id: string]: any } = {}
+  options: { [id: string]: any } = {},
+  callback?: ConfigurationCallback<V>
+
 ): RenderResult => {
   const mockApolloClient = createMockClient();
   const specs: QuerySpec[] = Array.isArray(querySpec) ? querySpec : [querySpec];
@@ -51,8 +53,12 @@ const renderWithApollo = (
       ...options,
       apolloProvider,
     },
-    // @ts-ignore
-    vue => vue.use(VueApollo)
+    (vue, store, router) => {
+      // @ts-ignore
+      vue.use(VueApollo);
+      // @ts-ignore
+      callback && callback(vue, store, router);
+    }
   );
 
   return {
