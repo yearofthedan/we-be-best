@@ -46,10 +46,12 @@ import AutoExpandingTextBox from '@/components/Room/Board/AutoExpandingTextBox.v
 import { PRIMARY_MOUSE_BUTTON_ID, supportsTouchEvents } from '@/common/dom';
 import ColourStyleSelector from '@/components/Room/Board/ColourStyleSelector.vue';
 import {
-  Item,
+  DeleteBoardItemMutation,
   MutationDeleteBoardItemArgs,
   MutationUpdateBoardItemStyleArgs,
   MutationUpdateBoardItemTextArgs,
+  UpdateBoardItemStyleMutation,
+  UpdateBoardItemTextMutation,
 } from '@type-definitions/graphql';
 import { itemTheme } from './itemTheme';
 import { ItemViewModel } from '@/components/Room/Board/itemBuilder';
@@ -131,7 +133,10 @@ export default Vue.extend({
     _onDeleteClick: async function (): Promise<void> {
       try {
         this.$emit('editfinish');
-        await this.$apollo.mutate<Item, MutationDeleteBoardItemArgs>({
+        await this.$apollo.mutate<
+          DeleteBoardItemMutation,
+          MutationDeleteBoardItemArgs
+        >({
           mutation: deleteBoardItem,
           variables: {
             id: this.item.id,
@@ -151,13 +156,23 @@ export default Vue.extend({
       };
 
       try {
-        await this.$apollo.mutate<Item, MutationUpdateBoardItemTextArgs>({
+        this.$emit('editfinish');
+        await this.$apollo.mutate<
+          UpdateBoardItemTextMutation,
+          MutationUpdateBoardItemTextArgs
+        >({
           mutation: updateBoardItemText,
           variables: {
             input: mutationPayload,
           },
+          optimisticResponse: {
+            __typename: 'Mutation',
+            updateBoardItemText: {
+              __typename: 'Item',
+              ...this.item,
+            },
+          },
         });
-        this.$emit('editfinish');
       } catch (e) {
         logError(e);
         this.$toasted.global.apollo_error(
@@ -200,7 +215,10 @@ export default Vue.extend({
       ((this.$refs.textbox as Vue).$el as HTMLElement).focus();
 
       try {
-        await this.$apollo.mutate<Item, MutationUpdateBoardItemStyleArgs>({
+        await this.$apollo.mutate<
+          UpdateBoardItemStyleMutation,
+          MutationUpdateBoardItemStyleArgs
+        >({
           mutation: updateBoardItemStyle,
           variables: {
             input: {
@@ -212,7 +230,7 @@ export default Vue.extend({
       } catch (e) {
         logError(e);
         this.$toasted.global.apollo_error(
-          `Could not save item changes: ${e.message}`
+          `Could not save item style changes: ${e.message}`
         );
       }
     },

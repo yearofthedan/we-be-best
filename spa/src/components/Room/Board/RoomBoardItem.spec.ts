@@ -9,11 +9,12 @@ import { PointerDownEvent } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import userEvent from '@testing-library/user-event';
 import { waitFor } from '@testing-library/dom';
 import {
-  makeHappyUpdateBoardItemTextMutationStub,
-  makeSadUpdateRoomBoardItemMutationStub,
   makeHappyDeleteBoardItemMutationStub,
-  makeSadDeleteBoardItemMutationStub,
   makeHappyUpdateBoardItemStyleMutationStub,
+  makeHappyUpdateBoardItemTextMutationStub,
+  makeSadDeleteBoardItemMutationStub,
+  makeSadUpdateBoardItemStyleMutationStub,
+  makeSadUpdateRoomBoardItemMutationStub,
 } from '@/testHelpers/itemQueryStubs';
 import {
   PRIMARY_MOUSE_BUTTON_ID,
@@ -250,6 +251,45 @@ describe('<room-board-item />', () => {
         expect(queryMocks[0]).toHaveBeenCalledWith({
           input: { id: 'item123', style: 2 },
         })
+      );
+    });
+    it('displays a toast update when an error occurs while updating style', async () => {
+      const $toasted = {
+        global: {
+          apollo_error: jest.fn(),
+        },
+      };
+      renderWithApollo(
+        RoomBoardItem,
+        [
+          makeSadUpdateBoardItemStyleMutationStub({
+            id: 'item123',
+            style: 3,
+          }),
+        ],
+        {
+          propsData: {
+            myId: 'me',
+            editing: true,
+            item: makeItem({
+              id: 'item123',
+              posX: 2,
+              posY: 1,
+              text: 'some text',
+            }),
+          },
+          mocks: {
+            $toasted: $toasted,
+          },
+        }
+      );
+
+      await userEvent.dblClick(screen.getByRole('listitem'));
+      await userEvent.click(screen.getByRole('radio', { name: /style-3/i }));
+      await sleep(5);
+
+      expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+        'Could not save item style changes: GraphQL error: everything is broken'
       );
     });
 

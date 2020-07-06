@@ -189,6 +189,25 @@ export const makeHappyUpdateBoardItemTextMutationStub = (
   };
 }
 
+export const makeSadUpdateRoomBoardItemMutationStub = (
+  inputOverrides = {}
+) => {
+  const errorData = {
+    message: 'everything is broken',
+  };
+  return {
+    query: updateBoardItemText,
+    variables: {
+      input: {
+        id: 'some-id',
+        text: 'some-text',
+        ...inputOverrides
+      },
+    },
+    errorData,
+  };
+}
+
 export const makeHappyUpdateBoardItemStyleMutationStub = (
   inputOverrides: Partial<UpdateBoardItemStyleInput> = {}
 ) => {
@@ -208,18 +227,18 @@ export const makeHappyUpdateBoardItemStyleMutationStub = (
   };
 }
 
-export const makeSadUpdateRoomBoardItemMutationStub = (
-  inputOverrides = {}
+export const makeSadUpdateBoardItemStyleMutationStub = (
+  inputOverrides: Partial<UpdateBoardItemStyleInput> = {} = {}
 ) => {
   const errorData = {
     message: 'everything is broken',
   };
   return {
-    query: updateBoardItemText,
+    query: updateBoardItemStyle,
     variables: {
       input: {
         id: 'some-id',
-        text: 'some-text',
+        style: 1,
         ...inputOverrides
       },
     },
