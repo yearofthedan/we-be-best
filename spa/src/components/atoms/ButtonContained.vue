@@ -42,6 +42,8 @@ button {
   font-size: var(--font-size-interactive);
   text-transform: uppercase;
   position: relative;
+  background-color: var(--colour-primary);
+  color: var(--colour-primary-text);
 }
 
 button[data-action-state='loading'] {

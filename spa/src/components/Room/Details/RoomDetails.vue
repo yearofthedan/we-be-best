@@ -22,6 +22,12 @@
         <dd><room-members v-bind:members="members" /></dd>
       </dl>
       <hr />
+      <dt>Background</dt>
+      <dd>
+        <button>1</button>
+        <button>2</button>
+      </dd>
+      <hr />
       <button-text aria-label="download data" v-on:click="onDownload">
         ⬇️ Download data
       </button-text>

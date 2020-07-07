@@ -146,10 +146,14 @@ export default Vue.extend({
 
 <style scoped>
 form {
-  justify-content: center;
+  background-color: var(--colour-background);
+  border-radius: calc(1 * var(--unit-base-rem));
   display: grid;
   grid-template-rows: auto;
   grid-row-gap: calc(4 * var(--unit-base-rem));
+  justify-content: center;
+  min-width: 300px;
+  padding: calc(16 * var(--unit-base-rem)) calc(8 * var(--unit-base-rem));
 }
 
 span[role='alert'] {
@@ -162,9 +166,10 @@ span[role='alert'] {
 }
 
 section {
-  display: flex;
+  height: 100%;
+  display: grid;
+  align-content: center;
   justify-content: center;
-  align-items: baseline;
 }
 
 label[for='room-id'] {
@@ -192,7 +197,14 @@ label[for='room-id'] > [role='alert'] {
   grid-area: d;
 }
 
-form > dl {
+input {
+  display: block;
+  font-size: var(--font-size-interactive);
+  padding: calc(2 * var(--unit-base-rem));
+  min-width: 300px;
+}
+
+dl {
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-areas:
@@ -201,25 +213,19 @@ form > dl {
   align-items: flex-end;
 }
 
-form > dl > button {
+dl > button {
   margin-bottom: var(--unit-base-rem);
   grid-area: b;
 }
 
-form > dl > dd {
+dl > dd {
   grid-area: c;
   color: var(--colour-secondary);
 }
 
-input {
-  display: block;
-  font-size: var(--font-size-interactive);
-  padding: calc(2 * var(--unit-base-rem));
-  min-width: 300px;
-}
-
-form {
-  min-width: 300px;
-  padding-top: calc(8 * var(--unit-base-rem));
+article {
+  background: linear-gradient(124deg, transparent 56%, var(--light-pink) 56%),
+    linear-gradient(64deg, transparent 60%, var(--whitest-white) 60%),
+    linear-gradient(36deg, var(--light-orange) 46%, var(--light-cyan) 46%);
 }
 </style>

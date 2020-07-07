@@ -34,19 +34,29 @@ article {
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
 
+  --white: hsla(0, 100%, 100%, 1);
   --mint: hsla(107, 4%, 97%, 1);
   --light-blue: hsla(215, 100%, 96%, 1);
+  /*--dark-blue: #1e2b76;*/
   --black: hsla(218, 73%, 6%, 1);
-  --blue: hsla(215, 57%, 74%, 1);
+  --blue: hsl(223, 55%, 51%);
   --red: hsl(343, 79%, 55%);
-  --grey: hsla(180, 2%, 49%, 1);
+  --grey: hsl(180, 3%, 61%);
   --light-grey: hsl(180, 9%, 86%);
 
+  --light-cyan: hsla(182, 100%, 88%, 1);
+  --light-pink: hsla(332, 92%, 80%, 1);
+  --light-orange: hsla(29, 100%, 79%, 1);
+  --whitest-white: hsla(0, 100%, 100%, 1);
+  --blackest-black: hsla(0, 0%, 0%, 1);
+  --gold-leaf: hsla(43, 74%, 49%, 1);
+
   --colour-primary: var(--light-blue);
+  --colour-primary-text: var(--black);
   --colour-primary-emphasis: var(--blue);
   --colour-secondary: var(--grey);
   --colour-shadow: var(--black);
-  --colour-background: var(--mint);
+  --colour-background: var(--white);
   --colour-warning: var(--red);
   --colour-disabled: var(--light-grey);
 
