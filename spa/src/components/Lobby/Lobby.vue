@@ -49,12 +49,13 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { v4 } from 'uuid';
 import { JoinRoomInput } from '@type-definitions/graphql';
 import { joinRoom } from '@/graphql/roomQueries.graphql';
 import ButtonContained from '@/components/atoms/ButtonContained.vue';
 import { ACTION_STATE } from '@/components/atoms/buttonStates';
 import ButtonText from '@/components/atoms/ButtonText.vue';
+import { customAlphabet } from 'nanoid';
+const nanoid = customAlphabet('23456789ABCDEFGHJKLMNPQRSTUVWXYZ', 12);
 
 export default Vue.extend({
   name: 'lobby',
@@ -78,7 +79,7 @@ export default Vue.extend({
     return {
       errors: {},
       memberName: null,
-      roomId: this.existingRoomId || v4(),
+      roomId: this.existingRoomId || nanoid(),
       submitState: ACTION_STATE.READY,
       isCreating: !this.existingRoomId,
     };
@@ -90,7 +91,7 @@ export default Vue.extend({
     },
     switchToCreate() {
       this.isCreating = true;
-      this.roomId = v4();
+      this.roomId = nanoid();
     },
     async onFormSubmit(e: Event) {
       this.submitState = ACTION_STATE.READY;

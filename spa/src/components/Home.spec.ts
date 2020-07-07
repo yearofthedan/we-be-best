@@ -23,8 +23,8 @@ function makeHappyPathMutationStub() {
   };
 }
 
-jest.mock('uuid', () => ({
-  v4: jest.fn().mockReturnValue('stub-uuid'),
+jest.mock('nanoid', () => ({
+  customAlphabet: () => jest.fn().mockReturnValue('stub-roomid'),
 }));
 
 describe('Home', () => {
@@ -46,11 +46,11 @@ describe('Home', () => {
     await userEvent.click(screen.getByRole('button', { name: /create room/i }));
     expect(queryMocks[0]).toHaveBeenCalledWith({
       input: {
-        roomId: 'stub-uuid',
+        roomId: 'stub-roomid',
         memberName: 'me',
       },
     });
 
-    expect(await screen.findByText('stub-uuid')).toBeInTheDocument();
+    expect(await screen.findByText('stub-roomid')).toBeInTheDocument();
   });
 });

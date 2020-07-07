@@ -7,13 +7,20 @@
         for="toggle-details"
         v-text="toggleLabel"
       />
-      <p>Room id: {{ roomId }}</p>
-      <button-text aria-label="copy room link" v-on:click="onCopy">
-        📄 Copy room link
-      </button-text>
-      <hr />
-      <span>Members</span>
-      <room-members v-bind:members="members" />
+      <dl>
+        <dt>Room id</dt>
+        <dd>
+          {{ roomId }}
+          <button-text aria-label="copy room link" v-on:click="onCopy">
+            📄 Copy room link
+          </button-text>
+        </dd>
+        <hr />
+        <dt>
+          Members
+        </dt>
+        <dd><room-members v-bind:members="members" /></dd>
+      </dl>
       <hr />
       <button-text aria-label="download data" v-on:click="onDownload">
         ⬇️ Download data
@@ -75,9 +82,6 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-section > p {
-  font-size: var(--font-size-aside);
-}
 label {
   --label-left-offset: -24px;
   font-size: calc(8 * var(--unit-base-rem));
@@ -104,7 +108,7 @@ label::before {
 }
 
 aside {
-  --content-width: 160px;
+  --content-width: 180px;
   position: fixed;
   top: 0;
   right: 0;
@@ -135,8 +139,18 @@ aside > section {
   z-index: 1001;
 }
 
-aside > section > span {
+dl > dt {
   padding: calc(2 * var(--unit-base-rem));
   font-size: var(--font-size-label);
+  text-align: right;
+}
+
+dl > dd {
+  font-size: var(--font-size-aside);
+  margin-right: calc(2 * var(--unit-base-rem));
+}
+
+button[aria-label='download data'] {
+  margin-right: calc(2 * var(--unit-base-rem));
 }
 </style>

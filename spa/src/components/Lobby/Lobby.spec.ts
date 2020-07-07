@@ -16,8 +16,8 @@ import {
 const ROOM_ID = 'my-room';
 const MEMBER_NAME = 'me';
 
-jest.mock('uuid', () => ({
-  v4: jest.fn().mockReturnValue('stub-uuid'),
+jest.mock('nanoid', () => ({
+  customAlphabet: () => jest.fn().mockReturnValue('stub-roomid'),
 }));
 
 describe('<lobby />', () => {
@@ -53,11 +53,11 @@ describe('<lobby />', () => {
     it('clears the id when switching to join from creating', async () => {
       render(Lobby);
 
-      expect(screen.getByText('stub-uuid')).toBeInTheDocument();
+      expect(screen.getByText('stub-roomid')).toBeInTheDocument();
       userEvent.click(screen.getByRole('button', { name: /Join a room/i }));
 
       await waitFor(() =>
-        expect(screen.queryByText('stub-uuid')).not.toBeInTheDocument()
+        expect(screen.queryByText('stub-roomid')).not.toBeInTheDocument()
       );
     });
 
@@ -142,11 +142,11 @@ describe('<lobby />', () => {
     it('generates an id when switching to creating', async () => {
       render(Lobby, { propsData: { existingRoomId: '11111' } });
 
-      expect(screen.queryByText('stub-uuid')).not.toBeInTheDocument();
+      expect(screen.queryByText('stub-roomid')).not.toBeInTheDocument();
       userEvent.click(screen.getByRole('button', { name: /Create a room/i }));
 
       await waitFor(() =>
-        expect(screen.getByText('stub-uuid')).toBeInTheDocument()
+        expect(screen.getByText('stub-roomid')).toBeInTheDocument()
       );
     });
 
@@ -162,7 +162,7 @@ describe('<lobby />', () => {
 
       expect(queryMocks[0]).toHaveBeenCalledWith({
         input: {
-          roomId: 'stub-uuid',
+          roomId: 'stub-roomid',
           memberName: MEMBER_NAME,
         },
       });
@@ -173,7 +173,7 @@ describe('<lobby />', () => {
 
       expect(emitted().joined[0]).toEqual([
         {
-          roomId: 'stub-uuid',
+          roomId: 'stub-roomid',
           memberName: MEMBER_NAME,
         },
       ]);
