@@ -27,6 +27,10 @@ dl {
   margin: 0;
 }
 
+article {
+  height: 100vh;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
 

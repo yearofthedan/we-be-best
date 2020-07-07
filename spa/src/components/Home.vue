@@ -1,12 +1,12 @@
 <template>
-  <article>
+  <transition appear name="fade">
     <lobby
       v-if="!memberName && !roomId"
       v-on:joined="_onJoined"
       v-bind:existingRoomId="existingRoomId"
     />
     <room v-else v-bind:room-id="roomId" v-bind:my-id="memberName" />
-  </article>
+  </transition>
 </template>
 
 <script lang="ts">
@@ -42,10 +42,12 @@ export default Vue.extend({
 </script>
 
 <style>
-article {
-  height: 100vh;
-  display: grid;
-  grid-template-rows: auto 1fr;
-  grid-row-gap: calc(3 * var(--unit-base-rem));
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter, .fade-leave-to
+  /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>

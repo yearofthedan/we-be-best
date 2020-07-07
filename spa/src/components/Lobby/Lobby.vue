@@ -1,50 +1,52 @@
 <template>
-  <section>
-    <form
-      id="lobby"
-      @submit="onFormSubmit"
-      action="https://vuejs.org/"
-      method="post"
-    >
-      <h2>Let's get a room going...</h2>
-      <div v-if="errors.length > 0">
-        <h3>Please correct the following errors:</h3>
-        <ul>
-          <li v-for="err in errors" :key="err">{{ err }}</li>
-        </ul>
-      </div>
-      <label for="your-name">
-        Your name
-        <input id="your-name" type="text" v-model="memberName" />
-        <span role="alert" v-if="errors.name">
-          {{ this.errors.name }}
-        </span>
-      </label>
-      <label v-if="!isCreating" for="room-id">
-        Room id to join
-        <button-text type="button" @click="switchToCreate"
-          >Create a room</button-text
-        >
-        <input id="room-id" type="text" v-model="roomId" />
-        <span role="alert" v-if="errors.roomId">
-          {{ this.errors.roomId }}
-        </span>
-      </label>
-      <dl v-if="isCreating">
-        <dt>Your room id</dt>
-        <button-text type="button" @click="switchToJoin"
-          >Join a room</button-text
-        >
-        <dd>{{ this.roomId }}</dd>
-      </dl>
-      <button-contained
-        :aria-label="isCreating ? 'create room' : 'join room'"
-        type="submit"
-        :state="submitState"
-        >{{ isCreating ? 'create room' : 'join room' }}
-      </button-contained>
-    </form>
-  </section>
+  <article>
+    <section>
+      <form
+        id="lobby"
+        @submit="onFormSubmit"
+        action="https://vuejs.org/"
+        method="post"
+      >
+        <h2>Let's get a room going...</h2>
+        <div v-if="errors.length > 0">
+          <h3>Please correct the following errors:</h3>
+          <ul>
+            <li v-for="err in errors" :key="err">{{ err }}</li>
+          </ul>
+        </div>
+        <label for="your-name">
+          Your name
+          <input id="your-name" type="text" v-model="memberName" />
+          <span role="alert" v-if="errors.name">
+            {{ this.errors.name }}
+          </span>
+        </label>
+        <label v-if="!isCreating" for="room-id">
+          Room id to join
+          <button-text type="button" @click="switchToCreate"
+            >Create a room
+          </button-text>
+          <input id="room-id" type="text" v-model="roomId" />
+          <span role="alert" v-if="errors.roomId">
+            {{ this.errors.roomId }}
+          </span>
+        </label>
+        <dl v-if="isCreating">
+          <dt>Your room id</dt>
+          <button-text type="button" @click="switchToJoin"
+            >Join a room
+          </button-text>
+          <dd>{{ this.roomId }}</dd>
+        </dl>
+        <button-contained
+          :aria-label="isCreating ? 'create room' : 'join room'"
+          type="submit"
+          :state="submitState"
+          >{{ isCreating ? 'create room' : 'join room' }}
+        </button-contained>
+      </form>
+    </section>
+  </article>
 </template>
 
 <script lang="ts">
@@ -55,6 +57,7 @@ import ButtonContained from '@/components/atoms/ButtonContained.vue';
 import { ACTION_STATE } from '@/components/atoms/buttonStates';
 import ButtonText from '@/components/atoms/ButtonText.vue';
 import { customAlphabet } from 'nanoid';
+
 const nanoid = customAlphabet('23456789ABCDEFGHJKLMNPQRSTUVWXYZ', 12);
 
 export default Vue.extend({
@@ -163,6 +166,7 @@ section {
   justify-content: center;
   align-items: baseline;
 }
+
 label[for='room-id'] {
   font-size: var(--font-size-label);
   width: 100%;
@@ -179,9 +183,11 @@ label[for='room-id'] > button {
   margin-bottom: var(--unit-base-rem);
   grid-area: b;
 }
+
 label[for='room-id'] > input {
   grid-area: c;
 }
+
 label[for='room-id'] > [role='alert'] {
   grid-area: d;
 }
@@ -211,6 +217,7 @@ input {
   padding: calc(2 * var(--unit-base-rem));
   min-width: 300px;
 }
+
 form {
   min-width: 300px;
   padding-top: calc(8 * var(--unit-base-rem));

@@ -1,20 +1,22 @@
 <template>
-  <section>
-    <template v-if="loading">Loading...</template>
-    <template v-else-if="error">An error occurred {{ error }}</template>
-    <template v-else-if="room">
-      <room-board
-        v-bind:my-id="myId"
-        v-bind:room-id="roomId"
-        v-bind:items="room.items"
-      />
-      <room-details
-        v-bind:items="room.items"
-        v-bind:members="room.members"
-        v-bind:room-id="roomId"
-      />
-    </template>
-  </section>
+  <article>
+    <section>
+      <template v-if="loading">Loading...</template>
+      <template v-else-if="error">An error occurred {{ error }}</template>
+      <template v-else-if="room">
+        <room-board
+          v-bind:my-id="myId"
+          v-bind:room-id="roomId"
+          v-bind:items="room.items"
+        />
+        <room-details
+          v-bind:items="room.items"
+          v-bind:members="room.members"
+          v-bind:room-id="roomId"
+        />
+      </template>
+    </section>
+  </article>
 </template>
 
 <script lang="ts">
@@ -134,7 +136,7 @@ export default Vue.extend({
               return;
             }
 
-            if (currentRoom.items)
+            if (currentRoom.items) {
               return {
                 room: {
                   ...currentRoom,
@@ -144,6 +146,7 @@ export default Vue.extend({
                   ),
                 },
               };
+            }
           },
         },
       ],
