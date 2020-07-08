@@ -3,6 +3,15 @@ Collaborative sticky notes on a shared whiteboard.
 
 [![Build Status](https://travis-ci.org/yearofthedan/we-be-best.svg?branch=master)](https://travis-ci.org/yearofthedan/we-be-best)
 
+## Demo
+There's a hosted demo here:
+https://we-be-best.herokuapp.com/
+
+It's Heroku's free plan, so it'll take a minute to spin up if people aren't using it.
+Any data you save exists for as long as Heroku doesn't spin down the app due to nobody using it.
+
+There's no notion of private accounts here. While the room ids are unique, somebody could brute force different id combinations to find a room. It's unlikely, but be mindful of the risk. 
+
 ## Tech overview
 _We Be Best_ is a VueJs frontend communicating with an Apollo Graphql server with mongodb for data storage.
 Source code for the front and backend are in this repo under `spa` and `server`, respectively.
