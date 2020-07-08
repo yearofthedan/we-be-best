@@ -17,7 +17,7 @@ export default Vue.extend({
   name: 'app',
   mounted() {
     this.$toasted.show(welcomeMessage, {
-      duration: 80000,
+      duration: 8000,
       position: 'bottom-center',
       containerClass: 'privacy-toast-container',
       className: 'privacy-toast',
