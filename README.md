@@ -1,6 +1,8 @@
 # we-be-best
 Collaborative sticky notes on a shared whiteboard.
 
+[![Build Status](https://travis-ci.org/yearofthedan/we-be-best.svg?branch=master)](https://travis-ci.org/yearofthedan/we-be-best)
+
 ## Tech overview
 _We Be Best_ is a VueJs frontend communicating with an Apollo Graphql server with mongodb for data storage.
 Source code for the front and backend are in this repo under `spa` and `server`, respectively.
