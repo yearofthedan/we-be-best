@@ -1,5 +1,5 @@
 <template>
-  <transition appear name="fade">
+  <transition name="fade">
     <lobby
       v-if="!memberName && !roomId"
       v-on:joined="_onJoined"
