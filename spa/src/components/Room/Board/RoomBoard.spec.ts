@@ -12,15 +12,12 @@ import {
 } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import { makeItem } from '@/testHelpers/testData';
 import userEvent from '@testing-library/user-event';
-import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/items';
 import {
   ITEM_ID,
-  makeHappyAddRoomBoardItemMutationStub,
   makeHappyLockRoomBoardItemMutationStub,
   makeHappyMoveBoardItemMutationStub,
   makeHappyUnlockRoomBoardItemMutationStub,
   makeHappyUpdateBoardItemTextMutationStub,
-  makeSadAddRoomBoardItemMutationStub,
   makeSadLockRoomBoardItemMutationStub,
   makeSadMoveBoardItemMutationStub,
   makeSadUnlockRoomBoardItemMutationStub,
@@ -118,65 +115,6 @@ describe('<room-board />', () => {
       expect(screen.queryAllByRole('textbox')).toHaveLength(0);
       await userEvent.dblClick(items[1]);
       expect(screen.getAllByRole('textbox')).toHaveLength(1);
-    });
-  });
-  describe('when adding an item', () => {
-    const renderComponent = () => {
-      return renderWithApollo(
-        RoomBoard,
-        [makeHappyAddRoomBoardItemMutationStub()],
-        {
-          propsData: { myId: MY_ID, roomId: ROOM_ID, items: [] },
-          mocks: {
-            $toasted: { global: { apollo_error: jest.fn() } },
-          },
-        }
-      );
-    };
-
-    it('lets me add an item', async () => {
-      renderComponent();
-      expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
-      await userEvent.click(screen.getByRole('button', { name: /add/i }));
-
-      await screen.findByRole('listitem');
-      expect(await screen.findByRole('textbox')).toBeInTheDocument();
-    });
-
-    it('sends an update when an item is created', async () => {
-      const { queryMocks } = renderComponent();
-      await userEvent.click(screen.getByRole('button', { name: /add/i }));
-
-      expect(queryMocks[0]).toHaveBeenCalledWith({
-        input: {
-          roomId: ROOM_ID,
-          itemId: expect.any(String),
-          posX: DEFAULT_X,
-          posY: DEFAULT_Y,
-        },
-      });
-    });
-
-    it('displays a toast update when an error occurs while adding', async () => {
-      const $toasted = {
-        global: {
-          apollo_error: jest.fn(),
-        },
-      };
-
-      renderWithApollo(RoomBoard, [makeSadAddRoomBoardItemMutationStub()], {
-        propsData: { myId: MY_ID, roomId: ROOM_ID, items: [] },
-        mocks: {
-          $toasted: $toasted,
-        },
-      });
-
-      await userEvent.click(screen.getByRole('button', { name: /add/i }));
-      await sleep(5);
-
-      expect($toasted.global.apollo_error).toHaveBeenCalledWith(
-        'Could not add a new item: GraphQL error: everything is broken'
-      );
     });
   });
   describe('when locked', () => {

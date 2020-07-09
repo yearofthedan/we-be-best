@@ -1,28 +1,27 @@
 <template>
   <article>
-    <section>
-      <template v-if="loading">Loading...</template>
-      <template v-else-if="error">An error occurred {{ error }}</template>
-      <template v-else-if="room">
-        <room-board
-          v-bind:my-id="myId"
-          v-bind:room-id="roomId"
-          v-bind:items="room.items"
-        />
-        <room-details
-          v-bind:items="room.items"
-          v-bind:members="room.members"
-          v-bind:room-id="roomId"
-        />
-      </template>
-    </section>
+    <template v-if="loading">Loading...</template>
+    <template v-else-if="error">An error occurred {{ error }}</template>
+    <template v-else-if="room">
+      <room-board
+        v-bind:my-id="myId"
+        v-bind:room-id="roomId"
+        v-bind:items="room.items"
+      />
+      <room-details
+        v-bind:items="room.items"
+        v-bind:members="room.members"
+        v-bind:room-id="roomId"
+      />
+      <button v-on:click="_onAddItem" aria-label="Add" type="button" />
+    </template>
   </article>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { ApolloError } from 'apollo-client';
-import { ItemViewModel } from '@/components/Room/Board/items';
+import makeNewItem, { ItemViewModel } from '@/components/Room/Board/items';
 import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
 import { removeArrayElement, upsertArrayElement } from '@/common/arrays';
@@ -41,7 +40,10 @@ import {
   SubscriptionRoomMemberUpdatesArgs,
   SubscriptionItemUpdatesArgs,
   Item,
+  AddRoomBoardItemInput,
 } from '@type-definitions/graphql';
+import { addRoomBoardItem } from '@/graphql/boardQueries.graphql';
+import { logError } from '@/common/logger';
 
 interface RoomComponentProps {
   roomId: string;
@@ -158,11 +160,70 @@ export default Vue.extend({
       },
     },
   },
+  methods: {
+    _onAddItem: async function (): Promise<void> {
+      const newItem = makeNewItem();
+      const mutationPayload: AddRoomBoardItemInput = {
+        posY: newItem.posY,
+        posX: newItem.posX,
+        roomId: this.roomId,
+        itemId: newItem.id,
+      };
+      try {
+        await this.$apollo.mutate({
+          mutation: addRoomBoardItem,
+          variables: {
+            input: mutationPayload,
+          },
+          optimisticResponse: {
+            __typename: 'Mutation',
+            addRoomBoardItem: {
+              __typename: 'Item',
+              ...mutationPayload,
+              text: '',
+              id: null,
+              isDeleted: null,
+              lockedBy: null,
+              style: null,
+            },
+          },
+        });
+      } catch (error) {
+        logError(error);
+        this.$toasted.global.apollo_error(
+          `Could not add a new item: ${error.message}`
+        );
+      }
+    },
+  },
 });
 </script>
 
 <style scoped>
 section {
   background-color: var(--colour-background);
+}
+
+button {
+  position: absolute;
+  z-index: var(--z-index-fab);
+  width: calc(16 * var(--unit-base-rem));
+  height: calc(16 * var(--unit-base-rem));
+  bottom: calc(8 * var(--unit-base-rem));
+  right: calc(8 * var(--unit-base-rem));
+  font-size: var(--font-size-interactive);
+}
+button::before {
+  content: '➕';
+  position: absolute;
+  font-size: calc(0.5 * var(--font-size-icon-button));
+  top: calc(-0.5 * var(--font-size-icon-button));
+  right: calc(-0.5 * var(--font-size-icon-button));
+  border-radius: 100%;
+  border: 1px solid;
+  width: var(--font-size-icon-button);
+  height: var(--font-size-icon-button);
+  background-color: var(--colour-primary);
+  line-height: var(--font-size-icon-button);
 }
 </style>

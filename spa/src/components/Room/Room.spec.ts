@@ -5,7 +5,17 @@ import {
   makeHappyRoomQueryStub,
   makeHappyRoomMemberUpdateSubscription,
 } from '@/testHelpers/roomQueryStubs';
-import { buildItemResponse } from '@/testHelpers/itemQueryStubs';
+import {
+  buildItemResponse,
+  makeHappyAddRoomBoardItemMutationStub,
+  makeSadAddRoomBoardItemMutationStub,
+  MY_ID,
+  ROOM_ID,
+} from '@/testHelpers/itemQueryStubs';
+import userEvent from '@testing-library/user-event';
+import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/items';
+import { sleep } from '@/testHelpers/timeout';
+import { waitFor } from '@testing-library/dom';
 
 describe('<room />', () => {
   it('renders the members in the room', async () => {
@@ -55,5 +65,83 @@ describe('<room />', () => {
 
     expect(await screen.findByText('item-text')).toBeInTheDocument();
     expect(await screen.findByText('more-item-text')).toBeInTheDocument();
+  });
+
+  describe('when adding an item', () => {
+    const renderComponent = () => {
+      return renderWithApollo(
+        Room,
+        [
+          makeHappyRoomQueryStub({
+            successData: { items: [] },
+          }),
+          makeHappyRoomMemberUpdateSubscription(),
+          makeHappyRoomItemUpdatesSubscription(),
+          makeHappyAddRoomBoardItemMutationStub(),
+        ],
+        {
+          propsData: { roomId: '123', myId: 'me' },
+          mocks: {
+            $toasted: { global: { apollo_error: jest.fn() } },
+          },
+        }
+      );
+    };
+
+    it('lets me add an item', async () => {
+      const { queryMocks } = renderComponent();
+
+      expect(
+        await screen.findByRole('button', { name: /add/i })
+      ).toBeInTheDocument();
+      expect(screen.getAllByRole('listitem')).toHaveLength(3);
+      await userEvent.click(screen.getByRole('button', { name: /add/i }));
+
+      await waitFor(() =>
+        expect(queryMocks[3]).toHaveBeenCalledWith({
+          input: {
+            roomId: '123',
+            itemId: expect.any(String),
+            posX: DEFAULT_X,
+            posY: DEFAULT_Y,
+          },
+        })
+      );
+    });
+
+    it('displays a toast update when an error occurs while adding', async () => {
+      const $toasted = {
+        global: {
+          apollo_error: jest.fn(),
+        },
+      };
+
+      renderWithApollo(
+        Room,
+        [
+          makeHappyRoomQueryStub({
+            successData: { items: [] },
+          }),
+          makeHappyRoomMemberUpdateSubscription(),
+          makeHappyRoomItemUpdatesSubscription(),
+          makeSadAddRoomBoardItemMutationStub(),
+        ],
+        {
+          propsData: { myId: MY_ID, roomId: ROOM_ID, items: [] },
+          mocks: {
+            $toasted: $toasted,
+          },
+        }
+      );
+
+      await userEvent.click(
+        await screen.findByRole('button', { name: /add/i })
+      );
+      await sleep(5);
+
+      expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+        'Could not add a new item: GraphQL error: everything is broken'
+      );
+    });
   });
 });

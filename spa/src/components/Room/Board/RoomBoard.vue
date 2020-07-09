@@ -17,7 +17,6 @@
         :key="item.id"
       />
     </transition-group>
-    <button v-on:click="_onAddItem" aria-label="Add" type="button" />
   </section>
 </template>
 
@@ -25,16 +24,14 @@
 import Vue from 'vue';
 import RoomBoardItem from './RoomBoardItem.vue';
 import {
-  addRoomBoardItem,
   lockRoomBoardItem,
   moveBoardItem,
   unlockRoomBoardItem,
 } from '@/graphql/boardQueries.graphql';
-import makeNewItem, { ItemViewModel } from '@/components/Room/Board/items';
+import { ItemViewModel } from '@/components/Room/Board/items';
 import { patchArrayElement } from '@/common/arrays';
 import { supportsTouchEvents } from '@/common/dom';
 import {
-  AddRoomBoardItemInput,
   LockRoomBoardItemInput,
   MoveBoardItemInput,
   UnlockRoomBoardItemInput,
@@ -86,30 +83,6 @@ export default Vue.extend({
   methods: {
     _getIsMoving: function (itemId: string): boolean {
       return itemId === this.movingItemReference;
-    },
-    _onAddItem: function (): void {
-      const newItem = makeNewItem();
-      this.itemsData = [...this.itemsData, newItem];
-      this.editingItemReference = newItem.id;
-
-      const mutationPayload: AddRoomBoardItemInput = {
-        posY: newItem.posY,
-        posX: newItem.posX,
-        roomId: this.roomId,
-        itemId: newItem.id,
-      };
-      this.$apollo
-        .mutate({
-          mutation: addRoomBoardItem,
-          variables: {
-            input: mutationPayload,
-          },
-        })
-        .catch((error) => {
-          this.$toasted.global.apollo_error(
-            `Could not add a new item: ${error.message}`
-          );
-        });
     },
     _onPointerUp: function (): void {
       this._onBoardItemStoppedMoving();
@@ -267,29 +240,6 @@ interface ItemMovedEventPayload {
 ul {
   list-style-type: none;
   padding: 0;
-}
-
-button {
-  position: absolute;
-  z-index: var(--z-index-fab);
-  width: calc(16 * var(--unit-base-rem));
-  height: calc(16 * var(--unit-base-rem));
-  bottom: calc(8 * var(--unit-base-rem));
-  right: calc(8 * var(--unit-base-rem));
-  font-size: var(--font-size-interactive);
-}
-button::before {
-  content: '➕';
-  position: absolute;
-  font-size: calc(0.5 * var(--font-size-icon-button));
-  top: calc(-0.5 * var(--font-size-icon-button));
-  right: calc(-0.5 * var(--font-size-icon-button));
-  border-radius: 100%;
-  border: 1px solid;
-  width: var(--font-size-icon-button);
-  height: var(--font-size-icon-button);
-  background-color: var(--colour-primary);
-  line-height: var(--font-size-icon-button);
 }
 
 section section {
