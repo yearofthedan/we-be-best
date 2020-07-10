@@ -45,7 +45,6 @@ export default Vue.extend({
 body,
 main {
   min-height: 100vh;
-  overflow: hidden;
 }
 
 button {
