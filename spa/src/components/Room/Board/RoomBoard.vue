@@ -1,23 +1,22 @@
 <template>
-  <section
+  <transition-group
+    name="list"
+    aria-label="board"
+    tag="ul"
     v-bind:data-room-name="roomId"
-    v-on:mousemove="this._onMouseMove"
-    v-on:pointermove="this._onPointerMove"
   >
-    <transition-group name="list" tag="ul">
-      <room-board-item
-        v-for="item in itemsData"
-        v-bind:item="item"
-        v-bind:moving="_getIsMoving(item.id)"
-        v-bind:my-id="myId"
-        v-bind:editing="editingItemReference === item.id"
-        v-on:movestart="_onBoardItemMoveStart"
-        v-on:editstart="_onBoardItemEditStart"
-        v-on:editfinish="_onBoardItemEditFinish"
-        :key="item.id"
-      />
-    </transition-group>
-  </section>
+    <room-board-item
+      v-for="item in itemsData"
+      v-bind:item="item"
+      v-bind:moving="_getIsMoving(item.id)"
+      v-bind:my-id="myId"
+      v-bind:editing="editingItemReference === item.id"
+      v-on:movestart="_onBoardItemMoveStart"
+      v-on:editstart="_onBoardItemEditStart"
+      v-on:editfinish="_onBoardItemEditFinish"
+      :key="item.id"
+    />
+  </transition-group>
 </template>
 
 <script lang="ts">
@@ -77,6 +76,8 @@ export default Vue.extend({
     };
   },
   mounted() {
+    window.addEventListener('mousemove', this._onMouseMove);
+    window.addEventListener('pointermove', this._onPointerMove);
     window.addEventListener('pointerup', this._onPointerUp);
     window.addEventListener('mouseup', this._onPointerUp);
   },
@@ -240,13 +241,10 @@ interface ItemMovedEventPayload {
 ul {
   list-style-type: none;
   padding: 0;
-}
-
-section section {
   height: 100vh;
 }
 
-section::before {
+ul::before {
   position: absolute;
   padding-left: calc(4 * var(--unit-base-rem));
   padding-bottom: calc(4 * var(--unit-base-rem));
