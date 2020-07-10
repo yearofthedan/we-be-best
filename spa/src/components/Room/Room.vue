@@ -204,8 +204,8 @@ section {
   background-color: var(--colour-background);
 }
 
-button {
-  position: absolute;
+button[aria-label='Add'] {
+  position: fixed;
   z-index: var(--z-index-fab);
   width: calc(16 * var(--unit-base-rem));
   height: calc(16 * var(--unit-base-rem));
@@ -213,7 +213,7 @@ button {
   right: calc(8 * var(--unit-base-rem));
   font-size: var(--font-size-interactive);
 }
-button::before {
+button[aria-label='Add']::before {
   content: '➕';
   position: absolute;
   font-size: calc(0.5 * var(--font-size-icon-button));
