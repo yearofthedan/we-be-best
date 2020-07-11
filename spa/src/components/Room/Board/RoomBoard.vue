@@ -252,11 +252,24 @@ ul {
   transform-origin: top left;
   width: 1280px;
   height: 800px;
-  border: solid 1px black;
   transform: scale(var(--zoom-factor));
   transition: all 0.2s;
-  background-color: var(--colour-background);
   box-shadow: 0 0 0 2px var(--colour-primary-emphasis);
+
+  background: repeating-linear-gradient(
+      90deg,
+      var(--colour-secondary),
+      var(--colour-secondary) var(--unit-base-rem),
+      transparent 0,
+      transparent 50%
+    ),
+    repeating-linear-gradient(
+      180deg,
+      var(--colour-secondary),
+      var(--colour-secondary) var(--unit-base-rem),
+      var(--colour-background) 0,
+      var(--colour-background) 50%
+    );
 }
 
 ul::before {
