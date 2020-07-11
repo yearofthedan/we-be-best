@@ -20,6 +20,18 @@
       type="button"
       >Add item</button-contained
     >
+    <button-contained
+      @click="$emit('change-background', 'QUADRANTS')"
+      aria-label="Change background to quadrants"
+      type="button"
+      >Quadrants</button-contained
+    >
+    <button-contained
+      @click="$emit('change-background', 'CLEAR')"
+      aria-label="Change background to clear"
+      type="button"
+      >Clean</button-contained
+    >
   </section>
 </template>
 <script lang="ts">

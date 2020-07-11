@@ -7,6 +7,7 @@
     v-on:mousemove="this._onMouseMove"
     v-on:pointermove="this._onPointerMove"
     v-bind:style="`--zoom-factor: ${zoomFactor}`"
+    v-bind:data-background="background"
   >
     <room-board-item
       v-for="item in itemsData"
@@ -45,8 +46,12 @@ export default Vue.extend({
     'room-board-item': RoomBoardItem,
   },
   props: {
-    zoomFactor: {
-      type: Number,
+    background: {
+      type: String,
+      default: 'QUADRANTS',
+    },
+    items: {
+      type: Array as () => ItemViewModel[],
       required: true,
     },
     myId: {
@@ -57,8 +62,8 @@ export default Vue.extend({
       type: String,
       required: true,
     },
-    items: {
-      type: Array as () => ItemViewModel[],
+    zoomFactor: {
+      type: Number,
       required: true,
     },
   },
@@ -253,9 +258,12 @@ ul {
   width: 1280px;
   height: 800px;
   transform: scale(var(--zoom-factor));
-  transition: all 0.2s;
+  transition: transform 0.2s;
   box-shadow: 0 0 0 2px var(--colour-primary-emphasis);
+  background: var(--colour-background);
+}
 
+ul[data-background='QUADRANTS'] {
   background: repeating-linear-gradient(
       90deg,
       var(--colour-secondary),

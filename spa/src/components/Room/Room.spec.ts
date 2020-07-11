@@ -17,6 +17,26 @@ import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/items';
 import { waitFor } from '@testing-library/dom';
 import { sleep } from '@/testHelpers/timeout';
 
+const renderComponent = () =>
+  renderWithApollo(
+    Room,
+    [
+      makeHappyRoomQueryStub(),
+      makeHappyRoomMemberUpdateSubscription(),
+      makeHappyRoomItemUpdatesSubscription(),
+      makeHappyAddRoomBoardItemMutationStub(),
+    ],
+    {
+      propsData: { roomId: '123', myId: 'me' },
+      stubs: {
+        'transition-group': { template: '<ul><slot /></ul>' },
+      },
+      mocks: {
+        $toasted: { global: { apollo_error: jest.fn() } },
+      },
+    }
+  );
+
 describe('<room />', () => {
   it('renders the members in the room', async () => {
     renderWithApollo(
@@ -68,22 +88,6 @@ describe('<room />', () => {
   });
 
   describe('changing board zoom', () => {
-    const renderComponent = () =>
-      renderWithApollo(
-        Room,
-        [
-          makeHappyRoomQueryStub(),
-          makeHappyRoomMemberUpdateSubscription(),
-          makeHappyRoomItemUpdatesSubscription(),
-        ],
-        {
-          propsData: { roomId: '123', myId: 'me' },
-          stubs: {
-            'transition-group': { template: '<ul><slot /></ul>' },
-          },
-        }
-      );
-
     it('defaults the factor to 1', async () => {
       renderComponent();
 
@@ -114,35 +118,39 @@ describe('<room />', () => {
       expect(screen.getByLabelText('board')).toHaveStyle(`--zoom-factor:0.8;`);
     });
   });
+  describe('changing board background', () => {
+    it('defaults to quadrants', async () => {
+      renderComponent();
+
+      await waitFor(() =>
+        expect(screen.getByLabelText('board')).toHaveAttribute(
+          'data-background',
+          'QUADRANTS'
+        )
+      );
+    });
+
+    it('switches to clear when selected', async () => {
+      renderComponent();
+
+      await userEvent.click(
+        await screen.findByRole('button', {
+          name: /Change background to clear/i,
+        })
+      );
+
+      expect(await screen.findByLabelText('board')).toHaveAttribute(
+        'data-background',
+        'CLEAR'
+      );
+    });
+  });
 
   describe('when adding an item', () => {
-    const renderComponent = () => {
-      return renderWithApollo(
-        Room,
-        [
-          makeHappyRoomQueryStub({
-            successData: { items: [] },
-          }),
-          makeHappyRoomMemberUpdateSubscription(),
-          makeHappyRoomItemUpdatesSubscription(),
-          makeHappyAddRoomBoardItemMutationStub(),
-        ],
-        {
-          propsData: { roomId: '123', myId: 'me' },
-          mocks: {
-            $toasted: { global: { apollo_error: jest.fn() } },
-          },
-        }
-      );
-    };
-
     it('lets me add an item', async () => {
       const { queryMocks } = renderComponent();
 
-      expect(
-        await screen.findByRole('button', { name: /add/i })
-      ).toBeInTheDocument();
-      expect(screen.getAllByRole('listitem')).toHaveLength(3);
+      await screen.findByRole('button', { name: /add/i });
       await userEvent.click(screen.getByRole('button', { name: /add/i }));
 
       await waitFor(() =>

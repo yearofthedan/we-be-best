@@ -8,6 +8,7 @@
         v-bind:my-id="myId"
         v-bind:room-id="roomId"
         v-bind:items="room.items"
+        v-bind:background="background"
       />
       <room-details
         v-bind:items="room.items"
@@ -18,6 +19,7 @@
         v-on:zoom-in="_onZoomIn"
         v-on:zoom-out="_onZoomOut"
         v-on:add-item="_onAddItem"
+        v-on:change-background="_onChangeBackground"
       />
     </template>
   </article>
@@ -60,6 +62,7 @@ interface RoomComponentData {
   error?: ApolloError | Error | null;
   room?: Room | null;
   zoomFactor: number;
+  background: string;
 }
 
 const resolveUpdate = (items: ItemViewModel[], update: Item) => {
@@ -93,6 +96,7 @@ export default Vue.extend({
       error: null,
       room: null,
       zoomFactor: 1,
+      background: 'QUADRANTS',
     };
   },
   apollo: {
@@ -170,6 +174,9 @@ export default Vue.extend({
     },
   },
   methods: {
+    _onChangeBackground: function (type: string) {
+      this.background = type;
+    },
     _onZoomOut: function () {
       this.zoomFactor -= 0.2;
     },
