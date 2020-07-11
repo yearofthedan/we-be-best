@@ -57,7 +57,8 @@ h1,
 h2,
 dd,
 dt,
-dl {
+dl,
+ul {
   margin: 0;
 }
 

@@ -215,7 +215,7 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-section {
-  background-color: var(--colour-background);
+article {
+  background-color: var(--colour-secondary);
 }
 </style>

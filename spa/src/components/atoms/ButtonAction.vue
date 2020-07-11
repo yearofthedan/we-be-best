@@ -17,11 +17,11 @@ button {
   text-transform: lowercase;
   border: 2px solid var(--colour-secondary);
   border-radius: 100%;
-  width: calc(10 * var(--unit-base-rem));
+  width: calc(20 * var(--unit-base-rem));
   height: calc(10 * var(--unit-base-rem));
   cursor: pointer;
-  background: var(--colour-secondary);
-  color: var(--colour-background);
+  background: var(--colour-background);
+  color: var(--colour-secondary);
   line-height: 0;
 }
 

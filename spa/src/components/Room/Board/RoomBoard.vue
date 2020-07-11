@@ -250,10 +250,13 @@ ul {
   padding: 0;
   --zoom-factor: 1;
   transform-origin: top left;
-  width: 1000px;
-  height: 1000px;
-
+  width: 1280px;
+  height: 800px;
+  border: solid 1px black;
   transform: scale(var(--zoom-factor));
+  transition: all 0.2s;
+  background-color: var(--colour-background);
+  box-shadow: 0 0 0 2px var(--colour-primary-emphasis);
 }
 
 ul::before {

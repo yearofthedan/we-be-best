@@ -1,18 +1,18 @@
 <template>
   <section>
     <button-action
-      @click="$emit('zoom-in', $event)"
-      aria-label="zoom in"
-      type="button"
-    >
-      +
-    </button-action>
-    <button-action
       @click="$emit('zoom-out', $event)"
       aria-label="zoom out"
       type="button"
     >
-      -
+      🔍-
+    </button-action>
+    <button-action
+      @click="$emit('zoom-in', $event)"
+      aria-label="zoom in"
+      type="button"
+    >
+      🔍+
     </button-action>
     <button-contained
       @click="$emit('add-item', $event)"
@@ -43,10 +43,14 @@ section {
   grid-template-columns: max-content max-content max-content;
   grid-column-gap: calc(2 * var(--unit-base-rem));
   align-items: center;
-  height: calc(12 * var(--unit-base-rem));
+  padding: 0 calc(2 * var(--unit-base-rem));
+  border-radius: 0 0 calc(2 * var(--unit-base-rem))
+    calc(2 * var(--unit-base-rem));
   transform: translate(-50%, 0);
   left: 50%;
   top: 0;
+  background: var(--colour-primary);
+  box-shadow: 1px 1px 2px 0px var(--colour-shadow);
 }
 
 button[aria-label='Zoom Out'] {
