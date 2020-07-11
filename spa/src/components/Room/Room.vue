@@ -14,13 +14,11 @@
         v-bind:members="room.members"
         v-bind:room-id="roomId"
       />
-      <button v-on:click="_onZoomOut" aria-label="zoom in" type="button">
-        +
-      </button>
-      <button v-on:click="_onZoomIn" aria-label="zoom out" type="button">
-        -
-      </button>
-      <button v-on:click="_onAddItem" aria-label="Add" type="button" />
+      <room-board-controls
+        v-on:zoom-in="_onZoomIn"
+        v-on:zoom-out="_onZoomOut"
+        v-on:add-item="_onAddItem"
+      />
     </template>
   </article>
 </template>
@@ -51,6 +49,7 @@ import {
 } from '@type-definitions/graphql';
 import { addRoomBoardItem } from '@/graphql/boardQueries.graphql';
 import { logError } from '@/common/logger';
+import RoomBoardControls from '@/components/Room/Board/RoomBoardControls.vue';
 
 interface RoomComponentProps {
   roomId: string;
@@ -76,6 +75,7 @@ export default Vue.extend({
   components: {
     'room-board': RoomBoard,
     'room-details': RoomDetails,
+    'room-board-controls': RoomBoardControls,
   },
   props: {
     myId: {
@@ -171,10 +171,10 @@ export default Vue.extend({
   },
   methods: {
     _onZoomOut: function () {
-      this.zoomFactor += 0.2;
+      this.zoomFactor -= 0.2;
     },
     _onZoomIn: function () {
-      this.zoomFactor -= 0.2;
+      this.zoomFactor += 0.2;
     },
     _onAddItem: async function (): Promise<void> {
       const newItem = makeNewItem();
@@ -217,40 +217,5 @@ export default Vue.extend({
 <style scoped>
 section {
   background-color: var(--colour-background);
-}
-
-button[aria-label='Zoom Out'] {
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-button[aria-label='Zoom In'] {
-  position: absolute;
-  left: 30px;
-  top: 0;
-}
-
-button[aria-label='Add'] {
-  position: fixed;
-  z-index: var(--z-index-fab);
-  width: calc(16 * var(--unit-base-rem));
-  height: calc(16 * var(--unit-base-rem));
-  bottom: calc(8 * var(--unit-base-rem));
-  right: calc(8 * var(--unit-base-rem));
-  font-size: var(--font-size-interactive);
-}
-button[aria-label='Add']::before {
-  content: '➕';
-  position: absolute;
-  font-size: calc(0.5 * var(--font-size-icon-button));
-  top: calc(-0.5 * var(--font-size-icon-button));
-  right: calc(-0.5 * var(--font-size-icon-button));
-  border-radius: 100%;
-  border: 1px solid;
-  width: var(--font-size-icon-button);
-  height: var(--font-size-icon-button);
-  background-color: var(--colour-primary);
-  line-height: var(--font-size-icon-button);
 }
 </style>

@@ -40,6 +40,7 @@ export default Vue.extend({
 }
 
 * {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
   box-sizing: border-box;
 }
 body,
@@ -63,10 +64,7 @@ dl {
 article {
   height: 100vh;
 }
-
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-
   --white: hsla(0, 100%, 100%, 1);
   --mint: hsla(107, 4%, 97%, 1);
   --light-blue: hsla(215, 100%, 96%, 1);
