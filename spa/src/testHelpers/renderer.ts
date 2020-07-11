@@ -4,7 +4,7 @@ import { createMockClient } from 'mock-apollo-client';
 import VueApollo from 'vue-apollo';
 import {ComponentHarness, ConfigurationCallback, render} from '@testing-library/vue';
 
-interface QuerySpec {
+export interface QuerySpec {
   query: DocumentNode;
   successData?: object;
   errorData?: { message: string };

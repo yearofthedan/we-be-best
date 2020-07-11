@@ -4,6 +4,7 @@
     <template v-else-if="error">An error occurred {{ error }}</template>
     <template v-else-if="room">
       <room-board
+        v-bind:zoom-factor="zoomFactor"
         v-bind:my-id="myId"
         v-bind:room-id="roomId"
         v-bind:items="room.items"
@@ -13,6 +14,12 @@
         v-bind:members="room.members"
         v-bind:room-id="roomId"
       />
+      <button v-on:click="_onZoomOut" aria-label="zoom in" type="button">
+        +
+      </button>
+      <button v-on:click="_onZoomIn" aria-label="zoom out" type="button">
+        -
+      </button>
       <button v-on:click="_onAddItem" aria-label="Add" type="button" />
     </template>
   </article>
@@ -53,6 +60,7 @@ interface RoomComponentData {
   loading?: boolean | null;
   error?: ApolloError | Error | null;
   room?: Room | null;
+  zoomFactor: number;
 }
 
 const resolveUpdate = (items: ItemViewModel[], update: Item) => {
@@ -84,6 +92,7 @@ export default Vue.extend({
       loading: null,
       error: null,
       room: null,
+      zoomFactor: 1,
     };
   },
   apollo: {
@@ -161,6 +170,12 @@ export default Vue.extend({
     },
   },
   methods: {
+    _onZoomOut: function () {
+      this.zoomFactor += 0.2;
+    },
+    _onZoomIn: function () {
+      this.zoomFactor -= 0.2;
+    },
     _onAddItem: async function (): Promise<void> {
       const newItem = makeNewItem();
       const mutationPayload: AddRoomBoardItemInput = {
@@ -202,6 +217,18 @@ export default Vue.extend({
 <style scoped>
 section {
   background-color: var(--colour-background);
+}
+
+button[aria-label='Zoom Out'] {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+button[aria-label='Zoom In'] {
+  position: absolute;
+  left: 30px;
+  top: 0;
 }
 
 button[aria-label='Add'] {

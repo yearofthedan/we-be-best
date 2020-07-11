@@ -4,6 +4,9 @@
     aria-label="board"
     tag="ul"
     v-bind:data-room-name="roomId"
+    v-on:mousemove="this._onMouseMove"
+    v-on:pointermove="this._onPointerMove"
+    v-bind:style="`--zoom-factor: ${zoomFactor}`"
   >
     <room-board-item
       v-for="item in itemsData"
@@ -42,6 +45,10 @@ export default Vue.extend({
     'room-board-item': RoomBoardItem,
   },
   props: {
+    zoomFactor: {
+      type: Number,
+      required: true,
+    },
     myId: {
       type: String,
       required: true,
@@ -241,7 +248,12 @@ interface ItemMovedEventPayload {
 ul {
   list-style-type: none;
   padding: 0;
-  height: 100vh;
+  --zoom-factor: 1;
+  transform-origin: top left;
+  width: 1000px;
+  height: 1000px;
+
+  transform: scale(var(--zoom-factor));
 }
 
 ul::before {

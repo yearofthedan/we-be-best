@@ -1,7 +1,7 @@
 import {ItemViewModel} from '@/components/Room/Board/items';
 import {MembersViewModel} from '@/components/Room/Details/members';
 
-export const makeItem = (overrides: Partial<ItemViewModel> = {}): ItemViewModel => ({
+export const buildItemViewModel = (overrides: Partial<ItemViewModel> = {}): ItemViewModel => ({
     id: 'ITEM123',
     lockedBy: 'me',
     posY: 20,

@@ -22,7 +22,7 @@ import {
   supportsTouchEvents,
 } from '@/common/dom';
 import { sleep } from '@/testHelpers/timeout';
-import { makeItem } from '@/testHelpers/testData';
+import { buildItemViewModel } from '@/testHelpers/testData';
 import {
   BLACKEST_BLACK,
   LIGHT_CYAN,
@@ -39,7 +39,7 @@ describe('<room-board-item />', () => {
       render(RoomBoardItem, {
         propsData: {
           myId: 'me',
-          item: makeItem({ posX: 2, posY: 1 }),
+          item: buildItemViewModel({ posX: 2, posY: 1 }),
           moving: false,
         },
       });
@@ -54,7 +54,7 @@ describe('<room-board-item />', () => {
       render(RoomBoardItem, {
         propsData: {
           myId: 'me',
-          item: makeItem({ text: 'some text' }),
+          item: buildItemViewModel({ text: 'some text' }),
           moving: false,
         },
       });
@@ -66,7 +66,7 @@ describe('<room-board-item />', () => {
       render(RoomBoardItem, {
         propsData: {
           myId: 'me',
-          item: makeItem(),
+          item: buildItemViewModel(),
           moving: false,
         },
       });
@@ -85,7 +85,7 @@ describe('<room-board-item />', () => {
         const { emitted } = render(RoomBoardItem, {
           propsData: {
             myId: 'me',
-            item: makeItem({ id: 'item123', posX: 2, posY: 1 }),
+            item: buildItemViewModel({ id: 'item123', posX: 2, posY: 1 }),
             moving: true,
           },
         });
@@ -102,7 +102,7 @@ describe('<room-board-item />', () => {
         const { emitted } = render(RoomBoardItem, {
           propsData: {
             myId: 'me',
-            item: makeItem({ id: 'item123', posX: 2, posY: 1 }),
+            item: buildItemViewModel({ id: 'item123', posX: 2, posY: 1 }),
             moving: true,
           },
         });
@@ -123,7 +123,7 @@ describe('<room-board-item />', () => {
         const { emitted } = render(RoomBoardItem, {
           propsData: {
             myId: 'me',
-            item: makeItem(),
+            item: buildItemViewModel(),
           },
         });
 
@@ -145,7 +145,7 @@ describe('<room-board-item />', () => {
         const { emitted } = render(RoomBoardItem, {
           propsData: {
             myId: 'me',
-            item: makeItem({ id: 'item123', posX: 2, posY: 1 }),
+            item: buildItemViewModel({ id: 'item123', posX: 2, posY: 1 }),
             moving: true,
           },
         });
@@ -165,7 +165,7 @@ describe('<room-board-item />', () => {
         const { emitted } = render(RoomBoardItem, {
           propsData: {
             myId: 'me',
-            item: makeItem({ id: 'item123', posX: 2, posY: 1 }),
+            item: buildItemViewModel({ id: 'item123', posX: 2, posY: 1 }),
             moving: true,
           },
         });
@@ -181,7 +181,7 @@ describe('<room-board-item />', () => {
         const { emitted } = render(RoomBoardItem, {
           propsData: {
             myId: 'me',
-            item: makeItem({ lockedBy: 'me' }),
+            item: buildItemViewModel({ lockedBy: 'me' }),
             moving: true,
           },
         });
@@ -197,7 +197,7 @@ describe('<room-board-item />', () => {
         const { emitted } = render(RoomBoardItem, {
           propsData: {
             myId: 'me',
-            item: makeItem({ lockedBy: 'someone' }),
+            item: buildItemViewModel({ lockedBy: 'someone' }),
             moving: true,
           },
         });
@@ -225,7 +225,7 @@ describe('<room-board-item />', () => {
         {
           propsData: {
             myId: 'me',
-            item: makeItem({
+            item: buildItemViewModel({
               id: 'item123',
               posX: 2,
               posY: 1,
@@ -271,7 +271,7 @@ describe('<room-board-item />', () => {
           propsData: {
             myId: 'me',
             editing: true,
-            item: makeItem({
+            item: buildItemViewModel({
               id: 'item123',
               posX: 2,
               posY: 1,
@@ -297,7 +297,7 @@ describe('<room-board-item />', () => {
       const { emitted } = render(RoomBoardItem, {
         propsData: {
           myId: 'me',
-          item: makeItem({
+          item: buildItemViewModel({
             id: 'item123',
             posX: 2,
             posY: 1,
@@ -325,7 +325,7 @@ describe('<room-board-item />', () => {
         {
           propsData: {
             myId: 'me',
-            item: makeItem({
+            item: buildItemViewModel({
               id: itemId,
               posX: 2,
               posY: 1,
@@ -369,7 +369,7 @@ describe('<room-board-item />', () => {
           propsData: {
             myId: 'me',
             editing: true,
-            item: makeItem({
+            item: buildItemViewModel({
               id: itemId,
               posX: 2,
               posY: 1,
@@ -406,7 +406,7 @@ describe('<room-board-item />', () => {
         {
           propsData: {
             myId: 'me',
-            item: makeItem({
+            item: buildItemViewModel({
               id: itemId,
               posX: 2,
               posY: 1,
@@ -444,7 +444,7 @@ describe('<room-board-item />', () => {
         {
           propsData: {
             myId: 'me',
-            item: makeItem({
+            item: buildItemViewModel({
               id: itemId,
               posX: 2,
               posY: 1,

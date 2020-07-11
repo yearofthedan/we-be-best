@@ -1,7 +1,7 @@
 import { render, screen } from '@/testHelpers/renderer';
 import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
 import userEvent from '@testing-library/user-event';
-import { makeItem, makeMember } from '@/testHelpers/testData';
+import { buildItemViewModel, makeMember } from '@/testHelpers/testData';
 import { mapToJsonString } from '@/components/Room/Details/roomExport';
 
 jest.mock('@/components/Room/Details/roomExport');
@@ -43,7 +43,7 @@ describe('RoomDetails', () => {
   });
 
   it('lets me download all the data', () => {
-    const items = [makeItem()];
+    const items = [buildItemViewModel()];
     const members = [makeMember()];
 
     render(RoomDetails, {

@@ -1,5 +1,6 @@
 import {
   fireEvent,
+  QuerySpec,
   renderWithApollo,
   screen,
   waitFor,
@@ -10,7 +11,7 @@ import {
   PointerMoveEvent,
   PointerUpEvent,
 } from '@/testHelpers/jsdomFriendlyPointerEvents';
-import { makeItem } from '@/testHelpers/testData';
+import { buildItemViewModel } from '@/testHelpers/testData';
 import userEvent from '@testing-library/user-event';
 import {
   ITEM_ID,
@@ -27,51 +28,85 @@ import {
 
 import { supportsTouchEvents } from '@/common/dom';
 import { sleep } from '@/testHelpers/timeout';
+import { ItemViewModel } from '@/components/Room/Board/items';
 
 jest.mock('@/common/dom', () => ({
   supportsTouchEvents: jest.fn().mockReturnValue(true),
 }));
 
-describe('<room-board />', () => {
-  it('renders a item defaulting at 10px by 10px', () => {
-    renderWithApollo(RoomBoard, [], {
+interface RoomBoardComponentProps {
+  myId: string;
+  roomId: string;
+  zoomFactor: number;
+  items: ItemViewModel[];
+}
+
+const renderComponent = (
+  props: Partial<RoomBoardComponentProps> = {},
+  queries: QuerySpec[] = []
+) => {
+  const mocks = {
+    $toasted: {
+      global: {
+        apollo_error: jest.fn(),
+      },
+    },
+  };
+
+  return {
+    ...renderWithApollo(RoomBoard, queries, {
       propsData: {
         myId: MY_ID,
+        zoomFactor: 1,
         roomId: ROOM_ID,
-        items: [makeItem({ posX: 10, posY: 10 })],
+        items: [buildItemViewModel({ id: ITEM_ID, posX: 10, posY: 10 })],
+        ...props,
       },
-    });
+      mocks,
+    }),
+    mocks,
+  };
+};
+
+describe('<room-board />', () => {
+  it('renders a item defaulting at 10px by 10px', () => {
+    renderComponent();
 
     expect(screen.getByRole('listitem')).toHaveStyle(`
       top:  10px;
       left: 10px;
     `);
   });
+  it('rerenders items when the props change', async () => {
+    const { updateProps } = renderComponent(
+      {
+        items: [buildItemViewModel({ id: ITEM_ID, posX: 10, posY: 10 })],
+      },
+      [makeHappyMoveBoardItemMutationStub()]
+    );
+
+    expect(screen.getByRole('listitem')).toHaveStyle(`top:  10px; left: 10px;`);
+
+    await updateProps({
+      items: [buildItemViewModel({ id: ITEM_ID, posX: 20, posY: 20 })],
+    });
+
+    expect(screen.getByRole('listitem')).toHaveStyle(`top:  20px; left: 20px;`);
+  });
   describe('when editing an item', () => {
     it('lets me edit an item', async () => {
-      renderWithApollo(RoomBoard, [], {
-        propsData: {
-          myId: MY_ID,
-          roomId: ROOM_ID,
-          items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-        },
-      });
+      renderComponent();
 
       await userEvent.dblClick(screen.getByRole('listitem'));
 
       expect(screen.getByRole('textbox')).toBeInTheDocument();
     });
-
     it('does not let me edit an item if I am already editing one', async () => {
-      renderWithApollo(RoomBoard, [], {
-        propsData: {
-          myId: MY_ID,
-          roomId: ROOM_ID,
-          items: [
-            makeItem({ id: 'ITEM_1', posX: 10, posY: 10 }),
-            makeItem({ id: 'ITEM_2', posX: 10, posY: 10 }),
-          ],
-        },
+      renderComponent({
+        items: [
+          buildItemViewModel({ id: 'ITEM_1' }),
+          buildItemViewModel({ id: 'ITEM_2' }),
+        ],
       });
 
       const items = screen.getAllByRole('listitem');
@@ -81,31 +116,19 @@ describe('<room-board />', () => {
       expect(screen.getAllByRole('textbox')).toHaveLength(1);
     });
     it('lets me edit different items in sequence', async () => {
-      renderWithApollo(
-        RoomBoard,
+      renderComponent(
+        {
+          items: [
+            buildItemViewModel({ id: 'ITEM_1' }),
+            buildItemViewModel({ id: 'ITEM_2' }),
+          ],
+        },
         [
           makeHappyUpdateBoardItemTextMutationStub({
             id: 'ITEM_1',
             text: 'placeholder text',
           }),
-        ],
-        {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [
-              makeItem({ id: 'ITEM_1', posX: 10, posY: 10 }),
-              makeItem({ id: 'ITEM_2', posX: 10, posY: 10 }),
-            ],
-          },
-          mocks: {
-            $toasted: {
-              global: {
-                apollo_error: jest.fn(),
-              },
-            },
-          },
-        }
+        ]
       );
 
       const items = screen.getAllByRole('listitem');
@@ -117,34 +140,38 @@ describe('<room-board />', () => {
       expect(screen.getAllByRole('textbox')).toHaveLength(1);
     });
   });
-  describe('when locked', () => {
-    it('allows moving a locked item if i locked it', async () => {
-      (supportsTouchEvents as jest.Mock).mockReturnValue(true);
-      const { queryMocks } = renderWithApollo(
-        RoomBoard,
-        [makeHappyLockRoomBoardItemMutationStub()],
+  describe('when moving', () => {
+    it('locks the item', async () => {
+      const { queryMocks } = renderComponent(
         {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [makeItem({ posX: 10, posY: 10, lockedBy: MY_ID })],
-          },
-        }
+          items: [buildItemViewModel({ id: ITEM_ID })],
+        },
+        [makeHappyLockRoomBoardItemMutationStub({ id: ITEM_ID })]
       );
 
-      await fireEvent(
-        screen.getByRole('listitem'),
-        new PointerDownEvent({
-          pointerId: 1000,
-        })
+      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+
+      //Best I can do for style atm since vue-jest / jsdom do not support style tags
+      expect(screen.getByRole('listitem')).toHaveAttribute('data-moving');
+
+      expect(queryMocks[0]).toHaveBeenCalledWith({
+        input: { lockedBy: MY_ID, id: ITEM_ID },
+      });
+    });
+    it('updates the position', async () => {
+      renderComponent(
+        {
+          items: [buildItemViewModel({ id: ITEM_ID, posX: 10, posY: 10 })],
+        },
+        [makeHappyLockRoomBoardItemMutationStub({ id: ITEM_ID })]
       );
 
+      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
       await fireEvent(
         screen.getByRole('listitem'),
         new PointerMoveEvent({
           movementX: 20,
           movementY: 10,
-          pointerId: 1000,
         })
       );
 
@@ -152,6 +179,31 @@ describe('<room-board />', () => {
         top:  20px;
         left: 30px;
       `);
+    });
+    it('allows moving a locked item if i locked it', async () => {
+      (supportsTouchEvents as jest.Mock).mockReturnValue(true);
+      const { queryMocks } = renderComponent(
+        {
+          items: [
+            buildItemViewModel({
+              id: ITEM_ID,
+              posX: 10,
+              posY: 10,
+              lockedBy: MY_ID,
+            }),
+          ],
+        },
+        [makeHappyLockRoomBoardItemMutationStub()]
+      );
+
+      const item = screen.getByRole('listitem');
+      await fireEvent(item, new PointerDownEvent());
+      await fireEvent(
+        item,
+        new PointerMoveEvent({ movementX: 20, movementY: 10 })
+      );
+
+      expect(item).toHaveStyle('top:  20px; left: 30px;');
       expect(queryMocks[0]).toHaveBeenCalledWith({
         input: {
           lockedBy: MY_ID,
@@ -159,150 +211,55 @@ describe('<room-board />', () => {
         },
       });
     });
-
     it('does not move the item if it has been locked by somebody else', async () => {
       (supportsTouchEvents as jest.Mock).mockReturnValue(true);
-      renderWithApollo(RoomBoard, [], {
-        propsData: {
-          myId: MY_ID,
-          roomId: ROOM_ID,
-          items: [
-            makeItem({
-              id: ITEM_ID,
-              posX: 10,
-              posY: 10,
-              lockedBy: 'other-person',
-            }),
-          ],
-        },
+      renderComponent({
+        items: [
+          buildItemViewModel({
+            id: ITEM_ID,
+            posX: 10,
+            posY: 10,
+            lockedBy: 'someone-else',
+          }),
+        ],
       });
 
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-
+      const item = screen.getByRole('listitem');
+      await fireEvent(item, new PointerDownEvent());
       await fireEvent(
-        screen.getByRole('listitem'),
-        new PointerMoveEvent({
-          movementX: 20,
-          movementY: 10,
-        })
+        item,
+        new PointerMoveEvent({ movementX: 20, movementY: 10 })
       );
 
-      expect(screen.getByRole('listitem')).toHaveStyle(`
-        top:  10px;
-        left: 10px;
-      `);
+      expect(item).toHaveStyle('top: 10px; left: 10px;');
     });
-  });
-  describe('when starting to move', () => {
-    it('locks the item', async () => {
-      const { queryMocks } = renderWithApollo(
-        RoomBoard,
-        [makeHappyLockRoomBoardItemMutationStub()],
-        {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-          },
-        }
-      );
-
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-
-      expect(queryMocks[0]).toHaveBeenCalledWith({
-        input: { lockedBy: MY_ID, id: ITEM_ID },
-      });
-    });
-
     it('displays a toast update when an error occurs while locking', async () => {
-      const $toasted = {
-        global: {
-          apollo_error: jest.fn(),
+      const { mocks } = renderComponent(
+        {
+          items: [buildItemViewModel({ id: ITEM_ID })],
         },
-      };
-
-      renderWithApollo(RoomBoard, [makeSadLockRoomBoardItemMutationStub()], {
-        propsData: {
-          myId: MY_ID,
-          roomId: ROOM_ID,
-          items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-        },
-        mocks: {
-          $toasted: $toasted,
-        },
-      });
+        [makeSadLockRoomBoardItemMutationStub({ id: ITEM_ID })]
+      );
 
       await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
       await sleep(5);
 
-      expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+      expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
         'Could not move the item: GraphQL error: everything is broken'
       );
     });
-  });
-  describe('when moving', () => {
-    beforeEach(() => {
-      renderWithApollo(RoomBoard, [makeHappyLockRoomBoardItemMutationStub()], {
-        propsData: {
-          myId: MY_ID,
-          roomId: ROOM_ID,
-          items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-        },
-      });
-    });
-    it('assigns the data-moving property item (vue-jest / jsdom do not support style tags)', async () => {
-      await fireEvent(
-        screen.getByRole('listitem'),
-        new PointerDownEvent({
-          pointerId: 1000,
-        })
-      );
-
-      expect(screen.getByRole('listitem')).toHaveAttribute('data-moving');
-    });
-
-    it('updates the position', async () => {
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-      await fireEvent(
-        screen.getByRole('listitem'),
-        new PointerMoveEvent({
-          movementX: 20,
-          movementY: 10,
-        })
-      );
-
-      expect(screen.getByRole('listitem')).toHaveStyle(`
-        top:  20px;
-        left: 30px;
-      `);
-    });
-  });
-  describe('after moving', () => {
-    const renderMovingComponent = async () => {
-      const renderResult = renderWithApollo(
-        RoomBoard,
-        [
-          makeHappyLockRoomBoardItemMutationStub(),
-          makeHappyUnlockRoomBoardItemMutationStub(),
-          makeHappyMoveBoardItemMutationStub(),
-        ],
+    it('unlocks after moving', async () => {
+      const { queryMocks } = await renderComponent(
         {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-          },
-          mocks: {
-            $toasted: { global: { apollo_error: jest.fn() } },
-          },
-        }
+          items: [buildItemViewModel({ id: ITEM_ID })],
+        },
+        [
+          makeHappyLockRoomBoardItemMutationStub({ id: ITEM_ID }),
+          makeHappyUnlockRoomBoardItemMutationStub({ id: ITEM_ID }),
+          makeHappyMoveBoardItemMutationStub({ id: ITEM_ID }),
+        ]
       );
       await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-      return renderResult;
-    };
-
-    it('unlocks the item', async () => {
-      const { queryMocks } = await renderMovingComponent();
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
 
       await waitFor(() => {
@@ -310,134 +267,71 @@ describe('<room-board />', () => {
           input: { id: ITEM_ID },
         });
       });
+
+      expect(screen.getByRole('listitem')).not.toHaveAttribute('data-moving');
     });
-
-    it('displays a toast update when an error occurs while unlocking', async () => {
-      const apolloErrorMock = jest.fn();
-
-      renderWithApollo(
-        RoomBoard,
-        [
-          makeHappyLockRoomBoardItemMutationStub(),
-          makeSadUnlockRoomBoardItemMutationStub(),
-          makeHappyMoveBoardItemMutationStub(),
-        ],
+    it('remotely updates the item position', async () => {
+      const { queryMocks } = await renderComponent(
         {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-          },
-          mocks: {
-            $toasted: { global: { apollo_error: apolloErrorMock } },
-          },
-        }
+          items: [buildItemViewModel({ id: ITEM_ID, posY: 10, posX: 10 })],
+        },
+        [
+          makeHappyLockRoomBoardItemMutationStub({ id: ITEM_ID }),
+          makeHappyUnlockRoomBoardItemMutationStub({ id: ITEM_ID }),
+          makeHappyMoveBoardItemMutationStub({ id: ITEM_ID }),
+        ]
       );
-
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-      await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
-      await sleep(5);
-
-      expect(apolloErrorMock).toHaveBeenCalledWith(
-        'Could not update the item: GraphQL error: everything is broken'
-      );
-    });
-
-    it('mutates the item position', async () => {
-      const { queryMocks } = await renderMovingComponent();
+      const item = screen.getByRole('listitem');
+      await fireEvent(item, new PointerDownEvent());
       await fireEvent(
-        screen.getByRole('listitem'),
-        new PointerMoveEvent({
-          movementX: 20,
-          movementY: 10,
-        })
+        item,
+        new PointerMoveEvent({ movementX: 20, movementY: 10 })
       );
-      await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
+      await fireEvent(item, new PointerUpEvent());
 
       expect(queryMocks[2]).toHaveBeenCalledWith({
         input: { id: ITEM_ID, posX: 30, posY: 20 },
       });
     });
-
-    it('displays a toast update when an error occurs while mutating the position', async () => {
-      const $toasted = {
-        global: {
-          apollo_error: jest.fn(),
+    it('displays a toast update when an error occurs while unlocking', async () => {
+      const { mocks } = renderComponent(
+        {
+          items: [buildItemViewModel({ id: ITEM_ID, posX: 10, posY: 10 })],
         },
-      };
-
-      renderWithApollo(
-        RoomBoard,
         [
           makeHappyLockRoomBoardItemMutationStub(),
-          makeHappyUnlockRoomBoardItemMutationStub(),
-          makeSadMoveBoardItemMutationStub(),
-        ],
-        {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-          },
-          mocks: {
-            $toasted: $toasted,
-          },
-        }
+          makeSadUnlockRoomBoardItemMutationStub(),
+          makeHappyMoveBoardItemMutationStub(),
+        ]
       );
 
       await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
       await sleep(5);
 
-      expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+      expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
         'Could not update the item: GraphQL error: everything is broken'
       );
     });
-
-    it('no longer has the data-moving attribute (vue-jest / jsdom do not support style tags)', async () => {
-      await renderMovingComponent();
-      expect(screen.getByRole('listitem')).toHaveAttribute('data-moving');
-      await fireEvent(
-        screen.getByRole('listitem'),
-        new PointerMoveEvent({
-          movementX: 20,
-          movementY: 10,
-        })
-      );
-
-      await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
-      expect(screen.getByRole('listitem')).not.toHaveAttribute('data-moving');
-    });
-  });
-  describe('when props change', () => {
-    it('updates based upon the new props', async () => {
-      const { updateProps } = renderWithApollo(
-        RoomBoard,
-        makeHappyMoveBoardItemMutationStub(),
+    it('displays a toast update when an error occurs while mutating the position', async () => {
+      const { mocks } = renderComponent(
         {
-          propsData: {
-            myId: MY_ID,
-            roomId: ROOM_ID,
-            items: [makeItem({ id: ITEM_ID, posX: 10, posY: 10 })],
-          },
-        }
+          items: [buildItemViewModel()],
+        },
+        [
+          makeHappyLockRoomBoardItemMutationStub(),
+          makeHappyUnlockRoomBoardItemMutationStub(),
+          makeSadMoveBoardItemMutationStub(),
+        ]
       );
 
-      expect(screen.getByRole('listitem')).toHaveStyle(`
-      top:  10px;
-      left: 10px;
-    `);
+      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+      await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
+      await sleep(5);
 
-      await updateProps({
-        myId: MY_ID,
-        roomId: ROOM_ID,
-        items: [makeItem({ id: ITEM_ID, posX: 20, posY: 20 })],
-      });
-
-      expect(screen.getByRole('listitem')).toHaveStyle(`
-        top:  20px;
-        left: 20px;
-      `);
+      expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
+        'Could not update the item: GraphQL error: everything is broken'
+      );
     });
   });
 });
