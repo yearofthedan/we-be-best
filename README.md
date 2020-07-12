@@ -34,3 +34,8 @@ You can run the following commands from project root:
 
 We build a docker image for deployment. 
 You can build the image and spin up a local container with `docker-compose up --build`.
+
+
+## Callouts
+
+- We're using icons from https://github.com/Remix-Design/remixicon
