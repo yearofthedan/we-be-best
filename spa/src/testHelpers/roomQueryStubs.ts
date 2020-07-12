@@ -22,7 +22,9 @@ export function makeHappyRoomItemUpdatesSubscription(
   }
 };
 
-export function makeHappyRoomMemberUpdateSubscription() {
+export function makeHappyRoomMemberUpdateSubscription(
+  override: { variables?: undefined; successData?: Partial<Room> } = {}
+) {
   return {
     query: roomMemberUpdates,
     successData: {
@@ -32,6 +34,7 @@ export function makeHappyRoomMemberUpdateSubscription() {
           buildMemberResult({id: '1', name: 'me'}),
           buildMemberResult({id: '2', name: 'my-mother'}),
         ],
+        ...override.successData,
       },
     },
   };

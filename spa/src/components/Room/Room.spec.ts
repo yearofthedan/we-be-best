@@ -1,5 +1,5 @@
 import Room from '@/components/Room/Room.vue';
-import { renderWithApollo, screen } from '@/testHelpers/renderer';
+import { QuerySpec, renderWithApollo, screen } from '@/testHelpers/renderer';
 import {
   makeHappyRoomItemUpdatesSubscription,
   makeHappyRoomMemberUpdateSubscription,
@@ -16,26 +16,49 @@ import userEvent from '@testing-library/user-event';
 import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/items';
 import { fireEvent, waitFor } from '@testing-library/dom';
 import { sleep } from '@/testHelpers/timeout';
+import { mapToJsonString } from '@/components/Room/Details/roomExport';
 
-const renderComponent = () =>
-  renderWithApollo(
-    Room,
-    [
-      makeHappyRoomQueryStub(),
-      makeHappyRoomMemberUpdateSubscription(),
-      makeHappyRoomItemUpdatesSubscription(),
-      makeHappyAddRoomBoardItemMutationStub(),
-    ],
-    {
-      propsData: { roomId: '123', myId: 'me' },
-      stubs: {
-        'transition-group': { template: '<ul><slot /></ul>' },
+jest.mock('@/components/Room/Details/roomExport');
+
+interface RoomComponentProps {
+  myId: string;
+  roomId: string;
+}
+
+const renderComponent = (
+  props: Partial<RoomComponentProps> = {},
+  queries?: QuerySpec[]
+) => {
+  const mocks = {
+    $toasted: {
+      global: {
+        apollo_error: jest.fn(),
       },
-      mocks: {
-        $toasted: { global: { apollo_error: jest.fn() } },
-      },
-    }
-  );
+    },
+  };
+
+  return {
+    ...renderWithApollo(
+      Room,
+      queries || [
+        makeHappyRoomQueryStub(),
+        makeHappyRoomMemberUpdateSubscription(),
+        makeHappyRoomItemUpdatesSubscription(),
+        makeHappyAddRoomBoardItemMutationStub(),
+      ],
+      {
+        propsData: { roomId: '123', myId: 'me', ...props },
+        stubs: {
+          'transition-group': { template: '<ul><slot /></ul>' },
+        },
+        mocks: {
+          $toasted: { global: { apollo_error: jest.fn() } },
+        },
+      }
+    ),
+    mocks,
+  };
+};
 
 describe('<room />', () => {
   it('renders the members in the room', async () => {
@@ -85,6 +108,29 @@ describe('<room />', () => {
 
     expect(await screen.findByText('item-text')).toBeInTheDocument();
     expect(await screen.findByText('more-item-text')).toBeInTheDocument();
+  });
+
+  it('lets me download all the data', async () => {
+    renderComponent(
+      {
+        roomId: 'ROOM123',
+      },
+      [
+        makeHappyRoomQueryStub(),
+        makeHappyRoomMemberUpdateSubscription(),
+        makeHappyRoomItemUpdatesSubscription(),
+      ]
+    );
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /download data/i })
+    );
+
+    expect(mapToJsonString).toHaveBeenCalledWith(
+      'ROOM123',
+      expect.any(Array),
+      expect.any(Array)
+    );
   });
 
   describe('changing board zoom', () => {

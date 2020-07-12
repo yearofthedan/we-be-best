@@ -20,23 +20,28 @@
       type="button"
       >Add item</button-contained
     >
-    <label
-      >Background
-      <select
-        v-model="selectedBackground"
-        v-on:change="$emit('change-background', $event.target.value)"
+    <select
+      aria-label="Background"
+      v-model="selectedBackground"
+      v-on:change="$emit('change-background', $event.target.value)"
+    >
+      <option disabled value="">Please select one</option>
+      <option
+        v-bind:selected="option === selectedBackground"
+        v-for="option in backgroundOptions"
+        :key="option"
+        v-bind:value="option"
       >
-        <option disabled value="">Please select one</option>
-        <option
-          v-for="option in backgroundOptions"
-          :key="option"
-          v-bind:value="option"
-        >
-          <input type="radio" />
-          {{ option }}
-        </option>
-      </select>
-    </label>
+        <input type="radio" />
+        {{ option }}
+      </option>
+    </select>
+    <button-action
+      aria-label="download data"
+      v-on:click="$emit('export', $event)"
+    >
+      ⬇
+    </button-action>
   </section>
 </template>
 <script lang="ts">
@@ -52,14 +57,20 @@ export default Vue.extend({
     'button-action': ButtonAction,
     'button-contained': ButtonContained,
   },
-  data: (): {
+  props: {
+    background: {
+      type: String,
+      required: true,
+    },
+  },
+  data: function (): {
     backgroundOptions: string[];
-    selectedBackground: string | null;
+    selectedBackground: string;
     focusedId: string;
-  } => {
+  } {
     return {
       backgroundOptions: BACKGROUND_OPTIONS,
-      selectedBackground: null,
+      selectedBackground: this.background,
       focusedId: 'BLANK',
     };
   },
@@ -70,7 +81,7 @@ export default Vue.extend({
 section {
   position: fixed;
   display: grid;
-  grid-template-columns: max-content max-content max-content;
+  grid-template-columns: repeat(5, max-content);
   grid-column-gap: calc(2 * var(--unit-base-rem));
   align-items: center;
   padding: 0 calc(2 * var(--unit-base-rem));
@@ -101,21 +112,5 @@ button[aria-label='Add'] {
 
 label {
   position: relative;
-}
-ul {
-  outline: none;
-  list-style: none;
-  position: absolute;
-}
-
-ul:not(:focus) > li {
-  height: 0;
-  width: 0;
-  opacity: 0;
-}
-
-li[data-focussed] {
-  border: solid 1px black;
-  height: 20px;
 }
 </style>

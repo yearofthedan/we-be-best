@@ -19,8 +19,11 @@
         v-on:zoom-in="_onZoomIn"
         v-on:zoom-out="_onZoomOut"
         v-on:add-item="_onAddItem"
+        v-on:export="_onExport"
         v-on:change-background="_onChangeBackground"
+        v-bind:background="background"
       />
+      <a ref="dataDownload" />
     </template>
   </article>
 </template>
@@ -52,6 +55,8 @@ import {
 import { addRoomBoardItem } from '@/graphql/boardQueries.graphql';
 import { logError } from '@/common/logger';
 import RoomBoardControls from '@/components/Room/Board/RoomBoardControls.vue';
+import { mapToJsonString } from '@/components/Room/Details/roomExport';
+import { MembersViewModel } from '@/components/Room/Details/members';
 
 interface RoomComponentProps {
   roomId: string;
@@ -182,6 +187,22 @@ export default Vue.extend({
     },
     _onZoomIn: function () {
       this.zoomFactor += 0.2;
+    },
+    _onExport: function () {
+      const dataStr =
+        'data:text/json;charset=utf-8,' +
+        encodeURIComponent(
+          mapToJsonString(
+            this.roomId,
+            this.room?.items as ItemViewModel[],
+            this.room?.members as MembersViewModel[]
+          )
+        );
+
+      const dataDownload = this.$refs.dataDownload as HTMLAnchorElement;
+      dataDownload.setAttribute('href', dataStr);
+      dataDownload.setAttribute('download', `room-${this.roomId}.json`);
+      dataDownload.click();
     },
     _onAddItem: async function (): Promise<void> {
       const newItem = makeNewItem();
