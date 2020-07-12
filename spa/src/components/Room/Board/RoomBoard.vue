@@ -280,6 +280,26 @@ ul[data-background='QUADRANTS'] {
     );
 }
 
+ul[data-background='HALF'] {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--colour-secondary),
+    var(--colour-secondary) var(--unit-base-rem),
+    var(--colour-background) 0,
+    var(--colour-background) 50%
+  );
+}
+
+ul[data-background='THIRDS'] {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--colour-secondary),
+    var(--colour-secondary) var(--unit-base-rem),
+    var(--colour-background) 0,
+    var(--colour-background) 33.33%
+  );
+}
+
 ul::before {
   position: absolute;
   padding-left: calc(4 * var(--unit-base-rem));

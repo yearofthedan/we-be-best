@@ -20,18 +20,23 @@
       type="button"
       >Add item</button-contained
     >
-    <button-contained
-      @click="$emit('change-background', 'QUADRANTS')"
-      aria-label="Change background to quadrants"
-      type="button"
-      >Quadrants</button-contained
-    >
-    <button-contained
-      @click="$emit('change-background', 'CLEAR')"
-      aria-label="Change background to clear"
-      type="button"
-      >Clean</button-contained
-    >
+    <label
+      >Background
+      <select
+        v-model="selectedBackground"
+        v-on:change="$emit('change-background', $event.target.value)"
+      >
+        <option disabled value="">Please select one</option>
+        <option
+          v-for="option in backgroundOptions"
+          :key="option"
+          v-bind:value="option"
+        >
+          <input type="radio" />
+          {{ option }}
+        </option>
+      </select>
+    </label>
   </section>
 </template>
 <script lang="ts">
@@ -39,11 +44,24 @@ import Vue from 'vue';
 import ButtonAction from '@/components/atoms/ButtonAction.vue';
 import ButtonContained from '@/components/atoms/ButtonContained.vue';
 
+const BACKGROUND_OPTIONS = ['BLANK', 'HALF', 'THIRDS', 'QUADRANTS'];
+
 export default Vue.extend({
   name: 'room-board-controls',
   components: {
     'button-action': ButtonAction,
     'button-contained': ButtonContained,
+  },
+  data: (): {
+    backgroundOptions: string[];
+    selectedBackground: string | null;
+    focusedId: string;
+  } => {
+    return {
+      backgroundOptions: BACKGROUND_OPTIONS,
+      selectedBackground: null,
+      focusedId: 'BLANK',
+    };
   },
 });
 </script>
@@ -79,5 +97,25 @@ button[aria-label='Add'] {
   position: relative;
   z-index: var(--z-index-fab);
   font-size: var(--font-size-interactive);
+}
+
+label {
+  position: relative;
+}
+ul {
+  outline: none;
+  list-style: none;
+  position: absolute;
+}
+
+ul:not(:focus) > li {
+  height: 0;
+  width: 0;
+  opacity: 0;
+}
+
+li[data-focussed] {
+  border: solid 1px black;
+  height: 20px;
 }
 </style>

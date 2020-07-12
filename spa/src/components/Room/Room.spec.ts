@@ -14,7 +14,7 @@ import {
 } from '@/testHelpers/itemQueryStubs';
 import userEvent from '@testing-library/user-event';
 import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/items';
-import { waitFor } from '@testing-library/dom';
+import { fireEvent, waitFor } from '@testing-library/dom';
 import { sleep } from '@/testHelpers/timeout';
 
 const renderComponent = () =>
@@ -130,18 +130,16 @@ describe('<room />', () => {
       );
     });
 
-    it('switches to clear when selected', async () => {
+    it('switches to blank when selected', async () => {
       renderComponent();
 
-      await userEvent.click(
-        await screen.findByRole('button', {
-          name: /Change background to clear/i,
-        })
-      );
+      const selectBox = await screen.findByLabelText('Background');
+
+      await fireEvent.change(selectBox, { target: { value: 'BLANK' } });
 
       expect(await screen.findByLabelText('board')).toHaveAttribute(
         'data-background',
-        'CLEAR'
+        'BLANK'
       );
     });
   });
