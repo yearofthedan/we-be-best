@@ -266,15 +266,15 @@ ul {
 ul[data-background='QUADRANTS'] {
   background: repeating-linear-gradient(
       90deg,
-      var(--colour-secondary),
-      var(--colour-secondary) var(--unit-base-rem),
+      var(--colour-shadow),
+      var(--colour-shadow) var(--unit-base-rem),
       transparent 0,
       transparent 50%
     ),
     repeating-linear-gradient(
       180deg,
-      var(--colour-secondary),
-      var(--colour-secondary) var(--unit-base-rem),
+      var(--colour-shadow),
+      var(--colour-shadow) var(--unit-base-rem),
       var(--colour-background) 0,
       var(--colour-background) 50%
     );

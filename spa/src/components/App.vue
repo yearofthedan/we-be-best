@@ -42,11 +42,18 @@ export default Vue.extend({
 * {
   box-sizing: border-box;
 }
-body,
-main {
+body {
   min-height: 100vh;
   font-size: 16px;
   font-family: Avenir, Helvetica, Arial, sans-serif;
+  background-color: var(--colour-shadow);
+  min-width: 100%;
+  max-width: fit-content;
+}
+
+main {
+  min-height: 100vh;
+  background-color: var(--colour-shadow);
 }
 
 button {
@@ -70,8 +77,9 @@ article {
   --white: hsla(0, 100%, 100%, 1);
   --mint: hsla(107, 4%, 97%, 1);
   --light-blue: hsla(215, 100%, 96%, 1);
-  --black: hsla(218, 73%, 6%, 1);
+  --black: hsl(220, 4%, 27%);
   --blue: hsl(223, 55%, 51%);
+  --dark-blue: hsl(223, 50%, 21%);
   --red: hsl(343, 79%, 55%);
   --grey: hsl(180, 3%, 61%);
   --light-grey: hsl(180, 9%, 86%);
@@ -85,7 +93,7 @@ article {
 
   --colour-primary: var(--blue);
   --colour-primary-text: var(--white);
-  --colour-primary-emphasis: var(--blue);
+  --colour-primary-emphasis: var(--dark-blue);
   --colour-secondary: var(--grey);
   --colour-shadow: var(--black);
   --colour-background: var(--white);
@@ -106,8 +114,6 @@ article {
   --z-index-board-item-moving: 2000;
 
   --button-height: calc(var(--unit-base-rem) * 9);
-
-  background-color: var(--colour-background);
 }
 
 button {

@@ -246,9 +246,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style scoped>
-article {
-  background-color: var(--colour-secondary);
-}
-</style>

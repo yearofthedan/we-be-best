@@ -20,8 +20,7 @@
       type="button"
       ><i class="ri-sticky-note-fill"></i>
     </button-action>
-    <label
-      ><i class="ri-pencil-ruler-2-line"></i>
+    <label>
       <select
         aria-label="Background"
         v-model="selectedBackground"
@@ -94,8 +93,8 @@ section {
   transform: translate(-50%, 0);
   left: 50%;
   top: 0;
-  background: var(--colour-background);
-  color: var(--colour-background);
+  background: var(--colour-primary);
+  color: var(--colour-primary-text);
   box-shadow: 1px 1px 2px 0px var(--colour-shadow);
 }
 

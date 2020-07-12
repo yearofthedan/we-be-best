@@ -32,9 +32,12 @@
           </span>
         </label>
         <dl v-if="isCreating">
-          <dt>Your room id</dt>
-          <button-text type="button" @click="switchToJoin"
-            >Join a room
+          <dt>Create a room with id</dt>
+          <button-text
+            aria-label="join a room"
+            type="button"
+            @click="switchToJoin"
+            >or join one...
           </button-text>
           <dd>{{ this.roomId }}</dd>
         </dl>
@@ -209,7 +212,7 @@ dl {
   grid-template-columns: 1fr auto;
   grid-template-areas:
     'a b'
-    'c c';
+    'c b';
   align-items: flex-end;
 }
 

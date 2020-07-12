@@ -16,16 +16,10 @@
       />
       <auto-expanding-text-box v-model="text" ref="textbox" />
       <div id="action-button-group">
-        <button-action
-          id="delete-button"
-          aria-label="delete"
-          v-on:click="_onDeleteClick"
+        <button-action aria-label="delete" v-on:click="_onDeleteClick"
           ><i class="ri-delete-bin-4-line"></i
         ></button-action>
-        <button-action
-          id="save-button"
-          aria-label="save"
-          v-on:click="_onSaveClick"
+        <button-action aria-label="save" v-on:click="_onSaveClick"
           ><i class="ri-check-fill"></i>
         </button-action>
       </div>
@@ -301,5 +295,9 @@ li {
   width: var(--font-size-button);
   bottom: 0;
   color: var(--colour-background);
+}
+
+#action-button-group > button {
+  background-color: var(--colour-secondary);
 }
 </style>

@@ -15,15 +15,23 @@ button {
   outline: none;
   font-size: var(--font-size-button);
   text-transform: lowercase;
-  border: 2px solid var(--colour-secondary);
+  border: none;
   border-radius: 100%;
   width: var(--button-height);
   height: var(--button-height);
   cursor: pointer;
-  background: var(--colour-primary);
+  background: inherit;
   color: inherit;
-  border-color: inherit;
   line-height: 0;
+  transition: filter 300ms;
+}
+
+button:hover {
+  filter: brightness(120%);
+}
+button:active {
+  filter: brightness(100%);
+  transition: filter 1s;
 }
 
 button:focus {
