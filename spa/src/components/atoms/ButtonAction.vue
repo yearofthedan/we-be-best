@@ -13,15 +13,16 @@ export default Vue.extend({
 <style scoped>
 button {
   outline: none;
-  font-size: var(--font-size-icon-button);
+  font-size: var(--font-size-button);
   text-transform: lowercase;
   border: 2px solid var(--colour-secondary);
   border-radius: 100%;
-  width: calc(20 * var(--unit-base-rem));
-  height: calc(10 * var(--unit-base-rem));
+  width: var(--button-height);
+  height: var(--button-height);
   cursor: pointer;
-  background: var(--colour-background);
-  color: var(--colour-secondary);
+  background: var(--colour-primary);
+  color: inherit;
+  border-color: inherit;
   line-height: 0;
 }
 

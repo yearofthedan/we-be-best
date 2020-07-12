@@ -16,18 +16,18 @@
       />
       <auto-expanding-text-box v-model="text" ref="textbox" />
       <div id="action-button-group">
-        <button
+        <button-action
           id="delete-button"
           aria-label="delete"
           v-on:click="_onDeleteClick"
-          v-text="this.deleteButtonText"
-        />
-        <button
+          ><i class="ri-delete-bin-4-line"></i
+        ></button-action>
+        <button-action
           id="save-button"
           aria-label="save"
           v-on:click="_onSaveClick"
-          v-text="this.saveButtonText"
-        />
+          ><i class="ri-check-fill"></i>
+        </button-action>
       </div>
     </template>
     <template v-else>
@@ -56,6 +56,7 @@ import {
 import { itemTheme } from './itemTheme';
 import { ItemViewModel } from '@/components/Room/Board/items';
 import { logError } from '@/common/logger';
+import ButtonAction from '@/components/atoms/ButtonAction.vue';
 
 interface MoveStartEventPayload {
   itemId: string;
@@ -70,14 +71,13 @@ type DataProperties = {
     backgroundColour: string;
     textColour: string;
   }[];
-  saveButtonText: string;
-  deleteButtonText: string;
 };
 export default Vue.extend({
   name: 'room-board-item',
   components: {
     'auto-expanding-text-box': AutoExpandingTextBox,
     'colour-style-selector': ColourStyleSelector,
+    'button-action': ButtonAction,
   },
   props: {
     item: {
@@ -102,8 +102,6 @@ export default Vue.extend({
       text: this.item.text,
       selectedStyle: this.item.style || 0,
       styleOptions: itemTheme,
-      saveButtonText: '✔',
-      deleteButtonText: '🗑',
     };
   },
   computed: {
@@ -293,33 +291,15 @@ li {
   z-index: var(--z-index-board-item);
 }
 
-button {
-  width: var(--font-size-icon-button);
-  height: var(--font-size-icon-button);
-  font-size: calc(0.5 * var(--font-size-icon-button));
-  line-height: var(--font-size-icon-button);
-  text-align: center;
-  border: solid 1px;
-  padding: 0;
-  border-radius: 100%;
-  box-shadow: 2px 2px 4px 0px var(--colour-secondary);
-}
-
 #action-button-group {
   position: absolute;
   display: flex;
   justify-content: space-between;
   flex-direction: column;
   height: 100%;
-  right: calc(-1.5 * (var(--font-size-icon-button)));
-  width: var(--font-size-icon-button);
+  right: calc(-1.5 * (var(--font-size-button)));
+  width: var(--font-size-button);
   bottom: 0;
-}
-
-button > span {
-  display: flex;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
+  color: var(--colour-background);
 }
 </style>

@@ -33,13 +33,9 @@ export default Vue.extend({
 </script>
 <style scoped>
 button {
-  line-height: var(--font-size-interactive);
-  height: calc(10 * var(--unit-base-rem));
-  max-width: 100%;
-  margin: calc(2 * var(--unit-base-rem));
-  padding: calc(2 * var(--unit-base-rem));
+  height: var(--button-height);
   border-radius: calc(1 * var(--unit-base-rem));
-  font-size: var(--font-size-interactive);
+  font-size: var(--font-size-button);
   text-transform: uppercase;
   position: relative;
   background-color: var(--colour-primary);
@@ -79,7 +75,6 @@ button[data-action-state='success']::before {
   height: calc(2 * var(--radius));
   left: calc(50% - var(--radius));
   bottom: calc(50% - var(--radius));
-  color: var(--colour-primary-emphasis);
   border: solid var(--colour-primary-emphasis) var(--unit-base-rem);
   border-radius: 100%;
   display: inline-flex;

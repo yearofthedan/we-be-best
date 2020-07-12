@@ -5,52 +5,54 @@
       aria-label="zoom out"
       type="button"
     >
-      🔍-
+      <i class="ri-zoom-out-line"></i>
     </button-action>
     <button-action
       @click="$emit('zoom-in', $event)"
       aria-label="zoom in"
       type="button"
     >
-      🔍+
+      <i class="ri-zoom-in-line"></i>
     </button-action>
-    <button-contained
+    <button-action
       @click="$emit('add-item', $event)"
-      aria-label="Add"
+      aria-label="Add item"
       type="button"
-      >Add item</button-contained
-    >
-    <select
-      aria-label="Background"
-      v-model="selectedBackground"
-      v-on:change="$emit('change-background', $event.target.value)"
-    >
-      <option disabled value="">Please select one</option>
-      <option
-        v-bind:selected="option === selectedBackground"
-        v-for="option in backgroundOptions"
-        :key="option"
-        v-bind:value="option"
+      ><i class="ri-sticky-note-fill"></i>
+    </button-action>
+    <label
+      ><i class="ri-pencil-ruler-2-line"></i>
+      <select
+        aria-label="Background"
+        v-model="selectedBackground"
+        v-on:change="$emit('change-background', $event.target.value)"
       >
-        <input type="radio" />
-        {{ option }}
-      </option>
-    </select>
+        <option disabled value="">Please select one</option>
+        <option
+          v-bind:selected="option === selectedBackground"
+          v-for="option in backgroundOptions"
+          :key="option"
+          v-bind:value="option"
+        >
+          <input type="radio" />
+          {{ option }}
+        </option>
+      </select>
+    </label>
     <button-action
       aria-label="download data"
       v-on:click="$emit('export', $event)"
     >
-      ⬇
+      <i class="ri-file-chart-fill"></i>
     </button-action>
-    <button-contained aria-label="copy room link" v-on:click="$emit('share')">
-      📄 Copy link
-    </button-contained>
+    <button-action aria-label="copy room link" v-on:click="$emit('share')">
+      <i class="ri-links-line"></i>
+    </button-action>
   </section>
 </template>
 <script lang="ts">
 import Vue from 'vue';
 import ButtonAction from '@/components/atoms/ButtonAction.vue';
-import ButtonContained from '@/components/atoms/ButtonContained.vue';
 
 const BACKGROUND_OPTIONS = ['BLANK', 'HALF', 'THIRDS', 'QUADRANTS'];
 
@@ -58,7 +60,6 @@ export default Vue.extend({
   name: 'room-controls',
   components: {
     'button-action': ButtonAction,
-    'button-contained': ButtonContained,
   },
   props: {
     background: {
@@ -87,30 +88,15 @@ section {
   grid-template-columns: repeat(6, max-content);
   grid-column-gap: calc(2 * var(--unit-base-rem));
   align-items: center;
-  padding: 0 calc(2 * var(--unit-base-rem));
+  padding: calc(2 * var(--unit-base-rem));
   border-radius: 0 0 calc(2 * var(--unit-base-rem))
     calc(2 * var(--unit-base-rem));
   transform: translate(-50%, 0);
   left: 50%;
   top: 0;
-  background: var(--colour-primary);
+  background: var(--colour-background);
+  color: var(--colour-background);
   box-shadow: 1px 1px 2px 0px var(--colour-shadow);
-}
-
-button[aria-label='Zoom Out'] {
-  left: 0;
-  top: 0;
-}
-
-button[aria-label='Zoom In'] {
-  left: 30px;
-  top: 0;
-}
-
-button[aria-label='Add'] {
-  position: relative;
-  z-index: var(--z-index-fab);
-  font-size: var(--font-size-interactive);
 }
 
 label {

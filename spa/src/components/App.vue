@@ -40,12 +40,13 @@ export default Vue.extend({
 }
 
 * {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   box-sizing: border-box;
 }
 body,
 main {
   min-height: 100vh;
+  font-size: 16px;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
 }
 
 button {
@@ -69,7 +70,6 @@ article {
   --white: hsla(0, 100%, 100%, 1);
   --mint: hsla(107, 4%, 97%, 1);
   --light-blue: hsla(215, 100%, 96%, 1);
-  /*--dark-blue: #1e2b76;*/
   --black: hsla(218, 73%, 6%, 1);
   --blue: hsl(223, 55%, 51%);
   --red: hsl(343, 79%, 55%);
@@ -83,8 +83,8 @@ article {
   --blackest-black: hsla(0, 0%, 0%, 1);
   --gold-leaf: hsla(43, 74%, 49%, 1);
 
-  --colour-primary: var(--light-blue);
-  --colour-primary-text: var(--black);
+  --colour-primary: var(--blue);
+  --colour-primary-text: var(--white);
   --colour-primary-emphasis: var(--blue);
   --colour-secondary: var(--grey);
   --colour-shadow: var(--black);
@@ -99,11 +99,21 @@ article {
   --font-size-interactive: calc(4 * var(--unit-base-rem));
   --font-size-label: calc(4 * var(--unit-base-rem));
   --font-size-text: calc(6 * var(--unit-base-rem));
-  --font-size-icon-button: calc(8 * var(--unit-base-rem));
+  --font-size-button: calc(4 * var(--unit-base-rem));
 
   --z-index-fab: 10000;
   --z-index-board-item: 1000;
   --z-index-board-item-moving: 2000;
+
+  --button-height: calc(var(--unit-base-rem) * 9);
+
   background-color: var(--colour-background);
+}
+
+button {
+  height: var(--button-height);
+  padding: 0;
+  margin: 0;
+  color: inherit;
 }
 </style>
