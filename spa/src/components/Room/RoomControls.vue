@@ -42,6 +42,9 @@
     >
       ⬇
     </button-action>
+    <button-contained aria-label="copy room link" v-on:click="$emit('share')">
+      📄 Copy link
+    </button-contained>
   </section>
 </template>
 <script lang="ts">
@@ -81,7 +84,7 @@ export default Vue.extend({
 section {
   position: fixed;
   display: grid;
-  grid-template-columns: repeat(5, max-content);
+  grid-template-columns: repeat(6, max-content);
   grid-column-gap: calc(2 * var(--unit-base-rem));
   align-items: center;
   padding: 0 calc(2 * var(--unit-base-rem));

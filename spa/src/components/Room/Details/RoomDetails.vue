@@ -2,18 +2,11 @@
   <aside>
     <input id="toggle-details" aria-label="room details" type="checkbox" />
     <section>
-      <label
-        aria-label="room details"
-        for="toggle-details"
-        v-text="toggleLabel"
-      />
+      <label aria-label="room details" for="toggle-details" />
       <dl>
         <dt>Room id</dt>
         <dd>
           {{ roomId }}
-          <button-text aria-label="copy room link" v-on:click="onCopy">
-            📄 Copy room link
-          </button-text>
         </dd>
         <hr />
         <dt>
@@ -28,14 +21,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import RoomMembers from '@/components/Room/Details/RoomMembers.vue';
-import ButtonText from '@/components/atoms/ButtonText.vue';
 import { ItemViewModel } from '@/components/Room/Board/items';
 
 export default Vue.extend({
   name: 'room-details',
   components: {
     'room-members': RoomMembers,
-    'button-text': ButtonText,
   },
   props: {
     roomId: {
@@ -54,18 +45,12 @@ export default Vue.extend({
   data: function (): { toggleLabel: string } {
     return { toggleLabel: '⚙' };
   },
-  methods: {
-    onCopy: function () {
-      const path = `${window.location.host}/?room=${this.roomId}`;
-      navigator.clipboard.writeText(path);
-    },
-  },
 });
 </script>
 
 <style scoped>
 label {
-  --label-left-offset: -24px;
+  --label-left-offset: -16px;
   font-size: calc(8 * var(--unit-base-rem));
   color: var(--colour-primary-emphasis);
   margin-left: auto;

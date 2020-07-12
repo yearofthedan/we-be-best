@@ -20,6 +20,7 @@
         v-on:zoom-out="_onZoomOut"
         v-on:add-item="_onAddItem"
         v-on:export="_onExport"
+        v-on:share="_onShare"
         v-on:change-background="_onChangeBackground"
         v-bind:background="background"
       />
@@ -187,6 +188,10 @@ export default Vue.extend({
     },
     _onZoomIn: function () {
       this.zoomFactor += 0.2;
+    },
+    _onShare: function () {
+      const path = `${window.location.host}/?room=${this.roomId}`;
+      navigator.clipboard.writeText(path);
     },
     _onExport: function () {
       const dataStr =

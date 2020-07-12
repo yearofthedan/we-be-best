@@ -1,5 +1,10 @@
 import Room from '@/components/Room/Room.vue';
-import { QuerySpec, renderWithApollo, screen } from '@/testHelpers/renderer';
+import {
+  QuerySpec,
+  render,
+  renderWithApollo,
+  screen,
+} from '@/testHelpers/renderer';
 import {
   makeHappyRoomItemUpdatesSubscription,
   makeHappyRoomMemberUpdateSubscription,
@@ -17,6 +22,7 @@ import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/items';
 import { fireEvent, waitFor } from '@testing-library/dom';
 import { sleep } from '@/testHelpers/timeout';
 import { mapToJsonString } from '@/components/Room/Details/roomExport';
+import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
 
 jest.mock('@/components/Room/Details/roomExport');
 
@@ -131,6 +137,18 @@ describe('<room />', () => {
       expect.any(Array),
       expect.any(Array)
     );
+  });
+
+  it('shows lets me copy the room url for sharing', async () => {
+    // @ts-ignore
+    const clipboard = (global.navigator.clipboard = { writeText: jest.fn() });
+
+    renderComponent({
+      roomId: 'ROOM123'
+    })
+
+    await userEvent.click(await screen.findByRole('button', { name: /copy room link/i }));
+    expect(clipboard.writeText).toHaveBeenCalledWith('localhost/?room=ROOM123');
   });
 
   describe('changing board zoom', () => {
