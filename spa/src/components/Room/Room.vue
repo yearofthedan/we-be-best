@@ -15,7 +15,7 @@
         v-bind:members="room.members"
         v-bind:room-id="roomId"
       />
-      <room-board-controls
+      <room-controls
         v-on:zoom-in="_onZoomIn"
         v-on:zoom-out="_onZoomOut"
         v-on:add-item="_onAddItem"
@@ -54,7 +54,7 @@ import {
 } from '@type-definitions/graphql';
 import { addRoomBoardItem } from '@/graphql/boardQueries.graphql';
 import { logError } from '@/common/logger';
-import RoomBoardControls from '@/components/Room/Board/RoomBoardControls.vue';
+import RoomControls from '@/components/Room/RoomControls.vue';
 import { mapToJsonString } from '@/components/Room/Details/roomExport';
 import { MembersViewModel } from '@/components/Room/Details/members';
 
@@ -83,7 +83,7 @@ export default Vue.extend({
   components: {
     'room-board': RoomBoard,
     'room-details': RoomDetails,
-    'room-board-controls': RoomBoardControls,
+    'room-controls': RoomControls,
   },
   props: {
     myId: {

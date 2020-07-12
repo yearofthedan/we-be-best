@@ -52,7 +52,7 @@ import ButtonContained from '@/components/atoms/ButtonContained.vue';
 const BACKGROUND_OPTIONS = ['BLANK', 'HALF', 'THIRDS', 'QUADRANTS'];
 
 export default Vue.extend({
-  name: 'room-board-controls',
+  name: 'room-controls',
   components: {
     'button-action': ButtonAction,
     'button-contained': ButtonContained,
