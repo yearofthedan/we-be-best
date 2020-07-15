@@ -29,6 +29,8 @@ import {
 import { supportsTouchEvents } from '@/common/dom';
 import { sleep } from '@/testHelpers/timeout';
 import { ItemViewModel } from '@/components/Room/Board/items';
+import * as logging from '@/common/logger';
+import noOp from '@/testHelpers/noOp';
 
 jest.mock('@/common/dom', () => ({
   supportsTouchEvents: jest.fn().mockReturnValue(true),
@@ -232,6 +234,10 @@ describe('<room-board />', () => {
       expect(item).toHaveStyle('top: 10px; left: 10px;');
     });
     it('displays a toast update when an error occurs while locking', async () => {
+      const logErrorSpy = jest
+        .spyOn(logging, 'logError')
+        .mockImplementation(noOp);
+
       const { mocks } = renderComponent(
         {
           items: [buildItemViewModel({ id: ITEM_ID })],
@@ -245,6 +251,7 @@ describe('<room-board />', () => {
       expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
         'Could not move the item: GraphQL error: everything is broken'
       );
+      expect(logErrorSpy).toHaveBeenCalled();
     });
     it('unlocks after moving', async () => {
       const { queryMocks } = await renderComponent(
