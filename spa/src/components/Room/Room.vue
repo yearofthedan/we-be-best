@@ -23,8 +23,8 @@
         v-on:share="_onShare"
         v-on:change-background="_onChangeBackground"
         v-bind:background="background"
+        v-bind:roomId="roomId"
       />
-      <a ref="dataDownload" />
     </template>
   </article>
 </template>
@@ -193,8 +193,8 @@ export default Vue.extend({
       const path = `${window.location.host}/?room=${this.roomId}`;
       navigator.clipboard.writeText(path);
     },
-    _onExport: function () {
-      const dataStr =
+    _onExport: function (event: MouseEvent) {
+      (event.target as HTMLAnchorElement).href =
         'data:text/json;charset=utf-8,' +
         encodeURIComponent(
           mapToJsonString(
@@ -203,11 +203,6 @@ export default Vue.extend({
             this.room?.members as MembersViewModel[]
           )
         );
-
-      const dataDownload = this.$refs.dataDownload as HTMLAnchorElement;
-      dataDownload.setAttribute('href', dataStr);
-      dataDownload.setAttribute('download', `room-${this.roomId}.json`);
-      dataDownload.click();
     },
     _onAddItem: async function (): Promise<void> {
       const newItem = makeNewItem();

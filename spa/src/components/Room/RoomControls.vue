@@ -38,12 +38,21 @@
         </option>
       </select>
     </label>
-    <button-action
+    <a
+      href="placeholder for data download"
+      v-bind:download="`we-be-best-room-${roomId}.json`"
       aria-label="download data"
       v-on:click="$emit('export', $event)"
     >
-      <i class="ri-file-chart-fill"></i>
-    </button-action>
+      <i
+        v-on:click="
+          'return false';
+
+
+        "
+        class="ri-file-chart-fill"
+      ></i>
+    </a>
     <button-action aria-label="copy room link" v-on:click="$emit('share')">
       <i class="ri-links-line"></i>
     </button-action>
@@ -62,6 +71,10 @@ export default Vue.extend({
   },
   props: {
     background: {
+      type: String,
+      required: true,
+    },
+    roomId: {
       type: String,
       required: true,
     },

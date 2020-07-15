@@ -16,16 +16,15 @@ import userEvent from '@testing-library/user-event';
 import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/items';
 import { fireEvent, waitFor } from '@testing-library/dom';
 import { sleep } from '@/testHelpers/timeout';
-import { mapToJsonString } from '@/components/Room/Details/roomExport';
-
-jest.mock('@/components/Room/Details/roomExport');
+import * as logging from '@/common/logger';
+import noOp from '@/testHelpers/noOp';
 
 interface RoomComponentProps {
   myId: string;
   roomId: string;
 }
 
-const renderComponent = (
+const renderComponent = async (
   props: Partial<RoomComponentProps> = {},
   queries?: QuerySpec[]
 ) => {
@@ -37,7 +36,7 @@ const renderComponent = (
     },
   };
 
-  return {
+  const result = {
     ...renderWithApollo(
       Room,
       queries || [
@@ -58,6 +57,9 @@ const renderComponent = (
     ),
     mocks,
   };
+
+  await screen.findByLabelText('board');
+  return result;
 };
 
 describe('<room />', () => {
@@ -111,7 +113,7 @@ describe('<room />', () => {
   });
 
   it('lets me download all the data', async () => {
-    renderComponent(
+    await renderComponent(
       {
         roomId: 'ROOM123',
       },
@@ -122,58 +124,47 @@ describe('<room />', () => {
       ]
     );
 
-    await userEvent.click(
-      await screen.findByRole('button', { name: /download data/i })
-    );
+    const link = screen.getByRole('link', { name: /download data/i });
+    await userEvent.click(link);
 
-    expect(mapToJsonString).toHaveBeenCalledWith(
-      'ROOM123',
-      expect.any(Array),
-      expect.any(Array)
-    );
+    const href =
+      'data:text/json;charset=utf-8,%7B%22room%22%3A%7B%22id%22%3A%22ROOM123%22%2C%22members%22%3A%5B%7B%22id%22%3A%221%22%2C%22name%22%3A%22me%22%7D%2C%7B%22id%22%3A%222%22%2C%22name%22%3A%22my-mother%22%7D%5D%2C%22items%22%3A%5B%7B%22id%22%3A%22ITEM1%22%2C%22posX%22%3A30%2C%22posY%22%3A20%2C%22lockedBy%22%3A%22me%22%2C%22text%22%3A%22placeholder%20text%22%2C%22style%22%3A2%2C%22isDeleted%22%3Anull%2C%22isNew%22%3Anull%7D%2C%7B%22id%22%3A%22ITEMM1234%22%2C%22posX%22%3A30%2C%22posY%22%3A20%2C%22lockedBy%22%3A%22me%22%2C%22text%22%3A%22placeholder%20text%22%2C%22style%22%3A2%2C%22isDeleted%22%3Anull%2C%22isNew%22%3Anull%7D%5D%7D%7D';
+    expect(link).toHaveAttribute('href', href);
   });
 
-  it('shows lets me copy the room url for sharing', async () => {
+  it('lets me copy the room url for sharing', async () => {
     // @ts-ignore
     const clipboard = (global.navigator.clipboard = { writeText: jest.fn() });
 
-    renderComponent({
+    await renderComponent({
       roomId: 'ROOM123',
     });
 
     await userEvent.click(
-      await screen.findByRole('button', { name: /copy room link/i })
+      screen.getByRole('button', { name: /copy room link/i })
     );
     expect(clipboard.writeText).toHaveBeenCalledWith('localhost/?room=ROOM123');
   });
 
   describe('changing board zoom', () => {
     it('defaults the factor to 1', async () => {
-      renderComponent();
+      await renderComponent();
 
-      expect(await screen.findByLabelText('board')).toHaveStyle(
-        `--zoom-factor: 1;`
-      );
+      expect(screen.getByLabelText('board')).toHaveStyle(`--zoom-factor: 1;`);
     });
 
     it('increases the factor by 0.2 when I click to zoom in', async () => {
-      renderComponent();
+      await renderComponent();
 
-      const zoomInButton = await screen.findByRole('button', {
-        name: 'zoom in',
-      });
-      await userEvent.click(zoomInButton);
+      await userEvent.click(screen.getByRole('button', { name: 'zoom in' }));
 
       expect(screen.getByLabelText('board')).toHaveStyle(`--zoom-factor: 1.2;`);
     });
 
     it('decreases the factor by 0.2 when I click to zoom out', async () => {
-      renderComponent();
+      await renderComponent();
 
-      const zoomOutButton = await screen.findByRole('button', {
-        name: 'zoom out',
-      });
-      await userEvent.click(zoomOutButton);
+      await userEvent.click(screen.getByRole('button', { name: 'zoom out' }));
 
       expect(screen.getByLabelText('board')).toHaveStyle(`--zoom-factor:0.8;`);
     });
@@ -206,7 +197,7 @@ describe('<room />', () => {
 
   describe('when adding an item', () => {
     it('lets me add an item', async () => {
-      const { queryMocks } = renderComponent();
+      const { queryMocks } = await renderComponent();
 
       await screen.findByRole('button', { name: /add/i });
       await userEvent.click(screen.getByRole('button', { name: /add/i }));
@@ -224,6 +215,10 @@ describe('<room />', () => {
     });
 
     it('displays a toast update when an error occurs while adding', async () => {
+      const logErrorSpy = jest
+        .spyOn(logging, 'logError')
+        .mockImplementation(noOp);
+
       const $toasted = {
         global: {
           apollo_error: jest.fn(),
@@ -255,6 +250,7 @@ describe('<room />', () => {
       expect($toasted.global.apollo_error).toHaveBeenCalledWith(
         'Could not add a new item: GraphQL error: everything is broken'
       );
+      expect(logErrorSpy).toHaveBeenCalled();
     });
   });
 });

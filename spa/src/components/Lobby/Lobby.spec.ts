@@ -86,7 +86,9 @@ describe('<lobby />', () => {
         }
       );
 
-      await userEvent.type(screen.getByRole('textbox', { name: /Room id/i }), `{selectall}${ROOM_ID}`,
+      await userEvent.type(
+        screen.getByRole('textbox', { name: /Room id/i }),
+        `{selectall}${ROOM_ID}`
       );
       await userEvent.type(screen.getByLabelText('Your name'), MEMBER_NAME);
       await userEvent.click(screen.getByRole('button', { name: /join room/i }));
