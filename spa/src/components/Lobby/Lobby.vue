@@ -103,7 +103,6 @@ export default Vue.extend({
       this.submitState = ACTION_STATE.READY;
       this.errors = {};
       e.preventDefault();
-
       if (!this.memberName) {
         this.errors.name = 'you need a name!';
       }

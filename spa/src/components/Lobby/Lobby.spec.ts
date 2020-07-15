@@ -69,11 +69,7 @@ describe('<lobby />', () => {
       });
 
       await userEvent.type(screen.getByLabelText('Your name'), 'Me');
-      await userEvent.type(
-        screen.getByRole('textbox', { name: /Room id/i }),
-        '{backspace}',
-        { initialSelectionStart: 0, initialSelectionEnd: 100 }
-      );
+      await userEvent.clear(screen.getByRole('textbox', { name: /Room id/i }));
       await userEvent.click(screen.getByRole('button', { name: /join room/i }));
 
       expect(screen.getByText('you need a room!')).toBeInTheDocument();
@@ -90,10 +86,7 @@ describe('<lobby />', () => {
         }
       );
 
-      await userEvent.type(
-        screen.getByRole('textbox', { name: /Room id/i }),
-        ROOM_ID,
-        { initialSelectionStart: 0, initialSelectionEnd: 100 }
+      await userEvent.type(screen.getByRole('textbox', { name: /Room id/i }), `{selectall}${ROOM_ID}`,
       );
       await userEvent.type(screen.getByLabelText('Your name'), MEMBER_NAME);
       await userEvent.click(screen.getByRole('button', { name: /join room/i }));
