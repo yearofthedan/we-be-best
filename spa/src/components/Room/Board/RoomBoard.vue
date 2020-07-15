@@ -15,7 +15,7 @@
       v-bind:moving="_getIsMoving(item.id)"
       v-bind:my-id="myId"
       v-bind:editing="editingItemReference === item.id"
-      v-on:movestart="_onBoardItemMoveStart"
+      v-on:pointerheld="_onBoardItemPointerHeld"
       v-on:editstart="_onBoardItemEditStart"
       v-on:editfinish="_onBoardItemEditFinish"
       :key="item.id"
@@ -76,6 +76,7 @@ export default Vue.extend({
     itemsData: ItemViewModel[];
     movingItemReference: string | null;
     editingItemReference: string | null;
+    heldItemReference: string | null;
     primaryTouchId: string | null;
   } {
     return {
@@ -84,6 +85,7 @@ export default Vue.extend({
       ),
       movingItemReference: null,
       editingItemReference: null,
+      heldItemReference: null,
       primaryTouchId: null,
     };
   },
@@ -99,6 +101,7 @@ export default Vue.extend({
     },
     _onPointerUp: function (): void {
       this._onBoardItemStoppedMoving();
+      this.heldItemReference = null;
     },
     _onPointerMove: function (event: PointerEvent): void {
       if (!supportsTouchEvents()) {
@@ -107,9 +110,12 @@ export default Vue.extend({
       const { movementX, movementY } = event;
 
       if (!this.movingItemReference) {
-        return;
+        if (!this.heldItemReference) {
+          return;
+        }
+        this.movingItemReference = this.heldItemReference;
+        this._lockItem(this.heldItemReference);
       }
-
       this._onBoardItemMoved({
         itemReference: this.movingItemReference,
         movementX,
@@ -123,7 +129,11 @@ export default Vue.extend({
       const { movementX, movementY } = event;
 
       if (!this.movingItemReference) {
-        return;
+        if (!this.heldItemReference) {
+          return;
+        }
+        this.movingItemReference = this.heldItemReference;
+        this._lockItem(this.heldItemReference);
       }
 
       this._onBoardItemMoved({
@@ -132,20 +142,9 @@ export default Vue.extend({
         movementY,
       });
     },
-    _onBoardItemEditStart: function (itemId: string) {
-      if (this.editingItemReference) {
-        return;
-      }
-      this.editingItemReference = itemId;
-    },
-    _onBoardItemEditFinish: function () {
-      this.editingItemReference = null;
-    },
-    _onBoardItemMoveStart: function (payload: ItemMoveStartedEventPayload) {
-      this.movingItemReference = payload.itemId;
-
+    _lockItem: function (itemId: string): void {
       const mutationPayload: LockRoomBoardItemInput = {
-        id: payload.itemId,
+        id: itemId,
         lockedBy: this.myId,
       };
       this.$apollo
@@ -161,6 +160,18 @@ export default Vue.extend({
             `Could not move the item: ${error.message}`
           );
         });
+    },
+    _onBoardItemPointerHeld: function (payload: ItemPointerEventPayload) {
+      this.heldItemReference = payload.itemId;
+    },
+    _onBoardItemEditStart: function (itemId: string) {
+      if (this.editingItemReference) {
+        return;
+      }
+      this.editingItemReference = itemId;
+    },
+    _onBoardItemEditFinish: function () {
+      this.editingItemReference = null;
     },
     _onBoardItemMoved: function ({
       itemReference,
@@ -237,7 +248,7 @@ export default Vue.extend({
   },
 });
 
-interface ItemMoveStartedEventPayload {
+interface ItemPointerEventPayload {
   itemId: string;
   pointerId: number;
 }

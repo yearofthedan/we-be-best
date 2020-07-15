@@ -95,9 +95,9 @@ describe('<room-board-item />', () => {
           new PointerDownEvent({ pointerId: 1000 })
         );
 
-        expect(emitted().movestart).toBeUndefined();
+        expect(emitted().pointerheld).toBeUndefined();
       });
-      it('fires a moving start event for a mouse click when touch is not enabled', async () => {
+      it('fires a pointerheld event for a mouse click when touch is not enabled', async () => {
         (supportsTouchEvents as jest.Mock).mockReturnValue(false);
         const { emitted } = render(RoomBoardItem, {
           propsData: {
@@ -111,15 +111,15 @@ describe('<room-board-item />', () => {
           button: PRIMARY_MOUSE_BUTTON_ID,
         });
 
-        expect(emitted().movestart).not.toBeUndefined();
-        expect(emitted().movestart[0]).toEqual([
+        expect(emitted().pointerheld).not.toBeUndefined();
+        expect(emitted().pointerheld[0]).toEqual([
           {
             pointerId: 1,
             itemId: 'item123',
           },
         ]);
       });
-      it('does not fire the moving start event for a mouse click which is not the primary button', async () => {
+      it('does not fire the pointerheld event for a mouse click which is not the primary button', async () => {
         const { emitted } = render(RoomBoardItem, {
           propsData: {
             myId: 'me',
@@ -135,12 +135,12 @@ describe('<room-board-item />', () => {
           })
         );
 
-        expect(emitted().movestart).toBeUndefined();
+        expect(emitted().pointerheld).toBeUndefined();
       });
     });
 
     describe('touch enabled', () => {
-      it('fires a moving start event when clicking with a pointer', async () => {
+      it('fires a pointerheld event when clicking with a pointer', async () => {
         (supportsTouchEvents as jest.Mock).mockReturnValue(true);
         const { emitted } = render(RoomBoardItem, {
           propsData: {
@@ -152,8 +152,8 @@ describe('<room-board-item />', () => {
 
         await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
 
-        expect(emitted().movestart).not.toBeUndefined();
-        expect(emitted().movestart[0]).toEqual([
+        expect(emitted().pointerheld).not.toBeUndefined();
+        expect(emitted().pointerheld[0]).toEqual([
           {
             pointerId: 1,
             itemId: 'item123',
@@ -172,12 +172,12 @@ describe('<room-board-item />', () => {
 
         await fireEvent.mouseDown(screen.getByRole('listitem'));
 
-        expect(emitted().movestart).toBeUndefined();
+        expect(emitted().pointerheld).toBeUndefined();
       });
     });
 
     describe('locking', () => {
-      it('fires a moving start event when the item is locked by me', async () => {
+      it('fires a pointerheld event when the item is locked by me', async () => {
         const { emitted } = render(RoomBoardItem, {
           propsData: {
             myId: 'me',
@@ -191,9 +191,9 @@ describe('<room-board-item />', () => {
           new PointerDownEvent({ pointerId: 1000 })
         );
 
-        expect(emitted().movestart).not.toBeUndefined();
+        expect(emitted().pointerheld).not.toBeUndefined();
       });
-      it('does not fire the moving start event when the item is locked by someone else', async () => {
+      it('does not fire the pointerheld event when the item is locked by someone else', async () => {
         const { emitted } = render(RoomBoardItem, {
           propsData: {
             myId: 'me',
@@ -207,7 +207,7 @@ describe('<room-board-item />', () => {
           new PointerDownEvent({ pointerId: 1000 })
         );
 
-        expect(emitted().movestart).toBeUndefined();
+        expect(emitted().pointerheld).toBeUndefined();
       });
     });
   });

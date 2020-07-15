@@ -52,7 +52,7 @@ import { ItemViewModel } from '@/components/Room/Board/items';
 import { logError } from '@/common/logger';
 import ButtonAction from '@/components/atoms/ButtonAction.vue';
 
-interface MoveStartEventPayload {
+interface PointerHeldEventPayload {
   itemId: string;
   pointerId: number;
 }
@@ -196,10 +196,10 @@ export default Vue.extend({
         return;
       }
 
-      this.$emit('movestart', {
+      this.$emit('pointerheld', {
         itemId: this.item.id,
         pointerId: 1,
-      } as MoveStartEventPayload);
+      } as PointerHeldEventPayload);
     },
     _onStyleChange: async function (style: string) {
       this.selectedStyle = this.styleOptions.findIndex((s) => s.name === style);

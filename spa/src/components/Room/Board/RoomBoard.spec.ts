@@ -141,6 +141,17 @@ describe('<room-board />', () => {
     });
   });
   describe('when moving', () => {
+    async function moveItem() {
+      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+      await fireEvent(
+        screen.getByRole('listitem'),
+        new PointerMoveEvent({
+          movementX: 20,
+          movementY: 10,
+        })
+      );
+    }
+
     it('locks the item', async () => {
       const { queryMocks } = renderComponent(
         {
@@ -149,11 +160,10 @@ describe('<room-board />', () => {
         [makeHappyLockRoomBoardItemMutationStub({ id: ITEM_ID })]
       );
 
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+      await moveItem();
 
       //Best I can do for style atm since vue-jest / jsdom do not support style tags
       expect(screen.getByRole('listitem')).toHaveAttribute('data-moving');
-
       expect(queryMocks[0]).toHaveBeenCalledWith({
         input: { lockedBy: MY_ID, id: ITEM_ID },
       });
@@ -165,15 +175,7 @@ describe('<room-board />', () => {
         },
         [makeHappyLockRoomBoardItemMutationStub({ id: ITEM_ID })]
       );
-
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
-      await fireEvent(
-        screen.getByRole('listitem'),
-        new PointerMoveEvent({
-          movementX: 20,
-          movementY: 10,
-        })
-      );
+      await moveItem();
 
       expect(screen.getByRole('listitem')).toHaveStyle(`
         top:  20px;
@@ -197,11 +199,7 @@ describe('<room-board />', () => {
       );
 
       const item = screen.getByRole('listitem');
-      await fireEvent(item, new PointerDownEvent());
-      await fireEvent(
-        item,
-        new PointerMoveEvent({ movementX: 20, movementY: 10 })
-      );
+      await moveItem();
 
       expect(item).toHaveStyle('top:  20px; left: 30px;');
       expect(queryMocks[0]).toHaveBeenCalledWith({
@@ -241,7 +239,7 @@ describe('<room-board />', () => {
         [makeSadLockRoomBoardItemMutationStub({ id: ITEM_ID })]
       );
 
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+      await moveItem();
       await sleep(5);
 
       expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
@@ -259,7 +257,7 @@ describe('<room-board />', () => {
           makeHappyMoveBoardItemMutationStub({ id: ITEM_ID }),
         ]
       );
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+      await moveItem();
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
 
       await waitFor(() => {
@@ -282,11 +280,7 @@ describe('<room-board />', () => {
         ]
       );
       const item = screen.getByRole('listitem');
-      await fireEvent(item, new PointerDownEvent());
-      await fireEvent(
-        item,
-        new PointerMoveEvent({ movementX: 20, movementY: 10 })
-      );
+      await moveItem();
       await fireEvent(item, new PointerUpEvent());
 
       expect(queryMocks[2]).toHaveBeenCalledWith({
@@ -305,7 +299,7 @@ describe('<room-board />', () => {
         ]
       );
 
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+      await moveItem();
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
       await sleep(5);
 
@@ -325,7 +319,7 @@ describe('<room-board />', () => {
         ]
       );
 
-      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+      await moveItem();
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
       await sleep(5);
 
