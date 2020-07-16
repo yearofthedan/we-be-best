@@ -16,8 +16,6 @@ import userEvent from '@testing-library/user-event';
 import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/items';
 import { fireEvent, waitFor } from '@testing-library/dom';
 import { sleep } from '@/testHelpers/timeout';
-import * as logging from '@/common/logger';
-import noOp from '@/testHelpers/noOp';
 
 interface RoomComponentProps {
   myId: string;
@@ -36,27 +34,22 @@ const renderComponent = async (
     },
   };
 
-  const result = {
-    ...renderWithApollo(
-      Room,
-      queries || [
-        makeHappyRoomQueryStub(),
-        makeHappyRoomMemberUpdateSubscription(),
-        makeHappyRoomItemUpdatesSubscription(),
-        makeHappyAddRoomBoardItemMutationStub(),
-      ],
-      {
-        propsData: { roomId: '123', myId: 'me', ...props },
-        stubs: {
-          'transition-group': { template: '<ul><slot /></ul>' },
-        },
-        mocks: {
-          $toasted: { global: { apollo_error: jest.fn() } },
-        },
-      }
-    ),
-    mocks,
-  };
+  const result = renderWithApollo(
+    Room,
+    queries || [
+      makeHappyRoomQueryStub(),
+      makeHappyRoomMemberUpdateSubscription(),
+      makeHappyRoomItemUpdatesSubscription(),
+      makeHappyAddRoomBoardItemMutationStub(),
+    ],
+    {
+      propsData: { roomId: '123', myId: 'me', ...props },
+      stubs: {
+        'transition-group': { template: '<ul><slot /></ul>' },
+      },
+      mocks,
+    }
+  );
 
   await screen.findByLabelText('board');
   return result;
@@ -215,14 +208,14 @@ describe('<room />', () => {
     });
 
     it('displays a toast update when an error occurs while adding', async () => {
-      const logErrorSpy = jest
-        .spyOn(logging, 'logError')
-        .mockImplementation(noOp);
-
       const $toasted = {
         global: {
           apollo_error: jest.fn(),
         },
+      };
+
+      const $logger = {
+        error: jest.fn(),
       };
 
       renderWithApollo(
@@ -238,7 +231,8 @@ describe('<room />', () => {
         {
           propsData: { myId: MY_ID, roomId: ROOM_ID, items: [] },
           mocks: {
-            $toasted: $toasted,
+            $toasted,
+            $logger,
           },
         }
       );
@@ -250,7 +244,7 @@ describe('<room />', () => {
       expect($toasted.global.apollo_error).toHaveBeenCalledWith(
         'Could not add a new item: GraphQL error: everything is broken'
       );
-      expect(logErrorSpy).toHaveBeenCalled();
+      expect($logger.error).toHaveBeenCalled();
     });
   });
 });

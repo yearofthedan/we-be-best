@@ -254,12 +254,7 @@ describe('<room-board-item />', () => {
       );
     });
     it('displays a toast update when an error occurs while updating style', async () => {
-      const $toasted = {
-        global: {
-          apollo_error: jest.fn(),
-        },
-      };
-      renderWithApollo(
+      const { mocks } = renderWithApollo(
         RoomBoardItem,
         [
           makeSadUpdateBoardItemStyleMutationStub({
@@ -279,7 +274,8 @@ describe('<room-board-item />', () => {
             }),
           },
           mocks: {
-            $toasted: $toasted,
+            $toasted: { global: { apollo_error: jest.fn() } },
+            $logger: { error: jest.fn() },
           },
         }
       );
@@ -288,9 +284,10 @@ describe('<room-board-item />', () => {
       await userEvent.click(screen.getByRole('radio', { name: /style-3/i }));
       await sleep(5);
 
-      expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+      expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
         'Could not save item style changes: GraphQL error: everything is broken'
       );
+      expect(mocks.$logger.error).toHaveBeenCalled();
     });
 
     it('sends an editing event when I double click', async () => {
@@ -352,12 +349,7 @@ describe('<room-board-item />', () => {
     it('displays a toast update when an error occurs while updating', async () => {
       const updatedText = 'updated content';
       const itemId = 'item123';
-      const $toasted = {
-        global: {
-          apollo_error: jest.fn(),
-        },
-      };
-      renderWithApollo(
+      const { mocks } = renderWithApollo(
         RoomBoardItem,
         [
           makeSadUpdateRoomBoardItemMutationStub({
@@ -377,7 +369,8 @@ describe('<room-board-item />', () => {
             }),
           },
           mocks: {
-            $toasted: $toasted,
+            $toasted: { global: { apollo_error: jest.fn() } },
+            $logger: { error: jest.fn() },
           },
         }
       );
@@ -388,9 +381,10 @@ describe('<room-board-item />', () => {
       await userEvent.click(screen.getByRole('button', { name: /save/i }));
       await sleep(5);
 
-      expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+      expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
         'Could not save item changes: GraphQL error: everything is broken'
       );
+      expect(mocks.$logger.error).toHaveBeenCalled();
     });
 
     it('lets me delete while editing', async () => {
@@ -429,12 +423,8 @@ describe('<room-board-item />', () => {
     });
     it('displays a toast update when an error occurs while deleting', async () => {
       const itemId = 'item123';
-      const $toasted = {
-        global: {
-          apollo_error: jest.fn(),
-        },
-      };
-      renderWithApollo(
+
+      const { mocks } = renderWithApollo(
         RoomBoardItem,
         [
           makeSadDeleteBoardItemMutationStub({
@@ -453,7 +443,14 @@ describe('<room-board-item />', () => {
             editing: true,
           },
           mocks: {
-            $toasted: $toasted,
+            $toasted: {
+              global: {
+                apollo_error: jest.fn(),
+              },
+            },
+            $logger: {
+              error: jest.fn(),
+            },
           },
         }
       );
@@ -461,9 +458,10 @@ describe('<room-board-item />', () => {
       await userEvent.click(screen.getByRole('button', { name: /delete/i }));
       await sleep(5);
 
-      expect($toasted.global.apollo_error).toHaveBeenCalledWith(
+      expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
         'Could not remove item: GraphQL error: everything is broken'
       );
+      expect(mocks.$logger.error).toHaveBeenCalled();
     });
   });
 });

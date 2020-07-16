@@ -49,7 +49,6 @@ import {
 } from '@type-definitions/graphql';
 import { itemTheme } from './itemTheme';
 import { ItemViewModel } from '@/components/Room/Board/items';
-import { logError } from '@/common/logger';
 import ButtonAction from '@/components/atoms/ButtonAction.vue';
 
 interface PointerHeldEventPayload {
@@ -135,7 +134,7 @@ export default Vue.extend({
           },
         });
       } catch (e) {
-        logError(e);
+        this.$logger.error(e);
         this.$toasted.global.apollo_error(
           `Could not remove item: ${e.message}`
         );
@@ -166,7 +165,7 @@ export default Vue.extend({
           },
         });
       } catch (e) {
-        logError(e);
+        this.$logger.error(e);
         this.$toasted.global.apollo_error(
           `Could not save item changes: ${e.message}`
         );
@@ -220,7 +219,7 @@ export default Vue.extend({
           },
         });
       } catch (e) {
-        logError(e);
+        this.$logger.error(e);
         this.$toasted.global.apollo_error(
           `Could not save item style changes: ${e.message}`
         );

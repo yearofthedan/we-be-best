@@ -3,6 +3,7 @@ import { DocumentNode } from 'graphql';
 import { createMockClient } from 'mock-apollo-client';
 import VueApollo from 'vue-apollo';
 import {ComponentHarness, ConfigurationCallback, render} from '@testing-library/vue';
+import loggerPlugin from '@/loggerPlugin';
 
 export interface QuerySpec {
   query: DocumentNode;
@@ -11,8 +12,12 @@ export interface QuerySpec {
   variables?: object;
 }
 
-export interface RenderResult extends ComponentHarness  {
+export interface RenderResult extends ComponentHarness {
   queryMocks: Array<jest.Mock<any, any>>;
+  mocks: Partial<{
+    $toasted: typeof Vue.prototype.$toasted;
+    $logger: typeof Vue.prototype.$logger;
+  }>
 }
 const renderWithApollo = <V extends Vue>(
   component: VueConstructor<Vue>,
@@ -52,20 +57,27 @@ const renderWithApollo = <V extends Vue>(
     {
       ...options,
       apolloProvider,
+      mocks: options.mocks,
     },
     (vue, store, router) => {
-      // @ts-ignore
       vue.use(VueApollo);
-      // @ts-ignore
-      callback && callback(vue, store, router);
+      vue.use(loggerPlugin);
+      callback && callback(vue as V, store, router);
     }
   );
 
   return {
     ...result,
     queryMocks,
+    mocks: options.mocks
   };
 };
+
+declare module 'vue/types/vue' {
+  interface Vue {
+    use: any;
+  }
+}
 
 export * from '@testing-library/vue';
 export { renderWithApollo };

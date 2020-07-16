@@ -54,7 +54,6 @@ import {
   AddRoomBoardItemInput,
 } from '@type-definitions/graphql';
 import { addRoomBoardItem } from '@/graphql/boardQueries.graphql';
-import { logError } from '@/common/logger';
 import RoomControls from '@/components/Room/RoomControls.vue';
 import { mapToJsonString } from '@/components/Room/Details/roomExport';
 import { MembersViewModel } from '@/components/Room/Details/members';
@@ -232,7 +231,7 @@ export default Vue.extend({
           },
         });
       } catch (error) {
-        logError(error);
+        this.$logger.error(error);
         this.$toasted.global.apollo_error(
           `Could not add a new item: ${error.message}`
         );

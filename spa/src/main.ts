@@ -9,6 +9,7 @@ import VueApollo from 'vue-apollo';
 import Toasted from 'vue-toasted';
 import App from './components/App.vue';
 import router from './router/router';
+import loggerPlugin from '@/loggerPlugin';
 
 const GRAPHQL_URI_HTTP =
   process.env.VUE_APP_GRAPHQL_URI_HTTP ||
@@ -72,6 +73,8 @@ Vue.toasted.register(
     singleton: true,
   }
 );
+
+Vue.use(loggerPlugin);
 
 new Vue({
   render: (h) => h(App),

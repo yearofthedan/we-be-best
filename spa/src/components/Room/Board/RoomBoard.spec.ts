@@ -29,8 +29,7 @@ import {
 import { supportsTouchEvents } from '@/common/dom';
 import { sleep } from '@/testHelpers/timeout';
 import { ItemViewModel } from '@/components/Room/Board/items';
-import * as logging from '@/common/logger';
-import noOp from '@/testHelpers/noOp';
+import { Vue } from 'vue/types/vue';
 
 jest.mock('@/common/dom', () => ({
   supportsTouchEvents: jest.fn().mockReturnValue(true),
@@ -45,29 +44,29 @@ interface RoomBoardComponentProps {
 
 const renderComponent = (
   props: Partial<RoomBoardComponentProps> = {},
-  queries: QuerySpec[] = []
+  queries: QuerySpec[] = [],
+  mocks: Partial<{
+    $toasted: typeof Vue.prototype.$toasted;
+    $logger: typeof Vue.prototype.$logger;
+  }> = {}
 ) => {
-  const mocks = {
-    $toasted: {
-      global: {
-        apollo_error: jest.fn(),
-      },
+  return renderWithApollo(RoomBoard, queries, {
+    propsData: {
+      myId: MY_ID,
+      zoomFactor: 1,
+      roomId: ROOM_ID,
+      items: [buildItemViewModel({ id: ITEM_ID, posX: 10, posY: 10 })],
+      ...props,
     },
-  };
-
-  return {
-    ...renderWithApollo(RoomBoard, queries, {
-      propsData: {
-        myId: MY_ID,
-        zoomFactor: 1,
-        roomId: ROOM_ID,
-        items: [buildItemViewModel({ id: ITEM_ID, posX: 10, posY: 10 })],
-        ...props,
+    mocks: {
+      $toasted: {
+        global: {
+          apollo_error: jest.fn(),
+        },
       },
-      mocks,
-    }),
-    mocks,
-  };
+      ...mocks,
+    },
+  });
 };
 
 describe('<room-board />', () => {
@@ -234,15 +233,16 @@ describe('<room-board />', () => {
       expect(item).toHaveStyle('top: 10px; left: 10px;');
     });
     it('displays a toast update when an error occurs while locking', async () => {
-      const logErrorSpy = jest
-        .spyOn(logging, 'logError')
-        .mockImplementation(noOp);
+      const $logger = {
+        error: jest.fn(),
+      };
 
       const { mocks } = renderComponent(
         {
           items: [buildItemViewModel({ id: ITEM_ID })],
         },
-        [makeSadLockRoomBoardItemMutationStub({ id: ITEM_ID })]
+        [makeSadLockRoomBoardItemMutationStub({ id: ITEM_ID })],
+        { $logger }
       );
 
       await moveItem();
@@ -251,7 +251,7 @@ describe('<room-board />', () => {
       expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
         'Could not move the item: GraphQL error: everything is broken'
       );
-      expect(logErrorSpy).toHaveBeenCalled();
+      expect(mocks.$logger?.error).toHaveBeenCalled();
     });
     it('unlocks after moving', async () => {
       const { queryMocks } = await renderComponent(

@@ -39,7 +39,6 @@ import {
   MoveBoardItemInput,
   UnlockRoomBoardItemInput,
 } from '@type-definitions/graphql';
-import { logError } from '@/common/logger';
 
 export default Vue.extend({
   name: 'board',
@@ -156,7 +155,7 @@ export default Vue.extend({
           },
         })
         .catch((error) => {
-          logError(error);
+          this.$logger.error(error);
           this.$toasted.global.apollo_error(
             `Could not move the item: ${error.message}`
           );
