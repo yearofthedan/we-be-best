@@ -109,25 +109,16 @@ export default Vue.extend({
       }
       const { movementX, movementY } = event;
 
-      if (!this.movingItemReference) {
-        if (!this.heldItemReference) {
-          return;
-        }
-        this.movingItemReference = this.heldItemReference;
-        this._lockItem(this.heldItemReference);
-      }
-      this._onBoardItemMoved({
-        itemReference: this.movingItemReference,
-        movementX,
-        movementY,
-      });
+      this.moveItemIfHeld(movementX, movementY);
     },
     _onMouseMove: function (event: MouseEvent): void {
       if (supportsTouchEvents()) {
         return;
       }
       const { movementX, movementY } = event;
-
+      this.moveItemIfHeld(movementX, movementY);
+    },
+    moveItemIfHeld(movementX: number, movementY: number) {
       if (!this.movingItemReference) {
         if (!this.heldItemReference) {
           return;
