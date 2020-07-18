@@ -41,6 +41,14 @@
           </button-text>
           <dd>{{ this.roomId }}</dd>
         </dl>
+        <details>
+          <summary>privacy warning</summary>
+          <ul>
+            <li>These are public rooms so ids can be guessed</li>
+            <li>Data is destroyed when nobody is using the app for a while</li>
+            <li>Use the export feature to keep your data</li>
+          </ul>
+        </details>
         <button-contained
           :aria-label="isCreating ? 'create room' : 'join room'"
           type="submit"
@@ -229,5 +237,23 @@ article {
   background: linear-gradient(124deg, transparent 56%, var(--light-pink) 56%),
     linear-gradient(64deg, transparent 60%, var(--whitest-white) 60%),
     linear-gradient(36deg, var(--light-orange) 46%, var(--light-cyan) 46%);
+}
+
+details {
+  max-width: 300px;
+}
+
+details[open] > summary::before {
+  content: '';
+}
+
+details > ul {
+  margin-top: calc(2 * var(--unit-base-rem));
+  list-style-type: '⚠️';
+}
+
+summary::before {
+  content: '⚠️';
+  padding-right: calc(2 * var(--unit-base-rem));
 }
 </style>

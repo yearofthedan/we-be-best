@@ -7,34 +7,11 @@
 <script>
 import Vue from 'vue';
 
-const welcomeMessage = `
-        ⚠️ These are public rooms so ids can be guessed
-        ⚠️ Data is destroyed when nobody is using the app for a while
-        ✅ Use the export feature to keep your data
-    `;
-
 export default Vue.extend({
   name: 'app',
-  mounted() {
-    this.$toasted.show(welcomeMessage, {
-      duration: 8000,
-      position: 'bottom-center',
-      containerClass: 'privacy-toast-container',
-      className: 'privacy-toast',
-    });
-  },
 });
 </script>
 <style>
-.privacy-toast {
-  white-space: pre;
-  line-height: 24px !important;
-  padding-bottom: 0 !important;
-  padding-top: 0 !important;
-}
-.privacy-toast-container {
-  opacity: 70%;
-}
 .toasted-container {
   font-family: Avenir, Helvetica, Arial, sans-serif;
 }

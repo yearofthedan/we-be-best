@@ -3,13 +3,10 @@ import { routes } from '@/router/router';
 import { render, screen } from '@/testHelpers/renderer';
 
 describe('routes', () => {
-  it('renders the home page with a pop up', () => {
-    const showMock = jest.fn();
-
-    render(App, { routes, mocks: { $toasted: { show: showMock } } });
+  it('renders the home page', () => {
+    render(App, { routes });
 
     expect(screen.getByText('create room')).toBeInTheDocument();
-    expect(showMock).toHaveBeenCalled();
   });
 
   it('prefills the room field if the room id is in the query field', () => {
