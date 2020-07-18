@@ -144,7 +144,7 @@ describe('<room-board />', () => {
     async function moveItem() {
       await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
       await fireEvent(
-        screen.getByRole('listitem'),
+        screen.getByLabelText('board'),
         new PointerMoveEvent({
           movementX: 20,
           movementY: 10,
@@ -272,6 +272,37 @@ describe('<room-board />', () => {
 
       expect(screen.getByRole('listitem')).not.toHaveAttribute('data-moving');
     });
+    it('forgets about saving if the item was removed while moving', async () => {
+      const { queryMocks, updateProps } = await renderComponent(
+        {
+          items: [buildItemViewModel({ id: ITEM_ID })],
+        },
+        [
+          makeHappyLockRoomBoardItemMutationStub({ id: ITEM_ID }),
+          makeHappyUnlockRoomBoardItemMutationStub({ id: ITEM_ID }),
+          makeHappyMoveBoardItemMutationStub({ id: ITEM_ID }),
+        ]
+      );
+
+      await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
+      await fireEvent(
+        screen.getByRole('listitem'),
+        new PointerMoveEvent({
+          movementX: 20,
+          movementY: 10,
+        })
+      );
+
+      await updateProps({ items: [] });
+
+      await fireEvent(screen.getByLabelText('board'), new PointerUpEvent());
+
+      await sleep(5);
+
+      expect(queryMocks[1]).not.toHaveBeenCalled();
+      expect(queryMocks[2]).not.toHaveBeenCalled();
+    });
+
     it('remotely updates the item position', async () => {
       const { queryMocks } = await renderComponent(
         {

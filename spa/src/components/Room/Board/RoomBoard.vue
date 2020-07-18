@@ -169,9 +169,11 @@ export default Vue.extend({
       movementX,
       movementY,
     }: ItemMovedEventPayload) {
-      const { posX, posY } = this.itemsData.find(
-        (e) => e.id === itemReference
-      ) as ItemViewModel;
+      const item = this.itemsData.find((e) => e.id === itemReference);
+      if (!item) {
+        return;
+      }
+      const { posX, posY } = item;
 
       this.itemsData = patchArrayElement(
         this.itemsData,
@@ -210,8 +212,7 @@ export default Vue.extend({
           },
         })
         .catch((error) => {
-          //todo investigate why these are causing flakiness in tests when not optional
-          this.$toasted?.global?.apollo_error(
+          this.$toasted.global.apollo_error(
             `Could not update the item: ${error.message}`
           );
         });
