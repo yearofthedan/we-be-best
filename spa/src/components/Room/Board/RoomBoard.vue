@@ -169,10 +169,6 @@ export default Vue.extend({
       movementX,
       movementY,
     }: ItemMovedEventPayload) {
-      if (!itemReference || (movementX === 0 && movementY === 0)) {
-        return;
-      }
-
       const { posX, posY } = this.itemsData.find(
         (e) => e.id === itemReference
       ) as ItemViewModel;
