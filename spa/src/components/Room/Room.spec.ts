@@ -61,7 +61,9 @@ describe('<room />', () => {
       Room,
       [
         makeHappyRoomQueryStub(),
-        makeHappyRoomMemberUpdateSubscription(),
+        makeHappyRoomMemberUpdateSubscription({
+          successData: { name: 'my-mother' },
+        }),
         makeHappyRoomItemUpdatesSubscription(),
       ],
       {
@@ -121,7 +123,7 @@ describe('<room />', () => {
     await userEvent.click(link);
 
     const href =
-      'data:text/json;charset=utf-8,%7B%22room%22%3A%7B%22id%22%3A%22ROOM123%22%2C%22members%22%3A%5B%7B%22id%22%3A%221%22%2C%22name%22%3A%22me%22%7D%2C%7B%22id%22%3A%222%22%2C%22name%22%3A%22my-mother%22%7D%5D%2C%22items%22%3A%5B%7B%22id%22%3A%22ITEM1%22%2C%22posX%22%3A30%2C%22posY%22%3A20%2C%22lockedBy%22%3A%22me%22%2C%22text%22%3A%22placeholder%20text%22%2C%22style%22%3A2%2C%22isDeleted%22%3Anull%2C%22isNew%22%3Anull%7D%2C%7B%22id%22%3A%22ITEMM1234%22%2C%22posX%22%3A30%2C%22posY%22%3A20%2C%22lockedBy%22%3A%22me%22%2C%22text%22%3A%22placeholder%20text%22%2C%22style%22%3A2%2C%22isDeleted%22%3Anull%2C%22isNew%22%3Anull%7D%5D%7D%7D';
+      'data:text/json;charset=utf-8,%7B%22room%22%3A%7B%22id%22%3A%22ROOM123%22%2C%22members%22%3A%5B%7B%22id%22%3A%22aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee%22%2C%22name%22%3A%22me%22%7D%2C%7B%22id%22%3A%222%22%2C%22name%22%3A%22PERSON%22%7D%5D%2C%22items%22%3A%5B%7B%22id%22%3A%22ITEM1%22%2C%22posX%22%3A30%2C%22posY%22%3A20%2C%22lockedBy%22%3A%22me%22%2C%22text%22%3A%22placeholder%20text%22%2C%22style%22%3A2%2C%22isDeleted%22%3Anull%2C%22isNew%22%3Anull%7D%2C%7B%22id%22%3A%22ITEMM1234%22%2C%22posX%22%3A30%2C%22posY%22%3A20%2C%22lockedBy%22%3A%22me%22%2C%22text%22%3A%22placeholder%20text%22%2C%22style%22%3A2%2C%22isDeleted%22%3Anull%2C%22isNew%22%3Anull%7D%5D%7D%7D';
     expect(link).toHaveAttribute('href', href);
   });
 

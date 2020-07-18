@@ -9,8 +9,8 @@ import Lobby from './Lobby.vue';
 import { sleep } from '@/testHelpers/timeout';
 import { ACTION_STATE } from '@/components/atoms/buttonStates';
 import {
-  makeHappyJoinRoomMutationStub,
-  makeSadJoinRoomMutationStub,
+  makeHappyAddMemberMutationStub,
+  makeSadAddMemberMutationStub,
 } from '@/testHelpers/roomQueryStubs';
 
 const ROOM_ID = 'my-room';
@@ -78,7 +78,7 @@ describe('<lobby />', () => {
     it('joins a room and emits a joined event', async () => {
       const { queryMocks, emitted } = renderWithApollo(
         Lobby,
-        [makeHappyJoinRoomMutationStub()],
+        [makeHappyAddMemberMutationStub()],
         {
           propsData: {
             existingRoomId: '1234',
@@ -147,7 +147,7 @@ describe('<lobby />', () => {
 
     it('creates a room and emits a joined event', async () => {
       const { queryMocks, emitted } = renderWithApollo(Lobby, [
-        makeHappyJoinRoomMutationStub(),
+        makeHappyAddMemberMutationStub(),
       ]);
 
       await userEvent.type(screen.getByLabelText('Your name'), MEMBER_NAME);
@@ -192,7 +192,7 @@ describe('<lobby />', () => {
 
     const { emitted } = renderWithApollo(
       Lobby,
-      [makeSadJoinRoomMutationStub()],
+      [makeSadAddMemberMutationStub()],
       {
         mocks: {
           $toasted: $toasted,
@@ -222,7 +222,7 @@ describe('<lobby />', () => {
   });
 
   it('displays success indicator after submitting', async () => {
-    renderWithApollo(Lobby, [makeHappyJoinRoomMutationStub()]);
+    renderWithApollo(Lobby, [makeHappyAddMemberMutationStub()]);
 
     await userEvent.type(screen.getByLabelText('Your name'), MEMBER_NAME);
     await userEvent.click(screen.getByRole('button', { name: /create room/i }));

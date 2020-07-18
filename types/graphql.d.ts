@@ -48,7 +48,7 @@ export type AddRoomBoardItemInput = {
   posY: Scalars['Int'];
 };
 
-export type JoinRoomInput = {
+export type AddMemberInput = {
   roomId: Scalars['ID'];
   memberName: Scalars['String'];
 };
@@ -76,6 +76,7 @@ export type Member = {
   __typename?: 'Member';
   id: Scalars['ID'];
   name: Scalars['String'];
+  room: Room;
 };
 
 export type Query = {
@@ -90,13 +91,13 @@ export type QueryRoomArgs = {
 
 export type Subscription = {
   __typename?: 'Subscription';
-  roomMemberUpdates: Room;
+  memberUpdates: Member;
   itemUpdates: Item;
 };
 
 
-export type SubscriptionRoomMemberUpdatesArgs = {
-  id: Scalars['ID'];
+export type SubscriptionMemberUpdatesArgs = {
+  roomId: Scalars['ID'];
 };
 
 
@@ -106,7 +107,7 @@ export type SubscriptionItemUpdatesArgs = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  joinRoom: Room;
+  addMember: Member;
   moveBoardItem: Item;
   lockRoomBoardItem: Item;
   unlockRoomBoardItem: Item;
@@ -117,8 +118,8 @@ export type Mutation = {
 };
 
 
-export type MutationJoinRoomArgs = {
-  input: JoinRoomInput;
+export type MutationAddMemberArgs = {
+  input: AddMemberInput;
 };
 
 
@@ -252,20 +253,25 @@ export type DeleteBoardItemMutation = (
   ) }
 );
 
-export type RoomMemberUpdatesSubscriptionVariables = Exact<{
-  id: Scalars['ID'];
+export type MemberBitsFragment = (
+  { __typename: 'Member' }
+  & Pick<Member, 'id' | 'name'>
+  & { room: (
+    { __typename?: 'Room' }
+    & Pick<Room, 'id'>
+  ) }
+);
+
+export type MemberUpdatesSubscriptionVariables = Exact<{
+  roomId: Scalars['ID'];
 }>;
 
 
-export type RoomMemberUpdatesSubscription = (
+export type MemberUpdatesSubscription = (
   { __typename?: 'Subscription' }
-  & { roomMemberUpdates: (
-    { __typename?: 'Room' }
-    & Pick<Room, 'id'>
-    & { members: Array<(
-      { __typename?: 'Member' }
-      & Pick<Member, 'id' | 'name'>
-    )> }
+  & { memberUpdates: (
+    { __typename?: 'Member' }
+    & MemberBitsFragment
   ) }
 );
 
@@ -302,19 +308,15 @@ export type RoomQuery = (
   )> }
 );
 
-export type JoinRoomMutationVariables = Exact<{
-  input: JoinRoomInput;
+export type AddMemberMutationVariables = Exact<{
+  input: AddMemberInput;
 }>;
 
 
-export type JoinRoomMutation = (
+export type AddMemberMutation = (
   { __typename?: 'Mutation' }
-  & { joinRoom: (
-    { __typename?: 'Room' }
-    & Pick<Room, 'id'>
-    & { items: Array<(
-      { __typename?: 'Item' }
-      & ItemBitsFragment
-    )> }
+  & { addMember: (
+    { __typename?: 'Member' }
+    & MemberBitsFragment
   ) }
 );

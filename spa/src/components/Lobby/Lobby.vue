@@ -54,8 +54,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { JoinRoomInput } from '@type-definitions/graphql';
-import { joinRoom } from '@/graphql/roomQueries.graphql';
+import { AddMemberInput } from '@type-definitions/graphql';
+import { addMember } from '@/graphql/roomQueries.graphql';
 import ButtonContained from '@/components/atoms/ButtonContained.vue';
 import { ACTION_STATE } from '@/components/atoms/buttonStates';
 import ButtonText from '@/components/atoms/ButtonText.vue';
@@ -117,7 +117,7 @@ export default Vue.extend({
 
       this.submitState = ACTION_STATE.LOADING;
 
-      const mutationPayload: { input: JoinRoomInput } = {
+      const mutationPayload: { input: AddMemberInput } = {
         input: {
           roomId: this.roomId as string,
           memberName: this.memberName as string,
@@ -125,7 +125,7 @@ export default Vue.extend({
       };
       try {
         await this.$apollo.mutate({
-          mutation: joinRoom,
+          mutation: addMember,
           variables: mutationPayload,
         });
 

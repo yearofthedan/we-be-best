@@ -5,8 +5,14 @@ import gql from 'graphql-tag';
 import testApolloServerAndClient from '../testHelpers/testApolloServerAndClient';
 import server from '../apolloServer';
 // @ts-ignore
-import {joinRoom} from '../../../spa/src/graphql/roomQueries.graphql';
+import {addMember} from '../../../spa/src/graphql/roomQueries.graphql';
 import {sleep} from '../testHelpers/timeout';
+
+const STUB_UUID = '11111-11111-1111-1111';
+
+jest.mock('uuid', () => ({
+  v4: () => { return STUB_UUID; }
+}));
 
 describe('integration: room members', () => {
   let query: ApolloServerTestClient['query'];
@@ -30,13 +36,10 @@ describe('integration: room members', () => {
       const subscriptionPromise = new Promise((resolve, reject) => {
         apolloClient.subscribe({
           query: gql`
-              subscription roomMemberUpdates($id: ID!) {
-                  roomMemberUpdates(id: $id) {
+              subscription memberUpdates($id: ID!) {
+                  memberUpdates(roomId: $id) {
                       id
-                      members {
-                          id
-                          name
-                      }
+                      name
                   }
               }`,
           variables: {id: '123'},
@@ -48,8 +51,8 @@ describe('integration: room members', () => {
       await sleep(1000);
       await apolloClient.mutate({
         mutation: gql`
-            mutation joinRoom($input: JoinRoomInput!) {
-                joinRoom(input: $input)  {
+            mutation addMember($input: AddMemberInput!) {
+                addMember(input: $input)  {
                     id
                 }
             }`,
@@ -62,19 +65,23 @@ describe('integration: room members', () => {
       });
 
       const result: any = await subscriptionPromise;
-      expect(result?.data?.roomMemberUpdates?.id).toEqual('123');
+      expect(result?.data?.memberUpdates?.id).toEqual(STUB_UUID);
     });
   });
 
   it('joins the room', async () => {
     const res = await query({
-      query: joinRoom,
+      query: addMember,
       variables: {input: {roomId: 'my-room', memberName: 'me'}},
     });
 
-    expect(res.data).toHaveProperty('joinRoom', {
-      id: 'my-room',
-      items: [],
+    expect(res.data).toHaveProperty('addMember', {
+      __typename: 'Member',
+      id: STUB_UUID,
+      name: 'me',
+      room: {
+        id: 'my-room'
+      },
     });
   });
 });

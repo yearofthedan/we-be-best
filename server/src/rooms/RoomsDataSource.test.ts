@@ -1,9 +1,9 @@
 import {Collection} from 'apollo-datasource-mongodb';
 import {Db, MongoClient} from 'mongodb';
 import {MongoMemoryServer} from 'mongodb-memory-server';
-import {buildItemModel, buildRoomMemberModel, buildRoomModel} from '../testHelpers/storedTestDataBuilder';
-import RoomsDataSource, {NewItemParam, RoomModel, UpdateItemParam} from './RoomsDataSource';
 import {UserInputError} from 'apollo-server-express';
+import {buildItemModel, buildRoomMemberModel, buildRoomModel} from '@/testHelpers/storedTestDataBuilder';
+import RoomsDataSource, {NewItemParam, RoomModel, UpdateItemParam} from './RoomsDataSource';
 
 const ROOMS_COLLECTION = 'rooms';
 const buildNewItemParam = (overrides: Partial<NewItemParam> = {}): NewItemParam => ({
@@ -235,22 +235,22 @@ describe('RoomsDataSource', () => {
       });
       await roomsCollection.insertOne(existingRoomModel);
 
-      const roomModel = await rooms.addMember(existingRoomModel.id, 'my-mum');
+      const memberModel = await rooms.addMember(existingRoomModel.id, 'my-mum');
 
-      expect(roomModel).toEqual({
-        ...existingRoomModel,
-        members: [ ...existingRoomModel.members, expect.objectContaining({ name: 'my-mum' }) ]
+      expect(memberModel).toEqual({
+        id: expect.any(String),
+        name: 'my-mum',
+        room: 'ROOM_123'
       });
     });
 
     it('creates the room if it does not exist', async () => {
-      const roomModel = await rooms.addMember('new-room', 'my-mum');
+      const memberModel = await rooms.addMember('new-room', 'my-mum');
 
-      expect(roomModel).toEqual({
-        _id: expect.anything(),
-        id: 'new-room',
-        items: [],
-        members: [expect.objectContaining({ name: 'my-mum' })]
+      expect(memberModel).toEqual({
+        id: expect.any(String),
+        name: 'my-mum',
+        room: 'new-room'
       });
     });
   });

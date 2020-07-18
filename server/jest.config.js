@@ -10,6 +10,7 @@ module.exports = {
   ],
   moduleNameMapper: {
     'graphql-tag': '<rootDir>/node_modules/graphql-tag',
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
   testMatch: [
     '**/src/**/*.(test|spec).(ts|js)',

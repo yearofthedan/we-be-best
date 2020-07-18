@@ -40,7 +40,7 @@ import { removeArrayElement, upsertArrayElement } from '@/common/arrays';
 import {
   itemUpdates,
   room,
-  roomMemberUpdates,
+  memberUpdates,
 } from '@/graphql/roomQueries.graphql';
 
 import {
@@ -48,15 +48,14 @@ import {
   Subscription,
   Room,
   QueryRoomArgs,
-  SubscriptionRoomMemberUpdatesArgs,
+  SubscriptionMemberUpdatesArgs,
   SubscriptionItemUpdatesArgs,
-  Item,
   AddRoomBoardItemInput,
 } from '@type-definitions/graphql';
 import { addRoomBoardItem } from '@/graphql/boardQueries.graphql';
 import RoomControls from '@/components/Room/RoomControls.vue';
 import { mapToJsonString } from '@/components/Room/Details/roomExport';
-import { MembersViewModel } from '@/components/Room/Details/members';
+import { MemberViewModel } from '@/components/Room/Details/members';
 
 interface RoomComponentProps {
   roomId: string;
@@ -70,7 +69,10 @@ interface RoomComponentData {
   background: string;
 }
 
-const resolveUpdate = (items: ItemViewModel[], update: Item) => {
+const resolveUpdate = <T extends { id: string; isDeleted?: boolean | null }>(
+  items: T[],
+  update: T
+) => {
   if (update.isDeleted) {
     return removeArrayElement(items, (e) => e.id === update.id);
   }
@@ -112,9 +114,9 @@ export default Vue.extend({
       },
       subscribeToMore: [
         {
-          document: roomMemberUpdates,
-          variables: function (): SubscriptionRoomMemberUpdatesArgs {
-            return { id: ((this as unknown) as RoomComponentProps).roomId };
+          document: memberUpdates,
+          variables: function (): SubscriptionMemberUpdatesArgs {
+            return { roomId: ((this as unknown) as RoomComponentProps).roomId };
           },
           onError(error: ApolloError) {
             ((this as unknown) as RoomComponentData).error = error;
@@ -125,14 +127,22 @@ export default Vue.extend({
               subscriptionData,
             }: {
               subscriptionData: {
-                data: Pick<Subscription, 'roomMemberUpdates'>;
+                data: Pick<Subscription, 'memberUpdates'>;
               };
             }
           ) {
+            const currentRoom = ((this as unknown) as RoomComponentData).room;
+            if (!currentRoom) {
+              return;
+            }
+
             return {
               room: {
-                ...((this as unknown) as RoomComponentData).room,
-                members: subscriptionData.data.roomMemberUpdates.members,
+                ...currentRoom,
+                members: resolveUpdate(
+                  currentRoom.members,
+                  subscriptionData.data.memberUpdates
+                ),
               },
             };
           },
@@ -199,7 +209,7 @@ export default Vue.extend({
           mapToJsonString(
             this.roomId,
             this.room?.items as ItemViewModel[],
-            this.room?.members as MembersViewModel[]
+            this.room?.members as MemberViewModel[]
           )
         );
     },

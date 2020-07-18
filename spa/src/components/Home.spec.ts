@@ -1,27 +1,7 @@
 import { renderWithApollo, screen } from '@/testHelpers/renderer';
 import userEvent from '@testing-library/user-event';
 import Home from './Home.vue';
-import { joinRoom } from '@/graphql/roomQueries.graphql';
-
-function makeHappyPathMutationStub() {
-  const successData = {
-    joinRoom: {
-      id: 'my-room',
-      members: ['me'],
-      items: [],
-    },
-  };
-  return {
-    query: joinRoom,
-    variables: {
-      input: {
-        roomId: 'my-room',
-        memberName: 'me',
-      },
-    },
-    successData,
-  };
-}
+import { makeHappyAddMemberMutationStub } from '@/testHelpers/roomQueryStubs';
 
 jest.mock('nanoid', () => ({
   customAlphabet: () => jest.fn().mockReturnValue('stub-roomid'),
@@ -31,7 +11,7 @@ describe('Home', () => {
   it('creates a gathering when I input a valid name and continue', async () => {
     const { queryMocks } = renderWithApollo(
       Home,
-      [makeHappyPathMutationStub()],
+      [makeHappyAddMemberMutationStub()],
       {
         stubs: {
           Room: {

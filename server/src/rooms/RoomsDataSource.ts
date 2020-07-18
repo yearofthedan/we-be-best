@@ -12,6 +12,7 @@ export interface RoomModel {
 export interface MemberModel {
   id: string;
   name: string;
+  room: string;
 }
 
 export interface ItemModel {
@@ -19,8 +20,8 @@ export interface ItemModel {
   posY: number;
   posX: number;
   text: string;
+  room: string;
   lockedBy?: string;
-  room?: string;
   isDeleted?: boolean;
   style?: number;
 }
@@ -117,23 +118,26 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
     return result.value?.items[0];
   }
 
-  async addMember(roomId: string, memberName: string): Promise<RoomModel | undefined> {
+  async addMember(roomId: string, memberName: string): Promise<MemberModel | undefined> {
     const member: MemberModel = {
       id: v4(),
-      name: memberName
+      name: memberName,
+      room: roomId,
     };
 
     return (await this.collection.findOneAndUpdate(
       {id: roomId},
+      { $push: {members: member}, $setOnInsert: {items: []} },
       {
-        $push: {members: member},
-        $setOnInsert: {items: []},
-      },
-      {
+        projection: {
+          members: {
+            $elemMatch: {id: member.id},
+          },
+        },
         upsert: true,
         returnOriginal: false,
       },
-    )).value;
+    )).value?.members[0];
   }
 }
 

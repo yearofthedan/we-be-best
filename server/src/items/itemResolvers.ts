@@ -22,7 +22,7 @@ export const addRoomBoardItem = async (
   _: unknown,
   { input }: MutationAddRoomBoardItemArgs,
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
-): Promise<Partial<Item>> => {
+): Promise<Item> => {
   const { itemId, roomId, posX, posY } = input;
   const itemModel = await dataSources.Rooms.addItem(roomId, { id: itemId, posY, posX, text: ''});
   const result = mapToItemResponse(itemModel);

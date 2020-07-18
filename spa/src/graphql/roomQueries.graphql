@@ -9,13 +9,19 @@ fragment ItemBits on Item {
     isDeleted
 }
 
-subscription roomMemberUpdates($id: ID!) {
-    roomMemberUpdates(id: $id) {
+fragment MemberBits on Member {
+    __typename
+    id
+    name
+    room {
         id
-        members {
-            id
-            name
-        }
+    }
+}
+
+
+subscription memberUpdates($roomId: ID!) {
+    memberUpdates(roomId: $roomId) {
+        ...MemberBits
     }
 }
 
@@ -38,11 +44,8 @@ query room($id: ID!) {
     }
 }
 
-mutation joinRoom($input: JoinRoomInput!) {
-    joinRoom(input: $input) {
-        id
-        items {
-            ...ItemBits
-        }
+mutation addMember($input: AddMemberInput!) {
+    addMember(input: $input) {
+        ...MemberBits
     }
 }

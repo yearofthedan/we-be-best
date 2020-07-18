@@ -18,10 +18,11 @@ export const deleteBoardItem: DocumentNode;
 declare module '@/graphql/roomQueries.graphql' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
-  export const roomMemberUpdates: DocumentNode;
+  export const MemberBits: DocumentNode;
+export const memberUpdates: DocumentNode;
 export const itemUpdates: DocumentNode;
 export const room: DocumentNode;
-export const joinRoom: DocumentNode;
+export const addMember: DocumentNode;
 
   export default defaultDocument;
 }

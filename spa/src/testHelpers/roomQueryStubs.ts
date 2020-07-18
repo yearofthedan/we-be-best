@@ -1,10 +1,14 @@
-import {itemUpdates, joinRoom, room, roomMemberUpdates} from '@/graphql/roomQueries.graphql';
+import {itemUpdates, addMember, room, memberUpdates} from '@/graphql/roomQueries.graphql';
 import {buildItemResponse} from '@/testHelpers/itemQueryStubs';
 import {Item, Member, Room} from '@type-definitions/graphql';
 
 export const buildMemberResult = (override: Partial<Member> = {}): Member => ({
+  __typename: 'Member',
   id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
   name: 'PERSON',
+  room: {
+    id: 'ROOM123'
+  } as Room,
   ...override
 });
 
@@ -23,19 +27,12 @@ export function makeHappyRoomItemUpdatesSubscription(
 };
 
 export function makeHappyRoomMemberUpdateSubscription(
-  override: { variables?: undefined; successData?: Partial<Room> } = {}
+  override: { variables?: undefined; successData?: Partial<Member> } = {}
 ) {
   return {
-    query: roomMemberUpdates,
+    query: memberUpdates,
     successData: {
-      roomMemberUpdates: {
-        id: '123',
-        members: [
-          buildMemberResult({id: '1', name: 'me'}),
-          buildMemberResult({id: '2', name: 'my-mother'}),
-        ],
-        ...override.successData,
-      },
+      memberUpdates: buildMemberResult({id: '2', ...override.successData}),
     },
   };
 }
@@ -54,9 +51,10 @@ export function makeHappyRoomQueryStub(override: { variables?: undefined; succes
     },
   };
 }
-export function makeHappyJoinRoomMutationStub() {
+
+export function makeHappyAddMemberMutationStub() {
   return {
-    query: joinRoom,
+    query: addMember,
     variables: {
       input: {
         roomId: 'my-room',
@@ -64,17 +62,13 @@ export function makeHappyJoinRoomMutationStub() {
       },
     },
     successData: {
-      joinRoom: {
-        id: 'my-room',
-        members: ['me'],
-        items: [],
-      },
+      addMember: buildMemberResult()
     },
   };
 }
-export function makeSadJoinRoomMutationStub() {
+export function makeSadAddMemberMutationStub() {
   return {
-    query: joinRoom,
+    query: addMember,
     variables: {
       input: {
         roomId: 'my-room',

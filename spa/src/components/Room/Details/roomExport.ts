@@ -3,19 +3,19 @@ import {
   mapToItemsViewModel,
 } from '@/components/Room/Board/items';
 import {
-  mapToMembersViewModel,
-  MembersViewModel,
+  mapToMemberViewModel,
+  MemberViewModel,
 } from '@/components/Room/Details/members';
 
 export const mapToJsonString = (
   id: string,
   items: ItemViewModel[],
-  members: MembersViewModel[]
+  members: MemberViewModel[]
 ): string => {
   return JSON.stringify({
     room: {
       id,
-      members: mapToMembersViewModel(members),
+      members: mapToMemberViewModel(members),
       items: mapToItemsViewModel(items),
     },
   });

@@ -5,10 +5,10 @@ import {
   Item,
   MutationAddRoomBoardItemArgs,
   MutationDeleteBoardItemArgs,
-  MutationJoinRoomArgs,
+  MutationAddMemberArgs,
   MutationLockRoomBoardItemArgs, MutationUpdateBoardItemStyleArgs,
   MutationUpdateBoardItemTextArgs, Room, Subscription,
-} from '@type-definitions/graphql';
+} from '../../../types/graphql';
 
 describe('integration: items', () => {
   let apolloClient: ApolloClient<any>;
@@ -48,10 +48,10 @@ describe('integration: items', () => {
   }
 
   async function addARoom(roomId: string = '123') {
-    await apolloClient.mutate<Room, MutationJoinRoomArgs>({
+    await apolloClient.mutate<Room, MutationAddMemberArgs>({
       mutation: gql`
-          mutation joinRoom($input: JoinRoomInput!) {
-              joinRoom(input: $input)  {
+          mutation addMember($input: AddMemberInput!) {
+              addMember(input: $input)  {
                   id
               }
           }`,

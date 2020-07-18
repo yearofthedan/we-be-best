@@ -1,13 +1,13 @@
 import { Member } from '@type-definitions/graphql';
 
-export interface MembersViewModel {
+export interface MemberViewModel {
   id: string;
   name: string;
 }
 
-export const mapToMembersViewModel = (
-  members: Member[]
-): MembersViewModel[] => {
+export const mapToMemberViewModel = (
+  members: Pick<Member, 'id' | 'name'>[]
+): MemberViewModel[] => {
   return members.map((m) => {
     return {
       id: m.id,

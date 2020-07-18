@@ -37,7 +37,7 @@ input AddRoomBoardItemInput {
     posY: Int!
 }
 
-input JoinRoomInput {
+input AddMemberInput {
     roomId: ID!
     memberName: String!
 }
@@ -62,6 +62,7 @@ type Item {
 type Member {
     id: ID!
     name: String!
+    room: Room!
 }
 
 type Query {
@@ -69,12 +70,12 @@ type Query {
 }
 
 type Subscription {
-    roomMemberUpdates(id: ID!): Room!
+    memberUpdates(roomId: ID!): Member!
     itemUpdates(roomId: ID!): Item!
 }
 
 type Mutation {
-    joinRoom(input: JoinRoomInput!): Room!
+    addMember(input: AddMemberInput!): Member!
     moveBoardItem(input: MoveBoardItemInput!): Item!
     lockRoomBoardItem(input: LockRoomBoardItemInput!): Item!
     unlockRoomBoardItem(input: UnlockRoomBoardItemInput!): Item!

@@ -13,6 +13,7 @@ export const buildItemData = (overrides: Partial<ItemModel> = {}): ItemModel => 
 export const buildRoomMemberModel = (overrides: Partial<MemberModel> = {}): MemberModel => ({
     id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
     name:  'PERSON',
+    room: 'ROOM123',
     ...overrides,
 });
 
