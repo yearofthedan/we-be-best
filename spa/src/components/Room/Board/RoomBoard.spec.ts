@@ -31,9 +31,8 @@ import { sleep } from '@/testHelpers/timeout';
 import { ItemViewModel } from '@/components/Room/Board/items';
 import { Vue } from 'vue/types/vue';
 
-jest.mock('@/common/dom', () => ({
-  supportsTouchEvents: jest.fn().mockReturnValue(true),
-}));
+jest.mock('@/common/dom');
+(supportsTouchEvents as jest.Mock).mockReturnValue(true);
 
 interface RoomBoardComponentProps {
   myId: string;
@@ -184,7 +183,6 @@ describe('<room-board />', () => {
       `);
     });
     it('allows moving a locked item if i locked it', async () => {
-      (supportsTouchEvents as jest.Mock).mockReturnValue(true);
       const { queryMocks } = renderComponent(
         {
           items: [
@@ -211,8 +209,7 @@ describe('<room-board />', () => {
       });
     });
     it('does not move the item if it has been locked by somebody else', async () => {
-      (supportsTouchEvents as jest.Mock).mockReturnValue(true);
-      renderComponent({
+      await renderComponent({
         items: [
           buildItemViewModel({
             id: ITEM_ID,

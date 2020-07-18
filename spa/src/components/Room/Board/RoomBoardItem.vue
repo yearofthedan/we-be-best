@@ -37,7 +37,7 @@ import {
   updateBoardItemText,
 } from '@/graphql/boardQueries.graphql';
 import AutoExpandingTextBox from '@/components/Room/Board/AutoExpandingTextBox.vue';
-import { PRIMARY_MOUSE_BUTTON_ID, supportsTouchEvents } from '@/common/dom';
+import { MOUSE_BUTTONS, supportsTouchEvents } from '@/common/dom';
 import ColourStyleSelector from '@/components/Room/Board/ColourStyleSelector.vue';
 import {
   DeleteBoardItemMutation,
@@ -104,13 +104,13 @@ export default Vue.extend({
       '--theme-primary-colour': string;
       '--theme-text-colour': string;
     } {
-      const style = this.styleOptions[this.selectedStyle];
+      const style =
+        this.styleOptions[this.selectedStyle] ?? this.styleOptions[0];
       return {
         left: `${this.item.posX}px`,
         top: `${this.item.posY}px`,
-        '--theme-primary-colour':
-          style.backgroundColour || 'var(--colour-primary-emphasis)',
-        '--theme-text-colour': style.textColour || 'var(--colour-background)',
+        '--theme-primary-colour': style.backgroundColour,
+        '--theme-text-colour': style.textColour,
       };
     },
     elementId: function () {
@@ -190,7 +190,7 @@ export default Vue.extend({
     _onMove: function (event: MouseEvent): void {
       if (
         (this.item.lockedBy && !this.lockedByMe) ||
-        (event.button && event.button !== PRIMARY_MOUSE_BUTTON_ID)
+        event.button !== MOUSE_BUTTONS.primary
       ) {
         return;
       }

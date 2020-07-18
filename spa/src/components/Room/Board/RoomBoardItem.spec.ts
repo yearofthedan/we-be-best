@@ -16,11 +16,7 @@ import {
   makeSadUpdateBoardItemStyleMutationStub,
   makeSadUpdateRoomBoardItemMutationStub,
 } from '@/testHelpers/itemQueryStubs';
-import {
-  PRIMARY_MOUSE_BUTTON_ID,
-  SECONDARY_MOUSE_BUTTON_ID,
-  supportsTouchEvents,
-} from '@/common/dom';
+import { MOUSE_BUTTONS, supportsTouchEvents } from '@/common/dom';
 import { sleep } from '@/testHelpers/timeout';
 import { buildItemViewModel } from '@/testHelpers/testData';
 import {
@@ -29,11 +25,12 @@ import {
   LIGHT_ORANGE,
 } from '@/components/Room/Board/itemTheme';
 
-jest.mock('@/common/dom', () => ({
-  supportsTouchEvents: jest.fn().mockReturnValue(true),
-}));
+jest.mock('@/common/dom');
 
 describe('<room-board-item />', () => {
+  beforeEach(() => {
+    (supportsTouchEvents as jest.Mock).mockReturnValue(true);
+  });
   describe('default rendering', () => {
     it('renders the positioning based upon the x and y props', () => {
       render(RoomBoardItem, {
@@ -76,6 +73,21 @@ describe('<room-board-item />', () => {
       --theme-text-colour: ${BLACKEST_BLACK};
     `);
     });
+
+    it('renders the default themed style if the style is invalid', () => {
+      render(RoomBoardItem, {
+        propsData: {
+          myId: 'me',
+          item: buildItemViewModel({ style: 100 }),
+          moving: false,
+        },
+      });
+
+      expect(screen.getByRole('listitem')).toHaveStyle(`
+      --theme-primary-colour: ${LIGHT_CYAN};
+      --theme-text-colour: ${BLACKEST_BLACK};
+    `);
+    });
   });
 
   describe('moving', () => {
@@ -107,8 +119,8 @@ describe('<room-board-item />', () => {
           },
         });
 
-        await fireEvent.mouseDown(screen.getByRole('listitem'), {
-          button: PRIMARY_MOUSE_BUTTON_ID,
+        await userEvent.click(screen.getByRole('listitem'), {
+          button: MOUSE_BUTTONS.primary,
         });
 
         expect(emitted().pointerheld).not.toBeUndefined();
@@ -131,7 +143,8 @@ describe('<room-board-item />', () => {
           screen.getByRole('listitem'),
           new PointerDownEvent({
             pointerId: 1000,
-            button: SECONDARY_MOUSE_BUTTON_ID,
+            // @ts-ignore
+            button: MOUSE_BUTTONS.secondary,
           })
         );
 
@@ -145,7 +158,12 @@ describe('<room-board-item />', () => {
         const { emitted } = render(RoomBoardItem, {
           propsData: {
             myId: 'me',
-            item: buildItemViewModel({ id: 'item123', posX: 2, posY: 1 }),
+            item: buildItemViewModel({
+              id: 'item123',
+              posX: 2,
+              posY: 1,
+              lockedBy: null,
+            }),
             moving: true,
           },
         });
@@ -165,7 +183,12 @@ describe('<room-board-item />', () => {
         const { emitted } = render(RoomBoardItem, {
           propsData: {
             myId: 'me',
-            item: buildItemViewModel({ id: 'item123', posX: 2, posY: 1 }),
+            item: buildItemViewModel({
+              id: 'item123',
+              posX: 2,
+              posY: 1,
+              lockedBy: null,
+            }),
             moving: true,
           },
         });
@@ -176,39 +199,37 @@ describe('<room-board-item />', () => {
       });
     });
 
-    describe('locking', () => {
-      it('fires a pointerheld event when the item is locked by me', async () => {
-        const { emitted } = render(RoomBoardItem, {
-          propsData: {
-            myId: 'me',
-            item: buildItemViewModel({ lockedBy: 'me' }),
-            moving: true,
-          },
-        });
-
-        await fireEvent(
-          screen.getByRole('listitem'),
-          new PointerDownEvent({ pointerId: 1000 })
-        );
-
-        expect(emitted().pointerheld).not.toBeUndefined();
+    it('fires a pointerheld event when the item is locked by me', async () => {
+      const { emitted } = render(RoomBoardItem, {
+        propsData: {
+          myId: 'me',
+          item: buildItemViewModel({ lockedBy: 'me' }),
+          moving: true,
+        },
       });
-      it('does not fire the pointerheld event when the item is locked by someone else', async () => {
-        const { emitted } = render(RoomBoardItem, {
-          propsData: {
-            myId: 'me',
-            item: buildItemViewModel({ lockedBy: 'someone' }),
-            moving: true,
-          },
-        });
 
-        await fireEvent(
-          screen.getByRole('listitem'),
-          new PointerDownEvent({ pointerId: 1000 })
-        );
+      await fireEvent(
+        screen.getByRole('listitem'),
+        new PointerDownEvent({ pointerId: 1000 })
+      );
 
-        expect(emitted().pointerheld).toBeUndefined();
+      expect(emitted().pointerheld).not.toBeUndefined();
+    });
+    it('does not fire the pointerheld event when the item is locked by someone else', async () => {
+      const { emitted } = render(RoomBoardItem, {
+        propsData: {
+          myId: 'me',
+          item: buildItemViewModel({ lockedBy: 'someone' }),
+          moving: true,
+        },
       });
+
+      await fireEvent(
+        screen.getByRole('listitem'),
+        new PointerDownEvent({ pointerId: 1000 })
+      );
+
+      expect(emitted().pointerheld).toBeUndefined();
     });
   });
 
