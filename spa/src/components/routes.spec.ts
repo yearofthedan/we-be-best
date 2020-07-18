@@ -1,6 +1,6 @@
 import App from '../components/App.vue';
-import { routes } from '@/router/router';
 import { render, screen } from '@/testHelpers/renderer';
+import { routes } from '@/components/routes';
 
 describe('routes', () => {
   it('renders the home page', () => {

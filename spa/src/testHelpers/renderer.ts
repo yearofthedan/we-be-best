@@ -3,7 +3,7 @@ import { DocumentNode } from 'graphql';
 import { createMockClient } from 'mock-apollo-client';
 import VueApollo from 'vue-apollo';
 import {ComponentHarness, ConfigurationCallback, render} from '@testing-library/vue';
-import loggerPlugin from '@/loggerPlugin';
+import logger from '@/vue/logger';
 
 export interface QuerySpec {
   query: DocumentNode;
@@ -61,7 +61,7 @@ const renderWithApollo = <V extends Vue>(
     },
     (vue, store, router) => {
       vue.use(VueApollo);
-      vue.use(loggerPlugin);
+      vue.use(logger);
       callback && callback(vue as V, store, router);
     }
   );
