@@ -11,23 +11,23 @@ export interface NoteViewModel {
   lockedBy?: string | null;
   text: string;
   style?: number | null;
-  isDeleted?: boolean | null;
   isNew?: boolean | null;
 }
 
+export const mapToNoteViewModel = (notes: Note): NoteViewModel => {
+  return {
+    id: notes.id,
+    posX: notes.posX,
+    posY: notes.posY,
+    lockedBy: notes.lockedBy,
+    text: notes.text,
+    style: notes.style,
+    isNew: null,
+  };
+};
+
 export const mapToNotesViewModel = (notes: Note[]): NoteViewModel[] => {
-  return notes.map((i) => {
-    return {
-      id: i.id,
-      posX: i.posX,
-      posY: i.posY,
-      lockedBy: i.lockedBy,
-      text: i.text,
-      style: i.style,
-      isDeleted: i.isDeleted,
-      isNew: null,
-    };
-  });
+  return notes.filter((note) => !note.isDeleted).map(mapToNoteViewModel);
 };
 
 const makeNewNote = (): NoteViewModel => ({

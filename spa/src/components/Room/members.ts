@@ -5,13 +5,13 @@ export interface MemberViewModel {
   name: string;
 }
 
-export const mapToMemberViewModel = (
-  members: Pick<Member, 'id' | 'name'>[]
-): MemberViewModel[] => {
-  return members.map((m) => {
-    return {
-      id: m.id,
-      name: m.name,
-    };
-  });
+const mapToMemberViewModel = (member: Member): MemberViewModel => {
+  return {
+    id: member.id,
+    name: member.name,
+  };
+};
+
+export const mapToMembersViewModel = (members: Member[]): MemberViewModel[] => {
+  return members.map(mapToMemberViewModel);
 };

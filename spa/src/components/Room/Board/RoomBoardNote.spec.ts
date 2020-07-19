@@ -18,7 +18,7 @@ import {
 } from '@/testHelpers/noteQueryStubs';
 import { MOUSE_BUTTONS, supportsTouchEvents } from '@/common/dom';
 import { sleep } from '@/testHelpers/timeout';
-import { buildNoteViewModel } from '@/testHelpers/testData';
+import { buildNoteViewModel } from '@/testHelpers/viewModelBuilders';
 import {
   BLACKEST_BLACK,
   LIGHT_CYAN,

@@ -11,7 +11,7 @@ import {
   PointerMoveEvent,
   PointerUpEvent,
 } from '@/testHelpers/jsdomFriendlyPointerEvents';
-import { buildNoteViewModel } from '@/testHelpers/testData';
+import { buildNoteViewModel } from '@/testHelpers/viewModelBuilders';
 import userEvent from '@testing-library/user-event';
 import {
   NOTE_ID,

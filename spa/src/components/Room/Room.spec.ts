@@ -106,25 +106,32 @@ describe('<room />', () => {
     expect(await screen.findByText('note-text')).toBeInTheDocument();
     expect(await screen.findByText('more-note-text')).toBeInTheDocument();
   });
+  it('does not render deleted notes on the board', async () => {
+    const note = buildNoteResponse({
+      id: 'NOTE1',
+      text: 'note-text',
+      style: null,
+    });
+    const noteToBeDeleted = buildNoteResponse({
+      id: 'NOTE2',
+      text: 'note-deleted-text',
+      isDeleted: false,
+    });
 
-  it('lets me download all the data', async () => {
-    await renderComponent(
-      {
-        roomId: 'ROOM123',
-      },
-      [
-        makeHappyRoomQueryStub(),
-        makeHappyRoomMemberUpdateSubscription(),
-        makeHappyRoomNoteUpdatesSubscription(),
-      ]
-    );
+    await renderComponent(undefined, [
+      makeHappyRoomQueryStub({
+        successData: { notes: [note, noteToBeDeleted] },
+      }),
+      makeHappyRoomMemberUpdateSubscription(),
+      makeHappyRoomNoteUpdatesSubscription({
+        successData: { ...noteToBeDeleted, isDeleted: true },
+      }),
+    ]);
 
-    const link = screen.getByRole('link', { name: /download data/i });
-    await userEvent.click(link);
-
-    const href =
-      'data:text/json;charset=utf-8,%7B%22room%22%3A%7B%22id%22%3A%22ROOM123%22%2C%22members%22%3A%5B%7B%22id%22%3A%22aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee%22%2C%22name%22%3A%22me%22%7D%2C%7B%22id%22%3A%222%22%2C%22name%22%3A%22PERSON%22%7D%5D%2C%22notes%22%3A%5B%7B%22id%22%3A%22NOTE1%22%2C%22posX%22%3A30%2C%22posY%22%3A20%2C%22lockedBy%22%3A%22me%22%2C%22text%22%3A%22placeholder%20text%22%2C%22style%22%3A2%2C%22isDeleted%22%3Anull%2C%22isNew%22%3Anull%7D%2C%7B%22id%22%3A%22NOTEM1234%22%2C%22posX%22%3A30%2C%22posY%22%3A20%2C%22lockedBy%22%3A%22me%22%2C%22text%22%3A%22placeholder%20text%22%2C%22style%22%3A2%2C%22isDeleted%22%3Anull%2C%22isNew%22%3Anull%7D%5D%7D%7D';
-    expect(link).toHaveAttribute('href', href);
+    expect(await screen.getByText('note-text')).toBeInTheDocument();
+    expect(
+      await screen.queryByText('note-deleted-text')
+    ).not.toBeInTheDocument();
   });
 
   it('lets me copy the room url for sharing', async () => {

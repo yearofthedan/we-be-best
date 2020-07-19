@@ -19,6 +19,8 @@ export interface RenderResult extends ComponentHarness {
     $logger: typeof Vue.prototype.$logger;
   }>
 }
+
+//todo make this more a renderWithPlugins
 const renderWithApollo = <V extends Vue>(
   component: VueConstructor<Vue>,
   querySpec: QuerySpec | QuerySpec[],

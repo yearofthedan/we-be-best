@@ -1,4 +1,5 @@
 import {NoteViewModel} from '@/components/Room/Board/notes';
+import {MemberViewModel} from '@/components/Room/members';
 
 export const buildNoteViewModel = (overrides: Partial<NoteViewModel> = {}): NoteViewModel => ({
     id: 'NOTE123',
@@ -7,6 +8,11 @@ export const buildNoteViewModel = (overrides: Partial<NoteViewModel> = {}): Note
     posX: 30,
     text: 'placeholder text',
     style: null,
-    isDeleted: null,
     ...overrides,
 });
+
+export const buildMemberViewModel = (overrides: Partial<MemberViewModel> = {}): MemberViewModel => ({
+    id: 'MEMBER123',
+    name: 'my mum',
+    ...overrides
+})

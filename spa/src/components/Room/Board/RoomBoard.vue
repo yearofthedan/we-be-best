@@ -80,9 +80,7 @@ export default Vue.extend({
     primaryTouchId: string | null;
   } {
     return {
-      notesData: this.$props.notes.filter(
-        (note: NoteViewModel) => !note.isDeleted
-      ),
+      notesData: this.notes,
       movingNoteReference: null,
       editingNoteReference: null,
       heldNoteReference: null,

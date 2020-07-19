@@ -22,6 +22,7 @@
 import Vue from 'vue';
 import RoomMembers from '@/components/Room/Details/RoomMembers.vue';
 import { NoteViewModel } from '@/components/Room/Board/notes';
+import { MemberViewModel } from '@/components/Room/members';
 
 export default Vue.extend({
   name: 'room-details',
@@ -38,7 +39,7 @@ export default Vue.extend({
       required: true,
     },
     members: {
-      type: Array as () => { id: string; name: string }[],
+      type: Array as () => MemberViewModel[],
       required: true,
     },
   },

@@ -1,0 +1,6 @@
+export enum BACKGROUND_OPTIONS {
+  BLANK = 'BLANK',
+  HALF = 'HALF',
+  THIRDS = 'THIRDS',
+  QUADRANTS = 'QUADRANTS',
+}

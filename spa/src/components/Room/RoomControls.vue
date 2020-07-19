@@ -42,7 +42,7 @@
       href="placeholder for data download"
       v-bind:download="`we-be-best-room-${roomId}.json`"
       aria-label="download data"
-      v-on:click="$emit('export', $event)"
+      v-on:click="onExport"
     >
       <i
         v-on:click="
@@ -61,8 +61,10 @@
 <script lang="ts">
 import Vue from 'vue';
 import ButtonAction from '@/components/atoms/ButtonAction.vue';
-
-const BACKGROUND_OPTIONS = ['BLANK', 'HALF', 'THIRDS', 'QUADRANTS'];
+import { NoteViewModel } from '@/components/Room/Board/notes';
+import { MemberViewModel } from '@/components/Room/members';
+import { mapToJsonString } from '@/components/Room/roomExport';
+import { BACKGROUND_OPTIONS } from '@/components/Room/roomStyle';
 
 export default Vue.extend({
   name: 'room-controls',
@@ -71,24 +73,41 @@ export default Vue.extend({
   },
   props: {
     background: {
-      type: String,
+      type: String as () => BACKGROUND_OPTIONS,
       required: true,
     },
     roomId: {
       type: String,
       required: true,
     },
+    notes: {
+      type: Array as () => NoteViewModel[],
+      required: true,
+    },
+    members: {
+      type: Array as () => MemberViewModel[],
+      required: true,
+    },
   },
   data: function (): {
-    backgroundOptions: string[];
+    backgroundOptions: BACKGROUND_OPTIONS[];
     selectedBackground: string;
     focusedId: string;
   } {
     return {
-      backgroundOptions: BACKGROUND_OPTIONS,
+      backgroundOptions: Object.values(BACKGROUND_OPTIONS),
       selectedBackground: this.background,
       focusedId: 'BLANK',
     };
+  },
+  methods: {
+    onExport: function (event: MouseEvent) {
+      (event.target as HTMLAnchorElement).href =
+        'data:text/json;charset=utf-8,' +
+        encodeURIComponent(
+          mapToJsonString(this.roomId, this.notes, this.members)
+        );
+    },
   },
 });
 </script>

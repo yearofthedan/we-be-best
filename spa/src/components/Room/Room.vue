@@ -7,23 +7,24 @@
         v-bind:zoom-factor="zoomFactor"
         v-bind:my-id="myId"
         v-bind:room-id="roomId"
-        v-bind:notes="room.notes"
+        v-bind:notes="notes"
         v-bind:background="background"
       />
       <room-details
-        v-bind:notes="room.notes"
-        v-bind:members="room.members"
+        v-bind:notes="notes"
+        v-bind:members="members"
         v-bind:room-id="roomId"
       />
       <room-controls
         v-on:zoom-in="_onZoomIn"
         v-on:zoom-out="_onZoomOut"
         v-on:add-note="_onAddNote"
-        v-on:export="_onExport"
         v-on:share="_onShare"
         v-on:change-background="_onChangeBackground"
         v-bind:background="background"
         v-bind:roomId="roomId"
+        v-bind:notes="notes"
+        v-bind:members="members"
       />
     </template>
   </article>
@@ -32,30 +33,35 @@
 <script lang="ts">
 import Vue from 'vue';
 import { ApolloError } from 'apollo-client';
-import makeNewNote, { NoteViewModel } from '@/components/Room/Board/notes';
+import makeNewNote, {
+  mapToNotesViewModel,
+  NoteViewModel,
+} from '@/components/Room/Board/notes';
 import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
 import { removeArrayElement, upsertArrayElement } from '@/common/arrays';
 
 import {
+  memberUpdates,
   noteUpdates,
   room,
-  memberUpdates,
 } from '@/graphql/roomQueries.graphql';
 
 import {
+  AddRoomBoardNoteInput,
   Query,
-  Subscription,
-  Room,
   QueryRoomArgs,
+  Room,
+  Subscription,
   SubscriptionMemberUpdatesArgs,
   SubscriptionNoteUpdatesArgs,
-  AddRoomBoardNoteInput,
 } from '@type-definitions/graphql';
 import { addRoomBoardNote } from '@/graphql/boardQueries.graphql';
 import RoomControls from '@/components/Room/RoomControls.vue';
-import { mapToJsonString } from '@/components/Room/roomExport';
-import { MemberViewModel } from '@/components/Room/members';
+import {
+  mapToMembersViewModel,
+  MemberViewModel,
+} from '@/components/Room/members';
 
 interface RoomComponentProps {
   roomId: string;
@@ -105,6 +111,14 @@ export default Vue.extend({
       zoomFactor: 1,
       background: 'QUADRANTS',
     };
+  },
+  computed: {
+    notes(): NoteViewModel[] {
+      return mapToNotesViewModel(this.room?.notes ?? []);
+    },
+    members(): MemberViewModel[] {
+      return mapToMembersViewModel(this.room?.members ?? []);
+    },
   },
   apollo: {
     room: {
@@ -201,17 +215,6 @@ export default Vue.extend({
     _onShare: function () {
       const path = `${window.location.host}/?room=${this.roomId}`;
       navigator.clipboard.writeText(path);
-    },
-    _onExport: function (event: MouseEvent) {
-      (event.target as HTMLAnchorElement).href =
-        'data:text/json;charset=utf-8,' +
-        encodeURIComponent(
-          mapToJsonString(
-            this.roomId,
-            this.room?.notes as NoteViewModel[],
-            this.room?.members as MemberViewModel[]
-          )
-        );
     },
     _onAddNote: async function (): Promise<void> {
       const newNote = makeNewNote();
