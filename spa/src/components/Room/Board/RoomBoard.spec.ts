@@ -38,7 +38,7 @@ interface RoomBoardComponentProps {
   myId: string;
   roomId: string;
   zoomFactor: number;
-  notes: NoteViewModel[];
+  notes: { [id: string]: NoteViewModel };
 }
 
 const renderComponent = (
@@ -80,7 +80,9 @@ describe('<room-board />', () => {
   it('rerenders notes when the props change', async () => {
     const { updateProps } = renderComponent(
       {
-        notes: [buildNoteViewModel({ id: NOTE_ID, posX: 10, posY: 10 })],
+        notes: {
+          NOTE_ID: buildNoteViewModel({ id: NOTE_ID, posX: 10, posY: 10 }),
+        },
       },
       [makeHappyMoveBoardNoteMutationStub()]
     );
@@ -103,10 +105,10 @@ describe('<room-board />', () => {
     });
     it('does not let me edit a note if I am already editing one', async () => {
       renderComponent({
-        notes: [
-          buildNoteViewModel({ id: 'NOTE_1' }),
-          buildNoteViewModel({ id: 'NOTE_2' }),
-        ],
+        notes: {
+          NOTE_1: buildNoteViewModel({ id: 'NOTE_1' }),
+          NOTE_2: buildNoteViewModel({ id: 'NOTE_2' }),
+        },
       });
 
       const notes = screen.getAllByRole('listitem');
@@ -118,10 +120,10 @@ describe('<room-board />', () => {
     it('lets me edit different notes in sequence', async () => {
       renderComponent(
         {
-          notes: [
-            buildNoteViewModel({ id: 'NOTE_1' }),
-            buildNoteViewModel({ id: 'NOTE_2' }),
-          ],
+          notes: {
+            NOTE_1: buildNoteViewModel({ id: 'NOTE_1' }),
+            NOTE_2: buildNoteViewModel({ id: 'NOTE_2' }),
+          },
         },
         [
           makeHappyUpdateBoardNoteTextMutationStub({
@@ -155,7 +157,7 @@ describe('<room-board />', () => {
     it('locks the note', async () => {
       const { queryMocks } = renderComponent(
         {
-          notes: [buildNoteViewModel({ id: NOTE_ID })],
+          notes: { NOTE_ID: buildNoteViewModel({ id: NOTE_ID }) },
         },
         [makeHappyLockRoomBoardNoteMutationStub({ id: NOTE_ID })]
       );
@@ -171,7 +173,9 @@ describe('<room-board />', () => {
     it('updates the position', async () => {
       renderComponent(
         {
-          notes: [buildNoteViewModel({ id: NOTE_ID, posX: 10, posY: 10 })],
+          notes: {
+            NOTE_ID: buildNoteViewModel({ id: NOTE_ID, posX: 10, posY: 10 }),
+          },
         },
         [makeHappyLockRoomBoardNoteMutationStub({ id: NOTE_ID })]
       );
@@ -185,14 +189,14 @@ describe('<room-board />', () => {
     it('allows moving a locked note if i locked it', async () => {
       const { queryMocks } = renderComponent(
         {
-          notes: [
-            buildNoteViewModel({
+          notes: {
+            NOTE_ID: buildNoteViewModel({
               id: NOTE_ID,
               posX: 10,
               posY: 10,
               lockedBy: MY_ID,
             }),
-          ],
+          },
         },
         [makeHappyLockRoomBoardNoteMutationStub()]
       );
@@ -210,14 +214,14 @@ describe('<room-board />', () => {
     });
     it('does not move the note if it has been locked by somebody else', async () => {
       await renderComponent({
-        notes: [
-          buildNoteViewModel({
+        notes: {
+          NOTE_ID: buildNoteViewModel({
             id: NOTE_ID,
             posX: 10,
             posY: 10,
             lockedBy: 'someone-else',
           }),
-        ],
+        },
       });
 
       const note = screen.getByRole('listitem');
@@ -236,7 +240,7 @@ describe('<room-board />', () => {
 
       const { mocks } = renderComponent(
         {
-          notes: [buildNoteViewModel({ id: NOTE_ID })],
+          notes: { NOTE_ID: buildNoteViewModel({ id: NOTE_ID }) },
         },
         [makeSadLockRoomBoardNoteMutationStub({ id: NOTE_ID })],
         { $logger }
@@ -253,7 +257,7 @@ describe('<room-board />', () => {
     it('unlocks after moving', async () => {
       const { queryMocks } = await renderComponent(
         {
-          notes: [buildNoteViewModel({ id: NOTE_ID })],
+          notes: { NOTE_ID: buildNoteViewModel({ id: NOTE_ID }) },
         },
         [
           makeHappyLockRoomBoardNoteMutationStub({ id: NOTE_ID }),
@@ -275,7 +279,7 @@ describe('<room-board />', () => {
     it('forgets about saving if the note was removed while moving', async () => {
       const { queryMocks, updateProps } = await renderComponent(
         {
-          notes: [buildNoteViewModel({ id: NOTE_ID })],
+          notes: { NOTE_ID: buildNoteViewModel({ id: NOTE_ID }) },
         },
         [
           makeHappyLockRoomBoardNoteMutationStub({ id: NOTE_ID }),
@@ -306,7 +310,9 @@ describe('<room-board />', () => {
     it('remotely updates the note position', async () => {
       const { queryMocks } = await renderComponent(
         {
-          notes: [buildNoteViewModel({ id: NOTE_ID, posY: 10, posX: 10 })],
+          notes: {
+            NOTE_ID: buildNoteViewModel({ id: NOTE_ID, posY: 10, posX: 10 }),
+          },
         },
         [
           makeHappyLockRoomBoardNoteMutationStub({ id: NOTE_ID }),
@@ -325,7 +331,9 @@ describe('<room-board />', () => {
     it('displays a toast update when an error occurs while unlocking', async () => {
       const { mocks } = renderComponent(
         {
-          notes: [buildNoteViewModel({ id: NOTE_ID, posX: 10, posY: 10 })],
+          notes: {
+            NOTE_ID: buildNoteViewModel({ id: NOTE_ID, posX: 10, posY: 10 }),
+          },
         },
         [
           makeHappyLockRoomBoardNoteMutationStub(),
@@ -345,7 +353,7 @@ describe('<room-board />', () => {
     it('displays a toast update when an error occurs while mutating the position', async () => {
       const { mocks } = renderComponent(
         {
-          notes: [buildNoteViewModel()],
+          notes: { NOTE_ID: buildNoteViewModel() },
         },
         [
           makeHappyLockRoomBoardNoteMutationStub(),

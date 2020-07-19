@@ -54,7 +54,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import ButtonAction from '@/components/atoms/ButtonAction.vue';
-import { NoteViewModel } from '@/components/Room/Board/notes';
+import { NotesViewModel } from '@/components/Room/Board/notes';
 import { MemberViewModel } from '@/components/Room/members';
 import { mapToJsonString } from '@/components/Room/roomExport';
 import { BACKGROUND_OPTIONS } from '@/components/Room/roomStyle';
@@ -74,7 +74,7 @@ export default Vue.extend({
       required: true,
     },
     notes: {
-      type: Array as () => NoteViewModel[],
+      type: Object as () => NotesViewModel,
       required: true,
     },
     members: {

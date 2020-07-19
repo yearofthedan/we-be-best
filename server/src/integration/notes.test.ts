@@ -78,6 +78,8 @@ describe('integration: notes', () => {
           noteId: 'note123',
           posX: 10,
           posY: 10,
+          text: '',
+          style: 0
         },
       },
     });

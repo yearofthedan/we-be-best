@@ -26,7 +26,7 @@ export interface NoteModel {
   style?: number;
 }
 
-export type NewNoteParam = Pick<NoteModel, 'id'|'posX'|'posY'|'text'>
+export type NewNoteParam = Pick<NoteModel, 'id'|'posX'|'posY'|'text'|'style'>
 export type UpdateNoteParam = Partial<NoteModel> & Pick<NoteModel, 'id'>;
 
 const buildNote = ({id, posX, posY, text, lockedBy, room}: NoteModel): NoteModel => ({

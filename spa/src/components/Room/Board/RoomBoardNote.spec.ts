@@ -9,9 +9,11 @@ import { PointerDownEvent } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import userEvent from '@testing-library/user-event';
 import { waitFor } from '@testing-library/dom';
 import {
+  makeHappyAddRoomBoardNoteMutationStub,
   makeHappyDeleteBoardNoteMutationStub,
   makeHappyUpdateBoardNoteStyleMutationStub,
   makeHappyUpdateBoardNoteTextMutationStub,
+  makeSadAddRoomBoardNoteMutationStub,
   makeSadDeleteBoardNoteMutationStub,
   makeSadUpdateBoardNoteStyleMutationStub,
   makeSadUpdateRoomBoardNoteMutationStub,
@@ -33,6 +35,7 @@ interface RoomBoardNoteProps {
   note: NoteViewModel;
   moving: boolean;
   editable: boolean;
+  roomId: string;
 }
 
 const renderComponent = async (
@@ -56,6 +59,7 @@ const renderComponent = async (
       editable: true,
       moving: false,
       myId: 'me',
+      roomId: 'ROOM123',
       ...props,
     },
     mocks,
@@ -83,15 +87,6 @@ describe('<room-board-note />', () => {
       renderComponent({ note: buildNoteViewModel({ text: 'some text' }) });
 
       expect(screen.getByText('some text')).toBeInTheDocument();
-    });
-
-    it('renders a default themed style', () => {
-      renderComponent({ note: buildNoteViewModel({ style: null }) });
-
-      expect(screen.getByRole('listitem')).toHaveStyle(`
-      --theme-primary-colour: ${LIGHT_CYAN};
-      --theme-text-colour: ${BLACKEST_BLACK};
-    `);
     });
 
     it('renders the default themed style if the style is invalid', () => {
@@ -190,9 +185,21 @@ describe('<room-board-note />', () => {
 
       expect(emitted().pointerheld).not.toBeUndefined();
     });
-    it('does not fire the pointerheld event when the note is locked by someone else', async () => {
+    it('does not allow moving when the note is locked by someone else', async () => {
       const { emitted } = await renderComponent({
         note: buildNoteViewModel({ lockedBy: 'someone' }),
+      });
+
+      await fireEvent(
+        screen.getByRole('listitem'),
+        new PointerDownEvent({ pointerId: 1000 })
+      );
+
+      expect(emitted().pointerheld).toBeUndefined();
+    });
+    it('does not allow moving when the note is new', async () => {
+      const { emitted } = await renderComponent({
+        note: buildNoteViewModel({ isNew: true }),
       });
 
       await fireEvent(
@@ -270,7 +277,6 @@ describe('<room-board-note />', () => {
       );
       expect(mocks.$logger.error).toHaveBeenCalled();
     });
-
     it('sends an editing event when I double click', async () => {
       const { emitted } = await renderComponent();
 
@@ -278,14 +284,12 @@ describe('<room-board-note />', () => {
       expect(emitted().editstart).not.toBeUndefined();
       expect(emitted().editstart[0]).toEqual(['NOTE123']);
     });
-
     it('does not edit if the note is not editable', async () => {
       const { emitted } = await renderComponent({ editable: false });
 
       await userEvent.dblClick(screen.getByRole('listitem'));
       expect(emitted().editstart).toBeUndefined();
     });
-
     it('sends an update when I save while editing', async () => {
       const noteId = 'NOTE123';
       const updatedText = 'updated content';
@@ -311,6 +315,60 @@ describe('<room-board-note />', () => {
       });
     });
 
+    it('adds rather than updating when the note is new', async () => {
+      const noteId = 'NOTE123';
+      const updatedText = 'updated content';
+      const { queryMocks } = await renderComponent(
+        {
+          note: buildNoteViewModel({
+            id: noteId,
+            text: 'some text',
+            isNew: true,
+          }),
+        },
+        [
+          makeHappyAddRoomBoardNoteMutationStub({
+            noteId: noteId,
+            text: updatedText,
+          }),
+        ]
+      );
+
+      await editTextAndSave(updatedText);
+      await screen.findByText(updatedText);
+      expect(queryMocks[0]).toHaveBeenCalledWith({
+        input: {
+          noteId: noteId,
+          posX: 30,
+          posY: 20,
+          roomId: 'ROOM123',
+          style: 0,
+          text: 'some text',
+        },
+      });
+    });
+    it('displays a toast when an error occurs while adding', async () => {
+      const updatedText = 'updated content';
+      const noteId = 'NOTE123';
+      const { mocks } = await renderComponent(
+        {
+          note: buildNoteViewModel({
+            id: noteId,
+            text: 'some text',
+            isNew: true,
+          }),
+        },
+        [makeSadAddRoomBoardNoteMutationStub()]
+      );
+
+      await editTextAndSave(updatedText);
+      await sleep(5);
+
+      expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
+        'Could not save note changes: GraphQL error: everything is broken'
+      );
+      expect(mocks.$logger.error).toHaveBeenCalled();
+    });
     it('reverts to the original text when an error occurs while updating', async () => {
       const noteId = 'NOTE123';
       const updatedText = 'updated content';
@@ -333,7 +391,6 @@ describe('<room-board-note />', () => {
 
       expect(await screen.findByText('original text')).toBeInTheDocument();
     });
-
     it('displays a toast update when an error occurs while updating', async () => {
       const updatedText = 'updated content';
       const noteId = 'NOTE123';
@@ -359,7 +416,6 @@ describe('<room-board-note />', () => {
       );
       expect(mocks.$logger.error).toHaveBeenCalled();
     });
-
     it('lets me delete while editing', async () => {
       const { queryMocks } = await renderComponent(undefined, [
         makeHappyDeleteBoardNoteMutationStub({

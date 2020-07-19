@@ -11,6 +11,7 @@
   >
     <room-board-note
       v-for="note in notesData"
+      v-bind:room-id="roomId"
       v-bind:note="note"
       v-bind:moving="_getIsMoving(note.id)"
       v-bind:my-id="myId"
@@ -33,7 +34,7 @@ import {
   moveBoardNote,
   unlockRoomBoardNote,
 } from '@/graphql/boardQueries.graphql';
-import { NoteViewModel } from '@/components/Room/Board/notes';
+import { NoteViewModel, NotesViewModel } from '@/components/Room/Board/notes';
 import { patchArrayElement } from '@/common/arrays';
 import { supportsTouchEvents } from '@/common/dom';
 import {
@@ -53,7 +54,7 @@ export default Vue.extend({
       default: 'QUADRANTS',
     },
     notes: {
-      type: Array as () => NoteViewModel[],
+      type: Object as () => NotesViewModel,
       required: true,
     },
     myId: {
@@ -71,7 +72,7 @@ export default Vue.extend({
   },
   watch: {
     notes: function (newVal) {
-      this.notesData = newVal;
+      this.notesData = Object.values(newVal);
     },
   },
   data: function (): {
@@ -82,7 +83,7 @@ export default Vue.extend({
     primaryTouchId: string | null;
   } {
     return {
-      notesData: this.notes,
+      notesData: Object.values(this.notes),
       movingNoteReference: null,
       editingNoteReference: null,
       heldNoteReference: null,

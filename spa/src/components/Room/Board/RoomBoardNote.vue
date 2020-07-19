@@ -32,6 +32,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import {
+  addRoomBoardNote,
   deleteBoardNote,
   updateBoardNoteStyle,
   updateBoardNoteText,
@@ -40,7 +41,9 @@ import AutoExpandingTextBox from '@/components/Room/Board/AutoExpandingTextBox.v
 import { MOUSE_BUTTONS, supportsTouchEvents } from '@/common/dom';
 import ColourStyleSelector from '@/components/Room/Board/ColourStyleSelector.vue';
 import {
+  AddRoomBoardNoteMutation,
   DeleteBoardNoteMutation,
+  MutationAddRoomBoardNoteArgs,
   MutationDeleteBoardNoteArgs,
   MutationUpdateBoardNoteStyleArgs,
   MutationUpdateBoardNoteTextArgs,
@@ -74,6 +77,10 @@ export default Vue.extend({
     'button-action': ButtonAction,
   },
   props: {
+    roomId: {
+      type: String,
+      required: true,
+    },
     note: {
       type: Object as () => NoteViewModel,
       required: true,
@@ -96,7 +103,7 @@ export default Vue.extend({
       text: this.note.text,
       selectedStyle: this.note.style || 0,
       styleOptions: noteTheme,
-      editing: false,
+      editing: this.note.isNew ?? false,
     };
   },
   computed: {
@@ -144,21 +151,39 @@ export default Vue.extend({
     },
     _onSaveClick: async function (): Promise<void> {
       const priorText = this.note.text;
-      const mutationPayload = {
-        id: this.note.id,
-        text: this.text,
-      };
-
       try {
         this.editing = false;
         this.$emit('editfinish');
+
+        if (this.note.isNew) {
+          await this.$apollo.mutate<
+            AddRoomBoardNoteMutation,
+            MutationAddRoomBoardNoteArgs
+          >({
+            mutation: addRoomBoardNote,
+            variables: {
+              input: {
+                roomId: this.roomId,
+                noteId: this.note.id,
+                text: this.note.text,
+                posX: this.note.posX,
+                posY: this.note.posY,
+                style: this.note.style,
+              },
+            },
+          });
+        }
+
         await this.$apollo.mutate<
           UpdateBoardNoteTextMutation,
           MutationUpdateBoardNoteTextArgs
         >({
           mutation: updateBoardNoteText,
           variables: {
-            input: mutationPayload,
+            input: {
+              id: this.note.id,
+              text: this.text,
+            },
           },
         });
       } catch (e) {
@@ -191,6 +216,7 @@ export default Vue.extend({
     _onMove: function (event: MouseEvent): void {
       if (
         (this.note.lockedBy && !this.lockedByMe) ||
+        this.editing ||
         event.button !== MOUSE_BUTTONS.primary
       ) {
         return;

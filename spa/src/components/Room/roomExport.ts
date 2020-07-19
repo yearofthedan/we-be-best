@@ -1,9 +1,9 @@
-import { NoteViewModel } from '@/components/Room/Board/notes';
+import { NotesViewModel } from '@/components/Room/Board/notes';
 import { MemberViewModel } from '@/components/Room/members';
 
 export const mapToJsonString = (
   id: string,
-  notes: NoteViewModel[],
+  notes: NotesViewModel,
   members: MemberViewModel[]
 ): string => {
   return JSON.stringify({

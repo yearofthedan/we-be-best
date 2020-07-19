@@ -10,6 +10,8 @@ export const buildAddNoteInput = (overrides: Partial<AddRoomBoardNoteInput> = {}
   noteId: 'note1',
   posX: 0,
   posY: 0,
+  style: 0,
+  text: '',
   ...overrides
 });
 

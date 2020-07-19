@@ -10,7 +10,7 @@ export interface NoteViewModel {
   posY: number;
   lockedBy?: string | null;
   text: string;
-  style?: number | null;
+  style: number;
   isNew?: boolean | null;
 }
 
@@ -21,13 +21,21 @@ export const mapToNoteViewModel = (notes: Note): NoteViewModel => {
     posY: notes.posY,
     lockedBy: notes.lockedBy,
     text: notes.text,
-    style: notes.style,
+    style: notes.style ?? 0,
     isNew: null,
   };
 };
 
-export const mapToNotesViewModel = (notes: Note[]): NoteViewModel[] => {
-  return notes.filter((note) => !note.isDeleted).map(mapToNoteViewModel);
+export type NotesViewModel = { [id: string]: NoteViewModel };
+
+export const mapToNotesViewModel = (notes: Note[]): NotesViewModel => {
+  return notes
+    .filter((note) => !note.isDeleted)
+    .map(mapToNoteViewModel)
+    .reduce((vm, curr) => {
+      vm[curr.id] = curr;
+      return vm;
+    }, {} as NotesViewModel);
 };
 
 const makeNewNote = (): NoteViewModel => ({

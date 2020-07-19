@@ -33,6 +33,8 @@ input UpdateBoardNoteStyleInput {
 input AddRoomBoardNoteInput {
     roomId: ID!
     noteId: String!
+    text: String!
+    style: Int!
     posX: Int!
     posY: Int!
 }

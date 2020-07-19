@@ -7,7 +7,7 @@ export const buildNoteViewModel = (overrides: Partial<NoteViewModel> = {}): Note
     posY: 20,
     posX: 30,
     text: 'placeholder text',
-    style: null,
+    style: 0,
     ...overrides,
 });
 

@@ -1,21 +1,13 @@
 import Room from '@/components/Room/Room.vue';
 import { QuerySpec, renderWithApollo, screen } from '@/testHelpers/renderer';
 import {
-  makeHappyRoomNoteUpdatesSubscription,
   makeHappyRoomMemberUpdateSubscription,
+  makeHappyRoomNoteUpdatesSubscription,
   makeHappyRoomQueryStub,
 } from '@/testHelpers/roomQueryStubs';
-import {
-  buildNoteResponse,
-  makeHappyAddRoomBoardNoteMutationStub,
-  makeSadAddRoomBoardNoteMutationStub,
-  MY_ID,
-  ROOM_ID,
-} from '@/testHelpers/noteQueryStubs';
+import { buildNoteResponse } from '@/testHelpers/noteQueryStubs';
 import userEvent from '@testing-library/user-event';
-import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/notes';
 import { fireEvent, waitFor } from '@testing-library/dom';
-import { sleep } from '@/testHelpers/timeout';
 
 interface RoomComponentProps {
   myId: string;
@@ -40,7 +32,6 @@ const renderComponent = async (
       makeHappyRoomQueryStub(),
       makeHappyRoomMemberUpdateSubscription(),
       makeHappyRoomNoteUpdatesSubscription(),
-      makeHappyAddRoomBoardNoteMutationStub(),
     ],
     {
       propsData: { roomId: '123', myId: 'me', ...props },
@@ -159,7 +150,7 @@ describe('<room />', () => {
   });
   describe('changing board background', () => {
     it('defaults to quadrants', async () => {
-      renderComponent();
+      await renderComponent();
 
       await waitFor(() =>
         expect(screen.getByLabelText('board')).toHaveAttribute(
@@ -170,7 +161,7 @@ describe('<room />', () => {
     });
 
     it('switches to blank when selected', async () => {
-      renderComponent();
+      await renderComponent();
 
       const selectBox = await screen.findByLabelText('Background');
 
@@ -185,61 +176,14 @@ describe('<room />', () => {
 
   describe('when adding a note', () => {
     it('lets me add a note', async () => {
-      const { queryMocks } = await renderComponent();
+      await renderComponent();
+
+      const itemsLength = screen.getAllByRole('listitem').length;
 
       await screen.findByRole('button', { name: /add/i });
       await userEvent.click(screen.getByRole('button', { name: /add/i }));
 
-      await waitFor(() =>
-        expect(queryMocks[3]).toHaveBeenCalledWith({
-          input: {
-            roomId: '123',
-            noteId: expect.any(String),
-            posX: DEFAULT_X,
-            posY: DEFAULT_Y,
-          },
-        })
-      );
-    });
-
-    it('displays a toast update when an error occurs while adding', async () => {
-      const $toasted = {
-        global: {
-          apollo_error: jest.fn(),
-        },
-      };
-
-      const $logger = {
-        error: jest.fn(),
-      };
-
-      renderWithApollo(
-        Room,
-        [
-          makeHappyRoomQueryStub({
-            successData: { notes: [] },
-          }),
-          makeHappyRoomMemberUpdateSubscription(),
-          makeHappyRoomNoteUpdatesSubscription(),
-          makeSadAddRoomBoardNoteMutationStub(),
-        ],
-        {
-          propsData: { myId: MY_ID, roomId: ROOM_ID, notes: [] },
-          mocks: {
-            $toasted,
-            $logger,
-          },
-        }
-      );
-
-      await userEvent.click(
-        await screen.findByRole('button', { name: /add/i })
-      );
-      await sleep(5);
-      expect($toasted.global.apollo_error).toHaveBeenCalledWith(
-        'Could not add a new note: GraphQL error: everything is broken'
-      );
-      expect($logger.error).toHaveBeenCalled();
+      expect(screen.getAllByRole('listitem').length).toEqual(itemsLength + 1);
     });
   });
 });

@@ -7,14 +7,10 @@
         v-bind:zoom-factor="zoomFactor"
         v-bind:my-id="myId"
         v-bind:room-id="roomId"
-        v-bind:notes="notes"
+        v-bind:notes="notesData"
         v-bind:background="background"
       />
-      <room-details
-        v-bind:notes="notes"
-        v-bind:members="members"
-        v-bind:room-id="roomId"
-      />
+      <room-details v-bind:members="members" v-bind:room-id="roomId" />
       <room-controls
         v-on:zoom-in="_onZoomIn"
         v-on:zoom-out="_onZoomOut"
@@ -22,7 +18,7 @@
         v-on:change-background="_onChangeBackground"
         v-bind:background="background"
         v-bind:roomId="roomId"
-        v-bind:notes="notes"
+        v-bind:notes="notesData"
         v-bind:members="members"
       />
     </template>
@@ -34,7 +30,7 @@ import Vue from 'vue';
 import { ApolloError } from 'apollo-client';
 import makeNewNote, {
   mapToNotesViewModel,
-  NoteViewModel,
+  NotesViewModel,
 } from '@/components/Room/Board/notes';
 import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
@@ -47,7 +43,6 @@ import {
 } from '@/graphql/roomQueries.graphql';
 
 import {
-  AddRoomBoardNoteInput,
   Query,
   QueryRoomArgs,
   Room,
@@ -55,7 +50,6 @@ import {
   SubscriptionMemberUpdatesArgs,
   SubscriptionNoteUpdatesArgs,
 } from '@type-definitions/graphql';
-import { addRoomBoardNote } from '@/graphql/boardQueries.graphql';
 import RoomControls from '@/components/Room/RoomControls.vue';
 import {
   mapToMembersViewModel,
@@ -72,6 +66,7 @@ interface RoomComponentData {
   room?: Room | null;
   zoomFactor: number;
   background: string;
+  notesData: NotesViewModel;
 }
 
 const resolveUpdate = <T extends { id: string; isDeleted?: boolean | null }>(
@@ -109,12 +104,15 @@ export default Vue.extend({
       room: null,
       zoomFactor: 1,
       background: 'QUADRANTS',
+      notesData: {},
     };
   },
-  computed: {
-    notes(): NoteViewModel[] {
-      return mapToNotesViewModel(this.room?.notes ?? []);
+  watch: {
+    room: function (newVal) {
+      this.notesData = mapToNotesViewModel(newVal.notes ?? []);
     },
+  },
+  computed: {
     members(): MemberViewModel[] {
       return mapToMembersViewModel(this.room?.members ?? []);
     },
@@ -213,37 +211,7 @@ export default Vue.extend({
     },
     _onAddNote: async function (): Promise<void> {
       const newNote = makeNewNote();
-      const mutationPayload: AddRoomBoardNoteInput = {
-        posY: newNote.posY,
-        posX: newNote.posX,
-        roomId: this.roomId,
-        noteId: newNote.id,
-      };
-      try {
-        await this.$apollo.mutate({
-          mutation: addRoomBoardNote,
-          variables: {
-            input: mutationPayload,
-          },
-          optimisticResponse: {
-            __typename: 'Mutation',
-            addRoomBoardNote: {
-              __typename: 'Note',
-              ...mutationPayload,
-              text: '',
-              id: null,
-              isDeleted: null,
-              lockedBy: null,
-              style: null,
-            },
-          },
-        });
-      } catch (error) {
-        this.$logger.error(error);
-        this.$toasted.global.apollo_error(
-          `Could not add a new note: ${error.message}`
-        );
-      }
+      this.notesData = { ...this.notesData, [newNote.id]: newNote };
     },
   },
 });
