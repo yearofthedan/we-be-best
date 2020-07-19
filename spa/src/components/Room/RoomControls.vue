@@ -46,7 +46,7 @@
     >
       <i class="ri-file-chart-fill"></i>
     </a>
-    <button-action aria-label="copy room link" v-on:click="$emit('share')">
+    <button-action aria-label="copy room link" v-on:click="onShare">
       <i class="ri-links-line"></i>
     </button-action>
   </section>
@@ -101,6 +101,10 @@ export default Vue.extend({
         encodeURIComponent(
           mapToJsonString(this.roomId, this.notes, this.members)
         );
+    },
+    onShare: function () {
+      const path = `${window.location.host}/?room=${this.roomId}`;
+      navigator.clipboard.writeText(path);
     },
   },
 });

@@ -134,20 +134,6 @@ describe('<room />', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('lets me copy the room url for sharing', async () => {
-    // @ts-ignore
-    const clipboard = (global.navigator.clipboard = { writeText: jest.fn() });
-
-    await renderComponent({
-      roomId: 'ROOM123',
-    });
-
-    await userEvent.click(
-      screen.getByRole('button', { name: /copy room link/i })
-    );
-    expect(clipboard.writeText).toHaveBeenCalledWith('localhost/?room=ROOM123');
-  });
-
   describe('changing board zoom', () => {
     it('defaults the factor to 1', async () => {
       await renderComponent();

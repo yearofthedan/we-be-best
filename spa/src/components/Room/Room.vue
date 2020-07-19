@@ -19,7 +19,6 @@
         v-on:zoom-in="_onZoomIn"
         v-on:zoom-out="_onZoomOut"
         v-on:add-note="_onAddNote"
-        v-on:share="_onShare"
         v-on:change-background="_onChangeBackground"
         v-bind:background="background"
         v-bind:roomId="roomId"
@@ -211,10 +210,6 @@ export default Vue.extend({
     },
     _onZoomIn: function () {
       this.zoomFactor += 0.2;
-    },
-    _onShare: function () {
-      const path = `${window.location.host}/?room=${this.roomId}`;
-      navigator.clipboard.writeText(path);
     },
     _onAddNote: async function (): Promise<void> {
       const newNote = makeNewNote();
