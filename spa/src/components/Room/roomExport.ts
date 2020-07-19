@@ -5,7 +5,7 @@ import {
 import {
   mapToMemberViewModel,
   MemberViewModel,
-} from '@/components/Room/Details/members';
+} from '@/components/Room/members';
 
 export const mapToJsonString = (
   id: string,

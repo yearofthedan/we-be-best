@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { getRandom } from '@/components/Room/avatars';
+import { getRandom } from '@/components/Room/Details/avatars';
 
 export default Vue.extend({
   name: 'room-members',

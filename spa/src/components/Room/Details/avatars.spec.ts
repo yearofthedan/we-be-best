@@ -1,4 +1,4 @@
-import { AVATARS, getRandom } from '@/components/Room/avatars';
+import { AVATARS, getRandom } from '@/components/Room/Details/avatars';
 
 describe('avatars', () => {
   describe('getRandom', () => {

@@ -54,8 +54,8 @@ import {
 } from '@type-definitions/graphql';
 import { addRoomBoardNote } from '@/graphql/boardQueries.graphql';
 import RoomControls from '@/components/Room/RoomControls.vue';
-import { mapToJsonString } from '@/components/Room/Details/roomExport';
-import { MemberViewModel } from '@/components/Room/Details/members';
+import { mapToJsonString } from '@/components/Room/roomExport';
+import { MemberViewModel } from '@/components/Room/members';
 
 interface RoomComponentProps {
   roomId: string;
