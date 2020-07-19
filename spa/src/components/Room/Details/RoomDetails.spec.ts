@@ -10,7 +10,7 @@ describe('RoomDetails', () => {
           { id: '5678', name: 'my mum' },
         ],
         roomId: 'ROOM123',
-        items: [],
+        notes: [],
       },
     });
 

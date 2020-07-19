@@ -11,24 +11,24 @@ import {
   PointerMoveEvent,
   PointerUpEvent,
 } from '@/testHelpers/jsdomFriendlyPointerEvents';
-import { buildItemViewModel } from '@/testHelpers/testData';
+import { buildNoteViewModel } from '@/testHelpers/testData';
 import userEvent from '@testing-library/user-event';
 import {
-  ITEM_ID,
-  makeHappyLockRoomBoardItemMutationStub,
-  makeHappyMoveBoardItemMutationStub,
-  makeHappyUnlockRoomBoardItemMutationStub,
-  makeHappyUpdateBoardItemTextMutationStub,
-  makeSadLockRoomBoardItemMutationStub,
-  makeSadMoveBoardItemMutationStub,
-  makeSadUnlockRoomBoardItemMutationStub,
+  NOTE_ID,
+  makeHappyLockRoomBoardNoteMutationStub,
+  makeHappyMoveBoardNoteMutationStub,
+  makeHappyUnlockRoomBoardNoteMutationStub,
+  makeHappyUpdateBoardNoteTextMutationStub,
+  makeSadLockRoomBoardNoteMutationStub,
+  makeSadMoveBoardNoteMutationStub,
+  makeSadUnlockRoomBoardNoteMutationStub,
   MY_ID,
   ROOM_ID,
-} from '@/testHelpers/itemQueryStubs';
+} from '@/testHelpers/noteQueryStubs';
 
 import { supportsTouchEvents } from '@/common/dom';
 import { sleep } from '@/testHelpers/timeout';
-import { ItemViewModel } from '@/components/Room/Board/items';
+import { NoteViewModel } from '@/components/Room/Board/notes';
 import { Vue } from 'vue/types/vue';
 
 jest.mock('@/common/dom');
@@ -38,7 +38,7 @@ interface RoomBoardComponentProps {
   myId: string;
   roomId: string;
   zoomFactor: number;
-  items: ItemViewModel[];
+  notes: NoteViewModel[];
 }
 
 const renderComponent = (
@@ -54,7 +54,7 @@ const renderComponent = (
       myId: MY_ID,
       zoomFactor: 1,
       roomId: ROOM_ID,
-      items: [buildItemViewModel({ id: ITEM_ID, posX: 10, posY: 10 })],
+      notes: [buildNoteViewModel({ id: NOTE_ID, posX: 10, posY: 10 })],
       ...props,
     },
     mocks: {
@@ -69,7 +69,7 @@ const renderComponent = (
 };
 
 describe('<room-board />', () => {
-  it('renders a item defaulting at 10px by 10px', () => {
+  it('renders a note defaulting at 10px by 10px', () => {
     renderComponent();
 
     expect(screen.getByRole('listitem')).toHaveStyle(`
@@ -77,71 +77,71 @@ describe('<room-board />', () => {
       left: 10px;
     `);
   });
-  it('rerenders items when the props change', async () => {
+  it('rerenders notes when the props change', async () => {
     const { updateProps } = renderComponent(
       {
-        items: [buildItemViewModel({ id: ITEM_ID, posX: 10, posY: 10 })],
+        notes: [buildNoteViewModel({ id: NOTE_ID, posX: 10, posY: 10 })],
       },
-      [makeHappyMoveBoardItemMutationStub()]
+      [makeHappyMoveBoardNoteMutationStub()]
     );
 
     expect(screen.getByRole('listitem')).toHaveStyle(`top:  10px; left: 10px;`);
 
     await updateProps({
-      items: [buildItemViewModel({ id: ITEM_ID, posX: 20, posY: 20 })],
+      notes: [buildNoteViewModel({ id: NOTE_ID, posX: 20, posY: 20 })],
     });
 
     expect(screen.getByRole('listitem')).toHaveStyle(`top:  20px; left: 20px;`);
   });
-  describe('when editing an item', () => {
-    it('lets me edit an item', async () => {
+  describe('when editing a note', () => {
+    it('lets me edit a note', async () => {
       renderComponent();
 
       await userEvent.dblClick(screen.getByRole('listitem'));
 
       expect(screen.getByRole('textbox')).toBeInTheDocument();
     });
-    it('does not let me edit an item if I am already editing one', async () => {
+    it('does not let me edit a note if I am already editing one', async () => {
       renderComponent({
-        items: [
-          buildItemViewModel({ id: 'ITEM_1' }),
-          buildItemViewModel({ id: 'ITEM_2' }),
+        notes: [
+          buildNoteViewModel({ id: 'NOTE_1' }),
+          buildNoteViewModel({ id: 'NOTE_2' }),
         ],
       });
 
-      const items = screen.getAllByRole('listitem');
-      await userEvent.dblClick(items[0]);
+      const notes = screen.getAllByRole('listitem');
+      await userEvent.dblClick(notes[0]);
       expect(screen.getAllByRole('textbox')).toHaveLength(1);
-      await userEvent.dblClick(items[1]);
+      await userEvent.dblClick(notes[1]);
       expect(screen.getAllByRole('textbox')).toHaveLength(1);
     });
-    it('lets me edit different items in sequence', async () => {
+    it('lets me edit different notes in sequence', async () => {
       renderComponent(
         {
-          items: [
-            buildItemViewModel({ id: 'ITEM_1' }),
-            buildItemViewModel({ id: 'ITEM_2' }),
+          notes: [
+            buildNoteViewModel({ id: 'NOTE_1' }),
+            buildNoteViewModel({ id: 'NOTE_2' }),
           ],
         },
         [
-          makeHappyUpdateBoardItemTextMutationStub({
-            id: 'ITEM_1',
+          makeHappyUpdateBoardNoteTextMutationStub({
+            id: 'NOTE_1',
             text: 'placeholder text',
           }),
         ]
       );
 
-      const items = screen.getAllByRole('listitem');
-      await userEvent.dblClick(items[0]);
+      const notes = screen.getAllByRole('listitem');
+      await userEvent.dblClick(notes[0]);
       expect(screen.getAllByRole('textbox')).toHaveLength(1);
       await userEvent.click(screen.getByRole('button', { name: /save/i }));
       expect(screen.queryAllByRole('textbox')).toHaveLength(0);
-      await userEvent.dblClick(items[1]);
+      await userEvent.dblClick(notes[1]);
       expect(screen.getAllByRole('textbox')).toHaveLength(1);
     });
   });
   describe('when moving', () => {
-    async function moveItem() {
+    async function moveNote() {
       await fireEvent(screen.getByRole('listitem'), new PointerDownEvent());
       await fireEvent(
         screen.getByLabelText('board'),
@@ -152,67 +152,67 @@ describe('<room-board />', () => {
       );
     }
 
-    it('locks the item', async () => {
+    it('locks the note', async () => {
       const { queryMocks } = renderComponent(
         {
-          items: [buildItemViewModel({ id: ITEM_ID })],
+          notes: [buildNoteViewModel({ id: NOTE_ID })],
         },
-        [makeHappyLockRoomBoardItemMutationStub({ id: ITEM_ID })]
+        [makeHappyLockRoomBoardNoteMutationStub({ id: NOTE_ID })]
       );
 
-      await moveItem();
+      await moveNote();
 
       //Best I can do for style atm since vue-jest / jsdom do not support style tags
       expect(screen.getByRole('listitem')).toHaveAttribute('data-moving');
       expect(queryMocks[0]).toHaveBeenCalledWith({
-        input: { lockedBy: MY_ID, id: ITEM_ID },
+        input: { lockedBy: MY_ID, id: NOTE_ID },
       });
     });
     it('updates the position', async () => {
       renderComponent(
         {
-          items: [buildItemViewModel({ id: ITEM_ID, posX: 10, posY: 10 })],
+          notes: [buildNoteViewModel({ id: NOTE_ID, posX: 10, posY: 10 })],
         },
-        [makeHappyLockRoomBoardItemMutationStub({ id: ITEM_ID })]
+        [makeHappyLockRoomBoardNoteMutationStub({ id: NOTE_ID })]
       );
-      await moveItem();
+      await moveNote();
 
       expect(screen.getByRole('listitem')).toHaveStyle(`
         top:  20px;
         left: 30px;
       `);
     });
-    it('allows moving a locked item if i locked it', async () => {
+    it('allows moving a locked note if i locked it', async () => {
       const { queryMocks } = renderComponent(
         {
-          items: [
-            buildItemViewModel({
-              id: ITEM_ID,
+          notes: [
+            buildNoteViewModel({
+              id: NOTE_ID,
               posX: 10,
               posY: 10,
               lockedBy: MY_ID,
             }),
           ],
         },
-        [makeHappyLockRoomBoardItemMutationStub()]
+        [makeHappyLockRoomBoardNoteMutationStub()]
       );
 
-      const item = screen.getByRole('listitem');
-      await moveItem();
+      const note = screen.getByRole('listitem');
+      await moveNote();
 
-      expect(item).toHaveStyle('top:  20px; left: 30px;');
+      expect(note).toHaveStyle('top:  20px; left: 30px;');
       expect(queryMocks[0]).toHaveBeenCalledWith({
         input: {
           lockedBy: MY_ID,
-          id: ITEM_ID,
+          id: NOTE_ID,
         },
       });
     });
-    it('does not move the item if it has been locked by somebody else', async () => {
+    it('does not move the note if it has been locked by somebody else', async () => {
       await renderComponent({
-        items: [
-          buildItemViewModel({
-            id: ITEM_ID,
+        notes: [
+          buildNoteViewModel({
+            id: NOTE_ID,
             posX: 10,
             posY: 10,
             lockedBy: 'someone-else',
@@ -220,14 +220,14 @@ describe('<room-board />', () => {
         ],
       });
 
-      const item = screen.getByRole('listitem');
-      await fireEvent(item, new PointerDownEvent());
+      const note = screen.getByRole('listitem');
+      await fireEvent(note, new PointerDownEvent());
       await fireEvent(
-        item,
+        note,
         new PointerMoveEvent({ movementX: 20, movementY: 10 })
       );
 
-      expect(item).toHaveStyle('top: 10px; left: 10px;');
+      expect(note).toHaveStyle('top: 10px; left: 10px;');
     });
     it('displays a toast update when an error occurs while locking', async () => {
       const $logger = {
@@ -236,51 +236,51 @@ describe('<room-board />', () => {
 
       const { mocks } = renderComponent(
         {
-          items: [buildItemViewModel({ id: ITEM_ID })],
+          notes: [buildNoteViewModel({ id: NOTE_ID })],
         },
-        [makeSadLockRoomBoardItemMutationStub({ id: ITEM_ID })],
+        [makeSadLockRoomBoardNoteMutationStub({ id: NOTE_ID })],
         { $logger }
       );
 
-      await moveItem();
+      await moveNote();
       await sleep(5);
 
       expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
-        'Could not move the item: GraphQL error: everything is broken'
+        'Could not move the note: GraphQL error: everything is broken'
       );
       expect(mocks.$logger?.error).toHaveBeenCalled();
     });
     it('unlocks after moving', async () => {
       const { queryMocks } = await renderComponent(
         {
-          items: [buildItemViewModel({ id: ITEM_ID })],
+          notes: [buildNoteViewModel({ id: NOTE_ID })],
         },
         [
-          makeHappyLockRoomBoardItemMutationStub({ id: ITEM_ID }),
-          makeHappyUnlockRoomBoardItemMutationStub({ id: ITEM_ID }),
-          makeHappyMoveBoardItemMutationStub({ id: ITEM_ID }),
+          makeHappyLockRoomBoardNoteMutationStub({ id: NOTE_ID }),
+          makeHappyUnlockRoomBoardNoteMutationStub({ id: NOTE_ID }),
+          makeHappyMoveBoardNoteMutationStub({ id: NOTE_ID }),
         ]
       );
-      await moveItem();
+      await moveNote();
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
 
       await waitFor(() => {
         return expect(queryMocks[1]).toHaveBeenCalledWith({
-          input: { id: ITEM_ID },
+          input: { id: NOTE_ID },
         });
       });
 
       expect(screen.getByRole('listitem')).not.toHaveAttribute('data-moving');
     });
-    it('forgets about saving if the item was removed while moving', async () => {
+    it('forgets about saving if the note was removed while moving', async () => {
       const { queryMocks, updateProps } = await renderComponent(
         {
-          items: [buildItemViewModel({ id: ITEM_ID })],
+          notes: [buildNoteViewModel({ id: NOTE_ID })],
         },
         [
-          makeHappyLockRoomBoardItemMutationStub({ id: ITEM_ID }),
-          makeHappyUnlockRoomBoardItemMutationStub({ id: ITEM_ID }),
-          makeHappyMoveBoardItemMutationStub({ id: ITEM_ID }),
+          makeHappyLockRoomBoardNoteMutationStub({ id: NOTE_ID }),
+          makeHappyUnlockRoomBoardNoteMutationStub({ id: NOTE_ID }),
+          makeHappyMoveBoardNoteMutationStub({ id: NOTE_ID }),
         ]
       );
 
@@ -293,7 +293,7 @@ describe('<room-board />', () => {
         })
       );
 
-      await updateProps({ items: [] });
+      await updateProps({ notes: [] });
 
       await fireEvent(screen.getByLabelText('board'), new PointerUpEvent());
 
@@ -303,63 +303,63 @@ describe('<room-board />', () => {
       expect(queryMocks[2]).not.toHaveBeenCalled();
     });
 
-    it('remotely updates the item position', async () => {
+    it('remotely updates the note position', async () => {
       const { queryMocks } = await renderComponent(
         {
-          items: [buildItemViewModel({ id: ITEM_ID, posY: 10, posX: 10 })],
+          notes: [buildNoteViewModel({ id: NOTE_ID, posY: 10, posX: 10 })],
         },
         [
-          makeHappyLockRoomBoardItemMutationStub({ id: ITEM_ID }),
-          makeHappyUnlockRoomBoardItemMutationStub({ id: ITEM_ID }),
-          makeHappyMoveBoardItemMutationStub({ id: ITEM_ID }),
+          makeHappyLockRoomBoardNoteMutationStub({ id: NOTE_ID }),
+          makeHappyUnlockRoomBoardNoteMutationStub({ id: NOTE_ID }),
+          makeHappyMoveBoardNoteMutationStub({ id: NOTE_ID }),
         ]
       );
-      const item = screen.getByRole('listitem');
-      await moveItem();
-      await fireEvent(item, new PointerUpEvent());
+      const note = screen.getByRole('listitem');
+      await moveNote();
+      await fireEvent(note, new PointerUpEvent());
 
       expect(queryMocks[2]).toHaveBeenCalledWith({
-        input: { id: ITEM_ID, posX: 30, posY: 20 },
+        input: { id: NOTE_ID, posX: 30, posY: 20 },
       });
     });
     it('displays a toast update when an error occurs while unlocking', async () => {
       const { mocks } = renderComponent(
         {
-          items: [buildItemViewModel({ id: ITEM_ID, posX: 10, posY: 10 })],
+          notes: [buildNoteViewModel({ id: NOTE_ID, posX: 10, posY: 10 })],
         },
         [
-          makeHappyLockRoomBoardItemMutationStub(),
-          makeSadUnlockRoomBoardItemMutationStub(),
-          makeHappyMoveBoardItemMutationStub(),
+          makeHappyLockRoomBoardNoteMutationStub(),
+          makeSadUnlockRoomBoardNoteMutationStub(),
+          makeHappyMoveBoardNoteMutationStub(),
         ]
       );
 
-      await moveItem();
+      await moveNote();
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
       await sleep(5);
 
       expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
-        'Could not update the item: GraphQL error: everything is broken'
+        'Could not update the note: GraphQL error: everything is broken'
       );
     });
     it('displays a toast update when an error occurs while mutating the position', async () => {
       const { mocks } = renderComponent(
         {
-          items: [buildItemViewModel()],
+          notes: [buildNoteViewModel()],
         },
         [
-          makeHappyLockRoomBoardItemMutationStub(),
-          makeHappyUnlockRoomBoardItemMutationStub(),
-          makeSadMoveBoardItemMutationStub(),
+          makeHappyLockRoomBoardNoteMutationStub(),
+          makeHappyUnlockRoomBoardNoteMutationStub(),
+          makeSadMoveBoardNoteMutationStub(),
         ]
       );
 
-      await moveItem();
+      await moveNote();
       await fireEvent(screen.getByRole('listitem'), new PointerUpEvent());
       await sleep(5);
 
       expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
-        'Could not update the item: GraphQL error: everything is broken'
+        'Could not update the note: GraphQL error: everything is broken'
       );
     });
   });

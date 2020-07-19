@@ -1,4 +1,4 @@
-fragment ItemBits on Item {
+fragment NoteBits on Note {
     __typename
     id
     posX
@@ -9,44 +9,44 @@ fragment ItemBits on Item {
     isDeleted
 }
 
-mutation addRoomBoardItem($input: AddRoomBoardItemInput!) {
-    addRoomBoardItem(input: $input) {
-        ...ItemBits
+mutation addRoomBoardNote($input: AddRoomBoardNoteInput!) {
+    addRoomBoardNote(input: $input) {
+        ...NoteBits
     }
 }
 
-mutation unlockRoomBoardItem($input: UnlockRoomBoardItemInput!) {
-    unlockRoomBoardItem(input: $input) {
-        ...ItemBits
+mutation unlockRoomBoardNote($input: UnlockRoomBoardNoteInput!) {
+    unlockRoomBoardNote(input: $input) {
+        ...NoteBits
     }
 }
 
-mutation lockRoomBoardItem($input: LockRoomBoardItemInput!) {
-    lockRoomBoardItem(input: $input) {
-        ...ItemBits
+mutation lockRoomBoardNote($input: LockRoomBoardNoteInput!) {
+    lockRoomBoardNote(input: $input) {
+        ...NoteBits
     }
 }
 
-mutation moveBoardItem($input: MoveBoardItemInput!) {
-    moveBoardItem(input: $input) {
-        ...ItemBits
+mutation moveBoardNote($input: MoveBoardNoteInput!) {
+    moveBoardNote(input: $input) {
+        ...NoteBits
     }
 }
 
-mutation updateBoardItemText($input: UpdateBoardItemTextInput!) {
-    updateBoardItemText(input: $input) {
-        ...ItemBits
+mutation updateBoardNoteText($input: UpdateBoardNoteTextInput!) {
+    updateBoardNoteText(input: $input) {
+        ...NoteBits
     }
 }
 
-mutation updateBoardItemStyle($input: UpdateBoardItemStyleInput!) {
-    updateBoardItemStyle(input: $input) {
-        ...ItemBits
+mutation updateBoardNoteStyle($input: UpdateBoardNoteStyleInput!) {
+    updateBoardNoteStyle(input: $input) {
+        ...NoteBits
     }
 }
 
-mutation deleteBoardItem($id: ID!) {
-    deleteBoardItem(id: $id)  {
+mutation deleteBoardNote($id: ID!) {
+    deleteBoardNote(id: $id)  {
         id
         isDeleted
     }

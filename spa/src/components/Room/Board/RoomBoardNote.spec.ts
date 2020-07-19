@@ -4,39 +4,39 @@ import {
   renderWithApollo,
   screen,
 } from '@/testHelpers/renderer';
-import RoomBoardItem from '@/components/Room/Board/RoomBoardItem.vue';
+import RoomBoardNote from '@/components/Room/Board/RoomBoardNote.vue';
 import { PointerDownEvent } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import userEvent from '@testing-library/user-event';
 import { waitFor } from '@testing-library/dom';
 import {
-  makeHappyDeleteBoardItemMutationStub,
-  makeHappyUpdateBoardItemStyleMutationStub,
-  makeHappyUpdateBoardItemTextMutationStub,
-  makeSadDeleteBoardItemMutationStub,
-  makeSadUpdateBoardItemStyleMutationStub,
-  makeSadUpdateRoomBoardItemMutationStub,
-} from '@/testHelpers/itemQueryStubs';
+  makeHappyDeleteBoardNoteMutationStub,
+  makeHappyUpdateBoardNoteStyleMutationStub,
+  makeHappyUpdateBoardNoteTextMutationStub,
+  makeSadDeleteBoardNoteMutationStub,
+  makeSadUpdateBoardNoteStyleMutationStub,
+  makeSadUpdateRoomBoardNoteMutationStub,
+} from '@/testHelpers/noteQueryStubs';
 import { MOUSE_BUTTONS, supportsTouchEvents } from '@/common/dom';
 import { sleep } from '@/testHelpers/timeout';
-import { buildItemViewModel } from '@/testHelpers/testData';
+import { buildNoteViewModel } from '@/testHelpers/testData';
 import {
   BLACKEST_BLACK,
   LIGHT_CYAN,
   LIGHT_ORANGE,
-} from '@/components/Room/Board/itemTheme';
+} from '@/components/Room/Board/noteTheme';
 
 jest.mock('@/common/dom');
 
-describe('<room-board-item />', () => {
+describe('<room-board-note />', () => {
   beforeEach(() => {
     (supportsTouchEvents as jest.Mock).mockReturnValue(true);
   });
   describe('default rendering', () => {
     it('renders the positioning based upon the x and y props', () => {
-      render(RoomBoardItem, {
+      render(RoomBoardNote, {
         propsData: {
           myId: 'me',
-          item: buildItemViewModel({ posX: 2, posY: 1 }),
+          note: buildNoteViewModel({ posX: 2, posY: 1 }),
           moving: false,
         },
       });
@@ -48,10 +48,10 @@ describe('<room-board-item />', () => {
     });
 
     it('renders the text', () => {
-      render(RoomBoardItem, {
+      render(RoomBoardNote, {
         propsData: {
           myId: 'me',
-          item: buildItemViewModel({ text: 'some text' }),
+          note: buildNoteViewModel({ text: 'some text' }),
           moving: false,
         },
       });
@@ -60,10 +60,10 @@ describe('<room-board-item />', () => {
     });
 
     it('renders a default themed style', () => {
-      render(RoomBoardItem, {
+      render(RoomBoardNote, {
         propsData: {
           myId: 'me',
-          item: buildItemViewModel(),
+          note: buildNoteViewModel(),
           moving: false,
         },
       });
@@ -75,10 +75,10 @@ describe('<room-board-item />', () => {
     });
 
     it('renders the default themed style if the style is invalid', () => {
-      render(RoomBoardItem, {
+      render(RoomBoardNote, {
         propsData: {
           myId: 'me',
-          item: buildItemViewModel({ style: 100 }),
+          note: buildNoteViewModel({ style: 100 }),
           moving: false,
         },
       });
@@ -94,10 +94,10 @@ describe('<room-board-item />', () => {
     describe('touch not enabled', () => {
       it('does not fire anything when clicking with a pointer if touch is not enabled', async () => {
         (supportsTouchEvents as jest.Mock).mockReturnValue(false);
-        const { emitted } = render(RoomBoardItem, {
+        const { emitted } = render(RoomBoardNote, {
           propsData: {
             myId: 'me',
-            item: buildItemViewModel({ id: 'item123', posX: 2, posY: 1 }),
+            note: buildNoteViewModel({ id: 'note123', posX: 2, posY: 1 }),
             moving: true,
           },
         });
@@ -111,10 +111,10 @@ describe('<room-board-item />', () => {
       });
       it('fires a pointerheld event for a mouse click when touch is not enabled', async () => {
         (supportsTouchEvents as jest.Mock).mockReturnValue(false);
-        const { emitted } = render(RoomBoardItem, {
+        const { emitted } = render(RoomBoardNote, {
           propsData: {
             myId: 'me',
-            item: buildItemViewModel({ id: 'item123', posX: 2, posY: 1 }),
+            note: buildNoteViewModel({ id: 'note123', posX: 2, posY: 1 }),
             moving: true,
           },
         });
@@ -127,15 +127,15 @@ describe('<room-board-item />', () => {
         expect(emitted().pointerheld[0]).toEqual([
           {
             pointerId: 1,
-            itemId: 'item123',
+            noteId: 'note123',
           },
         ]);
       });
       it('does not fire the pointerheld event for a mouse click which is not the primary button', async () => {
-        const { emitted } = render(RoomBoardItem, {
+        const { emitted } = render(RoomBoardNote, {
           propsData: {
             myId: 'me',
-            item: buildItemViewModel(),
+            note: buildNoteViewModel(),
           },
         });
 
@@ -155,11 +155,11 @@ describe('<room-board-item />', () => {
     describe('touch enabled', () => {
       it('fires a pointerheld event when clicking with a pointer', async () => {
         (supportsTouchEvents as jest.Mock).mockReturnValue(true);
-        const { emitted } = render(RoomBoardItem, {
+        const { emitted } = render(RoomBoardNote, {
           propsData: {
             myId: 'me',
-            item: buildItemViewModel({
-              id: 'item123',
+            note: buildNoteViewModel({
+              id: 'note123',
               posX: 2,
               posY: 1,
               lockedBy: null,
@@ -174,17 +174,17 @@ describe('<room-board-item />', () => {
         expect(emitted().pointerheld[0]).toEqual([
           {
             pointerId: 1,
-            itemId: 'item123',
+            noteId: 'note123',
           },
         ]);
       });
       it('fires nothing for a mouse click when touch is enabled', async () => {
         (supportsTouchEvents as jest.Mock).mockReturnValue(true);
-        const { emitted } = render(RoomBoardItem, {
+        const { emitted } = render(RoomBoardNote, {
           propsData: {
             myId: 'me',
-            item: buildItemViewModel({
-              id: 'item123',
+            note: buildNoteViewModel({
+              id: 'note123',
               posX: 2,
               posY: 1,
               lockedBy: null,
@@ -199,11 +199,11 @@ describe('<room-board-item />', () => {
       });
     });
 
-    it('fires a pointerheld event when the item is locked by me', async () => {
-      const { emitted } = render(RoomBoardItem, {
+    it('fires a pointerheld event when the note is locked by me', async () => {
+      const { emitted } = render(RoomBoardNote, {
         propsData: {
           myId: 'me',
-          item: buildItemViewModel({ lockedBy: 'me' }),
+          note: buildNoteViewModel({ lockedBy: 'me' }),
           moving: true,
         },
       });
@@ -215,11 +215,11 @@ describe('<room-board-item />', () => {
 
       expect(emitted().pointerheld).not.toBeUndefined();
     });
-    it('does not fire the pointerheld event when the item is locked by someone else', async () => {
-      const { emitted } = render(RoomBoardItem, {
+    it('does not fire the pointerheld event when the note is locked by someone else', async () => {
+      const { emitted } = render(RoomBoardNote, {
         propsData: {
           myId: 'me',
-          item: buildItemViewModel({ lockedBy: 'someone' }),
+          note: buildNoteViewModel({ lockedBy: 'someone' }),
           moving: true,
         },
       });
@@ -236,18 +236,18 @@ describe('<room-board-item />', () => {
   describe('editing', () => {
     it('lets me update the themed style while editing', async () => {
       const { queryMocks } = renderWithApollo(
-        RoomBoardItem,
+        RoomBoardNote,
         [
-          makeHappyUpdateBoardItemStyleMutationStub({
-            id: 'item123',
+          makeHappyUpdateBoardNoteStyleMutationStub({
+            id: 'note123',
             style: 3,
           }),
         ],
         {
           propsData: {
             myId: 'me',
-            item: buildItemViewModel({
-              id: 'item123',
+            note: buildNoteViewModel({
+              id: 'note123',
               posX: 2,
               posY: 1,
             }),
@@ -270,16 +270,16 @@ describe('<room-board-item />', () => {
 
       await waitFor(() =>
         expect(queryMocks[0]).toHaveBeenCalledWith({
-          input: { id: 'item123', style: 2 },
+          input: { id: 'note123', style: 2 },
         })
       );
     });
     it('displays a toast update when an error occurs while updating style', async () => {
       const { mocks } = renderWithApollo(
-        RoomBoardItem,
+        RoomBoardNote,
         [
-          makeSadUpdateBoardItemStyleMutationStub({
-            id: 'item123',
+          makeSadUpdateBoardNoteStyleMutationStub({
+            id: 'note123',
             style: 3,
           }),
         ],
@@ -287,8 +287,8 @@ describe('<room-board-item />', () => {
           propsData: {
             myId: 'me',
             editing: true,
-            item: buildItemViewModel({
-              id: 'item123',
+            note: buildNoteViewModel({
+              id: 'note123',
               posX: 2,
               posY: 1,
               text: 'some text',
@@ -306,17 +306,17 @@ describe('<room-board-item />', () => {
       await sleep(5);
 
       expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
-        'Could not save item style changes: GraphQL error: everything is broken'
+        'Could not save note style changes: GraphQL error: everything is broken'
       );
       expect(mocks.$logger.error).toHaveBeenCalled();
     });
 
     it('sends an editing event when I double click', async () => {
-      const { emitted } = render(RoomBoardItem, {
+      const { emitted } = render(RoomBoardNote, {
         propsData: {
           myId: 'me',
-          item: buildItemViewModel({
-            id: 'item123',
+          note: buildNoteViewModel({
+            id: 'note123',
             posX: 2,
             posY: 1,
             text: 'some text',
@@ -326,25 +326,25 @@ describe('<room-board-item />', () => {
 
       await userEvent.dblClick(screen.getByRole('listitem'));
       expect(emitted().editstart).not.toBeUndefined();
-      expect(emitted().editstart[0]).toEqual(['item123']);
+      expect(emitted().editstart[0]).toEqual(['note123']);
     });
 
     it('sends an update when I save while editing', async () => {
-      const itemId = 'item123';
+      const noteId = 'note123';
       const updatedText = 'updated content';
       const { queryMocks } = renderWithApollo(
-        RoomBoardItem,
+        RoomBoardNote,
         [
-          makeHappyUpdateBoardItemTextMutationStub({
-            id: itemId,
+          makeHappyUpdateBoardNoteTextMutationStub({
+            id: noteId,
             text: updatedText,
           }),
         ],
         {
           propsData: {
             myId: 'me',
-            item: buildItemViewModel({
-              id: itemId,
+            note: buildNoteViewModel({
+              id: noteId,
               posX: 2,
               posY: 1,
               text: 'some text',
@@ -363,18 +363,18 @@ describe('<room-board-item />', () => {
       await userEvent.click(screen.getByRole('button', { name: /save/i }));
       await waitFor(() =>
         expect(queryMocks[0]).toHaveBeenCalledWith({
-          input: { id: itemId, text: updatedText },
+          input: { id: noteId, text: updatedText },
         })
       );
     });
     it('displays a toast update when an error occurs while updating', async () => {
       const updatedText = 'updated content';
-      const itemId = 'item123';
+      const noteId = 'note123';
       const { mocks } = renderWithApollo(
-        RoomBoardItem,
+        RoomBoardNote,
         [
-          makeSadUpdateRoomBoardItemMutationStub({
-            id: itemId,
+          makeSadUpdateRoomBoardNoteMutationStub({
+            id: noteId,
             text: updatedText,
           }),
         ],
@@ -382,8 +382,8 @@ describe('<room-board-item />', () => {
           propsData: {
             myId: 'me',
             editing: true,
-            item: buildItemViewModel({
-              id: itemId,
+            note: buildNoteViewModel({
+              id: noteId,
               posX: 2,
               posY: 1,
               text: 'some text',
@@ -403,26 +403,26 @@ describe('<room-board-item />', () => {
       await sleep(5);
 
       expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
-        'Could not save item changes: GraphQL error: everything is broken'
+        'Could not save note changes: GraphQL error: everything is broken'
       );
       expect(mocks.$logger.error).toHaveBeenCalled();
     });
 
     it('lets me delete while editing', async () => {
-      const itemId = 'item123';
+      const noteId = 'note123';
 
       const { queryMocks } = renderWithApollo(
-        RoomBoardItem,
+        RoomBoardNote,
         [
-          makeHappyDeleteBoardItemMutationStub({
-            id: itemId,
+          makeHappyDeleteBoardNoteMutationStub({
+            id: noteId,
           }),
         ],
         {
           propsData: {
             myId: 'me',
-            item: buildItemViewModel({
-              id: itemId,
+            note: buildNoteViewModel({
+              id: noteId,
               posX: 2,
               posY: 1,
               text: 'some text',
@@ -439,24 +439,24 @@ describe('<room-board-item />', () => {
       await userEvent.click(screen.getByRole('button', { name: /delete/i }));
 
       await waitFor(() =>
-        expect(queryMocks[0]).toHaveBeenCalledWith({ id: itemId })
+        expect(queryMocks[0]).toHaveBeenCalledWith({ id: noteId })
       );
     });
     it('displays a toast update when an error occurs while deleting', async () => {
-      const itemId = 'item123';
+      const noteId = 'note123';
 
       const { mocks } = renderWithApollo(
-        RoomBoardItem,
+        RoomBoardNote,
         [
-          makeSadDeleteBoardItemMutationStub({
-            id: itemId,
+          makeSadDeleteBoardNoteMutationStub({
+            id: noteId,
           }),
         ],
         {
           propsData: {
             myId: 'me',
-            item: buildItemViewModel({
-              id: itemId,
+            note: buildNoteViewModel({
+              id: noteId,
               posX: 2,
               posY: 1,
               text: 'some text',
@@ -480,7 +480,7 @@ describe('<room-board-item />', () => {
       await sleep(5);
 
       expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
-        'Could not remove item: GraphQL error: everything is broken'
+        'Could not remove note: GraphQL error: everything is broken'
       );
       expect(mocks.$logger.error).toHaveBeenCalled();
     });

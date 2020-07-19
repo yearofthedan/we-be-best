@@ -7,7 +7,7 @@
     v-on:dblclick="_onEditClick"
     v-bind:data-moving="moving"
     v-bind:data-editing="editing"
-    v-bind:data-locked-by="!lockedByMe && item.lockedBy"
+    v-bind:data-locked-by="!lockedByMe && note.lockedBy"
   >
     <template v-if="editing">
       <colour-style-selector
@@ -32,27 +32,27 @@
 <script lang="ts">
 import Vue from 'vue';
 import {
-  deleteBoardItem,
-  updateBoardItemStyle,
-  updateBoardItemText,
+  deleteBoardNote,
+  updateBoardNoteStyle,
+  updateBoardNoteText,
 } from '@/graphql/boardQueries.graphql';
 import AutoExpandingTextBox from '@/components/Room/Board/AutoExpandingTextBox.vue';
 import { MOUSE_BUTTONS, supportsTouchEvents } from '@/common/dom';
 import ColourStyleSelector from '@/components/Room/Board/ColourStyleSelector.vue';
 import {
-  DeleteBoardItemMutation,
-  MutationDeleteBoardItemArgs,
-  MutationUpdateBoardItemStyleArgs,
-  MutationUpdateBoardItemTextArgs,
-  UpdateBoardItemStyleMutation,
-  UpdateBoardItemTextMutation,
+  DeleteBoardNoteMutation,
+  MutationDeleteBoardNoteArgs,
+  MutationUpdateBoardNoteStyleArgs,
+  MutationUpdateBoardNoteTextArgs,
+  UpdateBoardNoteStyleMutation,
+  UpdateBoardNoteTextMutation,
 } from '@type-definitions/graphql';
-import { itemTheme } from './itemTheme';
-import { ItemViewModel } from '@/components/Room/Board/items';
+import { noteTheme } from './noteTheme';
+import { NoteViewModel } from '@/components/Room/Board/notes';
 import ButtonAction from '@/components/atoms/ButtonAction.vue';
 
 interface PointerHeldEventPayload {
-  itemId: string;
+  noteId: string;
   pointerId: number;
 }
 
@@ -66,15 +66,15 @@ type DataProperties = {
   }[];
 };
 export default Vue.extend({
-  name: 'room-board-item',
+  name: 'room-board-note',
   components: {
     'auto-expanding-text-box': AutoExpandingTextBox,
     'colour-style-selector': ColourStyleSelector,
     'button-action': ButtonAction,
   },
   props: {
-    item: {
-      type: Object as () => ItemViewModel,
+    note: {
+      type: Object as () => NoteViewModel,
       required: true,
     },
     editing: {
@@ -92,9 +92,9 @@ export default Vue.extend({
   },
   data(): DataProperties {
     return {
-      text: this.item.text,
-      selectedStyle: this.item.style || 0,
-      styleOptions: itemTheme,
+      text: this.note.text,
+      selectedStyle: this.note.style || 0,
+      styleOptions: noteTheme,
     };
   },
   computed: {
@@ -107,17 +107,17 @@ export default Vue.extend({
       const style =
         this.styleOptions[this.selectedStyle] ?? this.styleOptions[0];
       return {
-        left: `${this.item.posX}px`,
-        top: `${this.item.posY}px`,
+        left: `${this.note.posX}px`,
+        top: `${this.note.posY}px`,
         '--theme-primary-colour': style.backgroundColour,
         '--theme-text-colour': style.textColour,
       };
     },
     elementId: function () {
-      return `item-${this.item.id}`;
+      return `note-${this.note.id}`;
     },
     lockedByMe: function () {
-      return this.item.lockedBy === this.myId;
+      return this.note.lockedBy === this.myId;
     },
   },
   methods: {
@@ -125,54 +125,54 @@ export default Vue.extend({
       try {
         this.$emit('editfinish');
         await this.$apollo.mutate<
-          DeleteBoardItemMutation,
-          MutationDeleteBoardItemArgs
+          DeleteBoardNoteMutation,
+          MutationDeleteBoardNoteArgs
         >({
-          mutation: deleteBoardItem,
+          mutation: deleteBoardNote,
           variables: {
-            id: this.item.id,
+            id: this.note.id,
           },
         });
       } catch (e) {
         this.$logger.error(e);
         this.$toasted.global.apollo_error(
-          `Could not remove item: ${e.message}`
+          `Could not remove note: ${e.message}`
         );
       }
     },
     _onSaveClick: async function (): Promise<void> {
       const mutationPayload = {
-        id: this.item.id,
+        id: this.note.id,
         text: this.text,
       };
 
       try {
         this.$emit('editfinish');
         await this.$apollo.mutate<
-          UpdateBoardItemTextMutation,
-          MutationUpdateBoardItemTextArgs
+          UpdateBoardNoteTextMutation,
+          MutationUpdateBoardNoteTextArgs
         >({
-          mutation: updateBoardItemText,
+          mutation: updateBoardNoteText,
           variables: {
             input: mutationPayload,
           },
           optimisticResponse: {
             __typename: 'Mutation',
-            updateBoardItemText: {
-              __typename: 'Item',
-              ...this.item,
+            updateBoardNoteText: {
+              __typename: 'Note',
+              ...this.note,
             },
           },
         });
       } catch (e) {
         this.$logger.error(e);
         this.$toasted.global.apollo_error(
-          `Could not save item changes: ${e.message}`
+          `Could not save note changes: ${e.message}`
         );
       }
     },
     _onEditClick: function (): void {
-      this.$emit('editstart', this.item.id);
+      this.$emit('editstart', this.note.id);
     },
     _onPointerDown: function (event: PointerEvent): void {
       if (!supportsTouchEvents()) {
@@ -189,14 +189,14 @@ export default Vue.extend({
     },
     _onMove: function (event: MouseEvent): void {
       if (
-        (this.item.lockedBy && !this.lockedByMe) ||
+        (this.note.lockedBy && !this.lockedByMe) ||
         event.button !== MOUSE_BUTTONS.primary
       ) {
         return;
       }
 
       this.$emit('pointerheld', {
-        itemId: this.item.id,
+        noteId: this.note.id,
         pointerId: 1,
       } as PointerHeldEventPayload);
     },
@@ -207,13 +207,13 @@ export default Vue.extend({
 
       try {
         await this.$apollo.mutate<
-          UpdateBoardItemStyleMutation,
-          MutationUpdateBoardItemStyleArgs
+          UpdateBoardNoteStyleMutation,
+          MutationUpdateBoardNoteStyleArgs
         >({
-          mutation: updateBoardItemStyle,
+          mutation: updateBoardNoteStyle,
           variables: {
             input: {
-              id: this.item.id,
+              id: this.note.id,
               style: this.selectedStyle,
             },
           },
@@ -221,7 +221,7 @@ export default Vue.extend({
       } catch (e) {
         this.$logger.error(e);
         this.$toasted.global.apollo_error(
-          `Could not save item style changes: ${e.message}`
+          `Could not save note style changes: ${e.message}`
         );
       }
     },
@@ -252,7 +252,7 @@ li[data-moving] {
   border-color: var(--colour-primary-emphasis);
   background-color: var(--colour-secondary);
   cursor: none;
-  z-index: var(--z-index-board-item-moving);
+  z-index: var(--z-index-board-note-moving);
 }
 
 li[data-editing] {
@@ -281,7 +281,7 @@ li {
   white-space: pre-wrap;
   word-break: break-word;
   font-size: var(--font-size-text);
-  z-index: var(--z-index-board-item);
+  z-index: var(--z-index-board-note);
 }
 
 #action-button-group {

@@ -19,7 +19,7 @@ describe('memberResolvers', () => {
     connection = await MongoClient.connect(await new MongoMemoryServer().getUri(), { useUnifiedTopology: true });
     const db = await connection.db();
     roomsCollection = await db.createCollection(ROOMS_COLLECTION);
-    await roomsCollection.createIndex({'items.id': 1});
+    await roomsCollection.createIndex({'notes.id': 1});
   });
   afterAll(async () => {
     await connection.close();
@@ -48,7 +48,7 @@ describe('memberResolvers', () => {
     });
 
     it('joins the room if it exists', async () => {
-      const room = buildRoomModel({ items: [], members: [buildRoomMemberModel({ name: 'my-mother'})]});
+      const room = buildRoomModel({ notes: [], members: [buildRoomMemberModel({ name: 'my-mother'})]});
       await roomsCollection.insertOne({...room});
 
       const publishStub = jest.fn();

@@ -6,7 +6,7 @@ import {
 
 describe('arrays', () => {
   describe('patchArrayElement', () => {
-    it('updates the item if it exists', () => {
+    it('updates the note if it exists', () => {
       const array = [{ id: 1, value: 'value' }];
 
       const result = patchArrayElement(
@@ -18,7 +18,7 @@ describe('arrays', () => {
       expect(result).toEqual([{ id: 1, value: 'updated value' }]);
     });
 
-    it('throws an error if the item does not exist', () => {
+    it('throws an error if the note does not exist', () => {
       expect(() =>
         patchArrayElement([] as string[], 'meh', (e) => e === '1')
       ).toThrowError();
@@ -34,7 +34,7 @@ describe('arrays', () => {
       expect(result).toEqual([]);
     });
 
-    it('throws an error if the item does not exist', () => {
+    it('throws an error if the note does not exist', () => {
       expect(() =>
         removeArrayElement([], (i) => i === 'some-string')
       ).toThrowError();
@@ -42,28 +42,28 @@ describe('arrays', () => {
   });
 
   describe('upsertArrayElement', () => {
-    it('adds the item if it does not exist', () => {
-      const items = upsertArrayElement(
+    it('adds the note if it does not exist', () => {
+      const notes = upsertArrayElement(
         [],
         { id: 1, value: 'new value' },
         (e) => e.id === 1
       );
 
-      expect(items).toEqual([{ id: 1, value: 'new value' }]);
+      expect(notes).toEqual([{ id: 1, value: 'new value' }]);
     });
 
-    it('replaces the item if it exists', () => {
+    it('replaces the note if it exists', () => {
       const array = [
         { id: 1, value: 'value' },
         { id: 2, value: 'value' },
       ];
-      const items = upsertArrayElement(
+      const notes = upsertArrayElement(
         array,
         { id: 1, value: 'new value' },
         (e) => e.id === 1
       );
 
-      expect(items).toEqual([
+      expect(notes).toEqual([
         { id: 1, value: 'new value' },
         { id: 2, value: 'value' },
       ]);

@@ -1,19 +1,19 @@
 import Room from '@/components/Room/Room.vue';
 import { QuerySpec, renderWithApollo, screen } from '@/testHelpers/renderer';
 import {
-  makeHappyRoomItemUpdatesSubscription,
+  makeHappyRoomNoteUpdatesSubscription,
   makeHappyRoomMemberUpdateSubscription,
   makeHappyRoomQueryStub,
 } from '@/testHelpers/roomQueryStubs';
 import {
-  buildItemResponse,
-  makeHappyAddRoomBoardItemMutationStub,
-  makeSadAddRoomBoardItemMutationStub,
+  buildNoteResponse,
+  makeHappyAddRoomBoardNoteMutationStub,
+  makeSadAddRoomBoardNoteMutationStub,
   MY_ID,
   ROOM_ID,
-} from '@/testHelpers/itemQueryStubs';
+} from '@/testHelpers/noteQueryStubs';
 import userEvent from '@testing-library/user-event';
-import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/items';
+import { DEFAULT_X, DEFAULT_Y } from '@/components/Room/Board/notes';
 import { fireEvent, waitFor } from '@testing-library/dom';
 import { sleep } from '@/testHelpers/timeout';
 
@@ -39,8 +39,8 @@ const renderComponent = async (
     queries || [
       makeHappyRoomQueryStub(),
       makeHappyRoomMemberUpdateSubscription(),
-      makeHappyRoomItemUpdatesSubscription(),
-      makeHappyAddRoomBoardItemMutationStub(),
+      makeHappyRoomNoteUpdatesSubscription(),
+      makeHappyAddRoomBoardNoteMutationStub(),
     ],
     {
       propsData: { roomId: '123', myId: 'me', ...props },
@@ -64,7 +64,7 @@ describe('<room />', () => {
         makeHappyRoomMemberUpdateSubscription({
           successData: { name: 'my-mother' },
         }),
-        makeHappyRoomItemUpdatesSubscription(),
+        makeHappyRoomNoteUpdatesSubscription(),
       ],
       {
         propsData: { roomId: '123', myId: 'me' },
@@ -75,15 +75,15 @@ describe('<room />', () => {
     expect(screen.getByText(/my-mother/)).toBeInTheDocument();
   });
 
-  it('renders the initial and updated items on the board', async () => {
-    const item = buildItemResponse({
-      id: 'ITEM1',
-      text: 'item-text',
+  it('renders the initial and updated notes on the board', async () => {
+    const note = buildNoteResponse({
+      id: 'NOTE1',
+      text: 'note-text',
       style: null,
     });
-    const itemToBeUpdated = buildItemResponse({
-      id: 'ITEM2',
-      text: 'item-text',
+    const noteToBeUpdated = buildNoteResponse({
+      id: 'NOTE2',
+      text: 'note-text',
       style: 2,
     });
 
@@ -91,11 +91,11 @@ describe('<room />', () => {
       Room,
       [
         makeHappyRoomQueryStub({
-          successData: { items: [item, itemToBeUpdated] },
+          successData: { notes: [note, noteToBeUpdated] },
         }),
         makeHappyRoomMemberUpdateSubscription(),
-        makeHappyRoomItemUpdatesSubscription({
-          successData: { ...itemToBeUpdated, text: 'more-item-text' },
+        makeHappyRoomNoteUpdatesSubscription({
+          successData: { ...noteToBeUpdated, text: 'more-note-text' },
         }),
       ],
       {
@@ -103,8 +103,8 @@ describe('<room />', () => {
       }
     );
 
-    expect(await screen.findByText('item-text')).toBeInTheDocument();
-    expect(await screen.findByText('more-item-text')).toBeInTheDocument();
+    expect(await screen.findByText('note-text')).toBeInTheDocument();
+    expect(await screen.findByText('more-note-text')).toBeInTheDocument();
   });
 
   it('lets me download all the data', async () => {
@@ -115,7 +115,7 @@ describe('<room />', () => {
       [
         makeHappyRoomQueryStub(),
         makeHappyRoomMemberUpdateSubscription(),
-        makeHappyRoomItemUpdatesSubscription(),
+        makeHappyRoomNoteUpdatesSubscription(),
       ]
     );
 
@@ -123,7 +123,7 @@ describe('<room />', () => {
     await userEvent.click(link);
 
     const href =
-      'data:text/json;charset=utf-8,%7B%22room%22%3A%7B%22id%22%3A%22ROOM123%22%2C%22members%22%3A%5B%7B%22id%22%3A%22aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee%22%2C%22name%22%3A%22me%22%7D%2C%7B%22id%22%3A%222%22%2C%22name%22%3A%22PERSON%22%7D%5D%2C%22items%22%3A%5B%7B%22id%22%3A%22ITEM1%22%2C%22posX%22%3A30%2C%22posY%22%3A20%2C%22lockedBy%22%3A%22me%22%2C%22text%22%3A%22placeholder%20text%22%2C%22style%22%3A2%2C%22isDeleted%22%3Anull%2C%22isNew%22%3Anull%7D%2C%7B%22id%22%3A%22ITEMM1234%22%2C%22posX%22%3A30%2C%22posY%22%3A20%2C%22lockedBy%22%3A%22me%22%2C%22text%22%3A%22placeholder%20text%22%2C%22style%22%3A2%2C%22isDeleted%22%3Anull%2C%22isNew%22%3Anull%7D%5D%7D%7D';
+      'data:text/json;charset=utf-8,%7B%22room%22%3A%7B%22id%22%3A%22ROOM123%22%2C%22members%22%3A%5B%7B%22id%22%3A%22aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee%22%2C%22name%22%3A%22me%22%7D%2C%7B%22id%22%3A%222%22%2C%22name%22%3A%22PERSON%22%7D%5D%2C%22notes%22%3A%5B%7B%22id%22%3A%22NOTE1%22%2C%22posX%22%3A30%2C%22posY%22%3A20%2C%22lockedBy%22%3A%22me%22%2C%22text%22%3A%22placeholder%20text%22%2C%22style%22%3A2%2C%22isDeleted%22%3Anull%2C%22isNew%22%3Anull%7D%2C%7B%22id%22%3A%22NOTEM1234%22%2C%22posX%22%3A30%2C%22posY%22%3A20%2C%22lockedBy%22%3A%22me%22%2C%22text%22%3A%22placeholder%20text%22%2C%22style%22%3A2%2C%22isDeleted%22%3Anull%2C%22isNew%22%3Anull%7D%5D%7D%7D';
     expect(link).toHaveAttribute('href', href);
   });
 
@@ -190,8 +190,8 @@ describe('<room />', () => {
     });
   });
 
-  describe('when adding an item', () => {
-    it('lets me add an item', async () => {
+  describe('when adding a note', () => {
+    it('lets me add a note', async () => {
       const { queryMocks } = await renderComponent();
 
       await screen.findByRole('button', { name: /add/i });
@@ -201,7 +201,7 @@ describe('<room />', () => {
         expect(queryMocks[3]).toHaveBeenCalledWith({
           input: {
             roomId: '123',
-            itemId: expect.any(String),
+            noteId: expect.any(String),
             posX: DEFAULT_X,
             posY: DEFAULT_Y,
           },
@@ -224,14 +224,14 @@ describe('<room />', () => {
         Room,
         [
           makeHappyRoomQueryStub({
-            successData: { items: [] },
+            successData: { notes: [] },
           }),
           makeHappyRoomMemberUpdateSubscription(),
-          makeHappyRoomItemUpdatesSubscription(),
-          makeSadAddRoomBoardItemMutationStub(),
+          makeHappyRoomNoteUpdatesSubscription(),
+          makeSadAddRoomBoardNoteMutationStub(),
         ],
         {
-          propsData: { myId: MY_ID, roomId: ROOM_ID, items: [] },
+          propsData: { myId: MY_ID, roomId: ROOM_ID, notes: [] },
           mocks: {
             $toasted,
             $logger,
@@ -244,7 +244,7 @@ describe('<room />', () => {
       );
       await sleep(5);
       expect($toasted.global.apollo_error).toHaveBeenCalledWith(
-        'Could not add a new item: GraphQL error: everything is broken'
+        'Could not add a new note: GraphQL error: everything is broken'
       );
       expect($logger.error).toHaveBeenCalled();
     });

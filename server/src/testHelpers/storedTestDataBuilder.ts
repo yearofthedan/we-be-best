@@ -1,7 +1,7 @@
-import {ItemModel, MemberModel, RoomModel} from '../rooms/RoomsDataSource';
+import {NoteModel, MemberModel, RoomModel} from '../rooms/RoomsDataSource';
 
-export const buildItemData = (overrides: Partial<ItemModel> = {}): ItemModel => ({
-    id: 'ITEM123',
+export const buildNoteData = (overrides: Partial<NoteModel> = {}): NoteModel => ({
+    id: 'NOTE123',
     lockedBy: 'me',
     posY: 20,
     posX: 30,
@@ -17,8 +17,8 @@ export const buildRoomMemberModel = (overrides: Partial<MemberModel> = {}): Memb
     ...overrides,
 });
 
-export const buildItemModel = (overrides: Partial<ItemModel> = {}): ItemModel => ({
-    id: 'ITEM123',
+export const buildNoteModel = (overrides: Partial<NoteModel> = {}): NoteModel => ({
+    id: 'NOTE123',
     lockedBy: 'me',
     posY: 20,
     posX: 30,
@@ -30,7 +30,7 @@ export const buildItemModel = (overrides: Partial<ItemModel> = {}): ItemModel =>
 export const buildRoomModel = (overrides: Partial<RoomModel> = {}): RoomModel => ({
     _id: 'internal_id',
     id: 'ROOM123',
-    items: [buildItemModel()],
+    notes: [buildNoteModel()],
     members: [buildRoomMemberModel()],
     ...overrides,
 });

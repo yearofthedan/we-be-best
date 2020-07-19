@@ -21,7 +21,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import RoomMembers from '@/components/Room/Details/RoomMembers.vue';
-import { ItemViewModel } from '@/components/Room/Board/items';
+import { NoteViewModel } from '@/components/Room/Board/notes';
 
 export default Vue.extend({
   name: 'room-details',
@@ -33,8 +33,8 @@ export default Vue.extend({
       type: String,
       required: true,
     },
-    items: {
-      type: Array as () => ItemViewModel[],
+    notes: {
+      type: Array as () => NoteViewModel[],
       required: true,
     },
     members: {

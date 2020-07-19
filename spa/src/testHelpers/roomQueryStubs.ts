@@ -1,6 +1,6 @@
-import {itemUpdates, addMember, room, memberUpdates} from '@/graphql/roomQueries.graphql';
-import {buildItemResponse} from '@/testHelpers/itemQueryStubs';
-import {Item, Member, Room} from '@type-definitions/graphql';
+import {noteUpdates, addMember, room, memberUpdates} from '@/graphql/roomQueries.graphql';
+import {buildNoteResponse} from '@/testHelpers/noteQueryStubs';
+import {Note, Member, Room} from '@type-definitions/graphql';
 
 export const buildMemberResult = (override: Partial<Member> = {}): Member => ({
   __typename: 'Member',
@@ -12,14 +12,14 @@ export const buildMemberResult = (override: Partial<Member> = {}): Member => ({
   ...override
 });
 
-export function makeHappyRoomItemUpdatesSubscription(
-  override: { variables?: undefined; successData?: Partial<Item> } = {}
+export function makeHappyRoomNoteUpdatesSubscription(
+  override: { variables?: undefined; successData?: Partial<Note> } = {}
 ) {
   return {
-    query: itemUpdates,
+    query: noteUpdates,
     successData: {
-      itemUpdates: {
-        ...buildItemResponse({id: 'ITEMM1234'}),
+      noteUpdates: {
+        ...buildNoteResponse({id: 'NOTEM1234'}),
         ...override.successData,
       },
     },
@@ -45,7 +45,7 @@ export function makeHappyRoomQueryStub(override: { variables?: undefined; succes
       room: {
         id: '123',
         members: [buildMemberResult({ name: 'me' })],
-        items: [buildItemResponse({ id: 'ITEM1' })],
+        notes: [buildNoteResponse({ id: 'NOTE1' })],
         ...override.successData,
       },
     },

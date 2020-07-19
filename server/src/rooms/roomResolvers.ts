@@ -12,7 +12,7 @@ const mapToRoomResponse = (roomModel: RoomModel): Room => {
           id: room
         } as Room
       })),
-    items: roomModel.items.map(
+    notes: roomModel.notes.map(
       ({ room, ...rest}) => ({
         ...rest,
         room: {

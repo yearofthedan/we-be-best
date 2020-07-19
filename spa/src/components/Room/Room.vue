@@ -7,18 +7,18 @@
         v-bind:zoom-factor="zoomFactor"
         v-bind:my-id="myId"
         v-bind:room-id="roomId"
-        v-bind:items="room.items"
+        v-bind:notes="room.notes"
         v-bind:background="background"
       />
       <room-details
-        v-bind:items="room.items"
+        v-bind:notes="room.notes"
         v-bind:members="room.members"
         v-bind:room-id="roomId"
       />
       <room-controls
         v-on:zoom-in="_onZoomIn"
         v-on:zoom-out="_onZoomOut"
-        v-on:add-item="_onAddItem"
+        v-on:add-note="_onAddNote"
         v-on:export="_onExport"
         v-on:share="_onShare"
         v-on:change-background="_onChangeBackground"
@@ -32,13 +32,13 @@
 <script lang="ts">
 import Vue from 'vue';
 import { ApolloError } from 'apollo-client';
-import makeNewItem, { ItemViewModel } from '@/components/Room/Board/items';
+import makeNewNote, { NoteViewModel } from '@/components/Room/Board/notes';
 import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
 import { removeArrayElement, upsertArrayElement } from '@/common/arrays';
 
 import {
-  itemUpdates,
+  noteUpdates,
   room,
   memberUpdates,
 } from '@/graphql/roomQueries.graphql';
@@ -49,10 +49,10 @@ import {
   Room,
   QueryRoomArgs,
   SubscriptionMemberUpdatesArgs,
-  SubscriptionItemUpdatesArgs,
-  AddRoomBoardItemInput,
+  SubscriptionNoteUpdatesArgs,
+  AddRoomBoardNoteInput,
 } from '@type-definitions/graphql';
-import { addRoomBoardItem } from '@/graphql/boardQueries.graphql';
+import { addRoomBoardNote } from '@/graphql/boardQueries.graphql';
 import RoomControls from '@/components/Room/RoomControls.vue';
 import { mapToJsonString } from '@/components/Room/Details/roomExport';
 import { MemberViewModel } from '@/components/Room/Details/members';
@@ -70,14 +70,14 @@ interface RoomComponentData {
 }
 
 const resolveUpdate = <T extends { id: string; isDeleted?: boolean | null }>(
-  items: T[],
+  array: T[],
   update: T
 ) => {
   if (update.isDeleted) {
-    return removeArrayElement(items, (e) => e.id === update.id);
+    return removeArrayElement(array, (e) => e.id === update.id);
   }
 
-  return upsertArrayElement(items, update, (e) => e.id === update.id);
+  return upsertArrayElement(array, update, (e) => e.id === update.id);
 };
 
 export default Vue.extend({
@@ -148,8 +148,8 @@ export default Vue.extend({
           },
         },
         {
-          document: itemUpdates,
-          variables: function (): SubscriptionItemUpdatesArgs {
+          document: noteUpdates,
+          variables: function (): SubscriptionNoteUpdatesArgs {
             return { roomId: ((this as unknown) as RoomComponentProps).roomId };
           },
           onError(error: ApolloError) {
@@ -159,20 +159,20 @@ export default Vue.extend({
             previousResult: Pick<Query, 'room'>,
             {
               subscriptionData,
-            }: { subscriptionData: { data: Pick<Subscription, 'itemUpdates'> } }
+            }: { subscriptionData: { data: Pick<Subscription, 'noteUpdates'> } }
           ) {
             const currentRoom = ((this as unknown) as RoomComponentData).room;
-            if (!currentRoom?.items) {
+            if (!currentRoom?.notes) {
               return;
             }
 
-            if (currentRoom.items) {
+            if (currentRoom.notes) {
               return {
                 room: {
                   ...currentRoom,
-                  items: resolveUpdate(
-                    currentRoom.items,
-                    subscriptionData.data.itemUpdates
+                  notes: resolveUpdate(
+                    currentRoom.notes,
+                    subscriptionData.data.noteUpdates
                   ),
                 },
               };
@@ -208,29 +208,29 @@ export default Vue.extend({
         encodeURIComponent(
           mapToJsonString(
             this.roomId,
-            this.room?.items as ItemViewModel[],
+            this.room?.notes as NoteViewModel[],
             this.room?.members as MemberViewModel[]
           )
         );
     },
-    _onAddItem: async function (): Promise<void> {
-      const newItem = makeNewItem();
-      const mutationPayload: AddRoomBoardItemInput = {
-        posY: newItem.posY,
-        posX: newItem.posX,
+    _onAddNote: async function (): Promise<void> {
+      const newNote = makeNewNote();
+      const mutationPayload: AddRoomBoardNoteInput = {
+        posY: newNote.posY,
+        posX: newNote.posX,
         roomId: this.roomId,
-        itemId: newItem.id,
+        noteId: newNote.id,
       };
       try {
         await this.$apollo.mutate({
-          mutation: addRoomBoardItem,
+          mutation: addRoomBoardNote,
           variables: {
             input: mutationPayload,
           },
           optimisticResponse: {
             __typename: 'Mutation',
-            addRoomBoardItem: {
-              __typename: 'Item',
+            addRoomBoardNote: {
+              __typename: 'Note',
               ...mutationPayload,
               text: '',
               id: null,
@@ -243,7 +243,7 @@ export default Vue.extend({
       } catch (error) {
         this.$logger.error(error);
         this.$toasted.global.apollo_error(
-          `Could not add a new item: ${error.message}`
+          `Could not add a new note: ${error.message}`
         );
       }
     },

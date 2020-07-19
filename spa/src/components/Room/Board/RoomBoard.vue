@@ -9,49 +9,49 @@
     v-bind:style="`--zoom-factor: ${zoomFactor}`"
     v-bind:data-background="background"
   >
-    <room-board-item
-      v-for="item in itemsData"
-      v-bind:item="item"
-      v-bind:moving="_getIsMoving(item.id)"
+    <room-board-note
+      v-for="note in notesData"
+      v-bind:note="note"
+      v-bind:moving="_getIsMoving(note.id)"
       v-bind:my-id="myId"
-      v-bind:editing="editingItemReference === item.id"
-      v-on:pointerheld="_onBoardItemPointerHeld"
-      v-on:editstart="_onBoardItemEditStart"
-      v-on:editfinish="_onBoardItemEditFinish"
-      :key="item.id"
+      v-bind:editing="editingNoteReference === note.id"
+      v-on:pointerheld="_onBoardNotePointerHeld"
+      v-on:editstart="_onBoardNoteEditStart"
+      v-on:editfinish="_onBoardNoteEditFinish"
+      :key="note.id"
     />
   </transition-group>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import RoomBoardItem from './RoomBoardItem.vue';
+import RoomBoardNote from './RoomBoardNote.vue';
 import {
-  lockRoomBoardItem,
-  moveBoardItem,
-  unlockRoomBoardItem,
+  lockRoomBoardNote,
+  moveBoardNote,
+  unlockRoomBoardNote,
 } from '@/graphql/boardQueries.graphql';
-import { ItemViewModel } from '@/components/Room/Board/items';
+import { NoteViewModel } from '@/components/Room/Board/notes';
 import { patchArrayElement } from '@/common/arrays';
 import { supportsTouchEvents } from '@/common/dom';
 import {
-  LockRoomBoardItemInput,
-  MoveBoardItemInput,
-  UnlockRoomBoardItemInput,
+  LockRoomBoardNoteInput,
+  MoveBoardNoteInput,
+  UnlockRoomBoardNoteInput,
 } from '@type-definitions/graphql';
 
 export default Vue.extend({
   name: 'board',
   components: {
-    'room-board-item': RoomBoardItem,
+    'room-board-note': RoomBoardNote,
   },
   props: {
     background: {
       type: String,
       default: 'QUADRANTS',
     },
-    items: {
-      type: Array as () => ItemViewModel[],
+    notes: {
+      type: Array as () => NoteViewModel[],
       required: true,
     },
     myId: {
@@ -68,24 +68,24 @@ export default Vue.extend({
     },
   },
   watch: {
-    items: function (newVal) {
-      this.itemsData = newVal;
+    notes: function (newVal) {
+      this.notesData = newVal;
     },
   },
   data: function (): {
-    itemsData: ItemViewModel[];
-    movingItemReference: string | null;
-    editingItemReference: string | null;
-    heldItemReference: string | null;
+    notesData: NoteViewModel[];
+    movingNoteReference: string | null;
+    editingNoteReference: string | null;
+    heldNoteReference: string | null;
     primaryTouchId: string | null;
   } {
     return {
-      itemsData: this.$props.items.filter(
-        (item: ItemViewModel) => !item.isDeleted
+      notesData: this.$props.notes.filter(
+        (note: NoteViewModel) => !note.isDeleted
       ),
-      movingItemReference: null,
-      editingItemReference: null,
-      heldItemReference: null,
+      movingNoteReference: null,
+      editingNoteReference: null,
+      heldNoteReference: null,
       primaryTouchId: null,
     };
   },
@@ -96,12 +96,12 @@ export default Vue.extend({
     window.addEventListener('mouseup', this._onPointerUp);
   },
   methods: {
-    _getIsMoving: function (itemId: string): boolean {
-      return itemId === this.movingItemReference;
+    _getIsMoving: function (noteId: string): boolean {
+      return noteId === this.movingNoteReference;
     },
     _onPointerUp: function (): void {
-      this._onBoardItemStoppedMoving();
-      this.heldItemReference = null;
+      this._onBoardNoteStoppedMoving();
+      this.heldNoteReference = null;
     },
     _onPointerMove: function (event: PointerEvent): void {
       if (!supportsTouchEvents()) {
@@ -109,38 +109,38 @@ export default Vue.extend({
       }
       const { movementX, movementY } = event;
 
-      this.moveItemIfHeld(movementX, movementY);
+      this.moveNoteIfHeld(movementX, movementY);
     },
     _onMouseMove: function (event: MouseEvent): void {
       if (supportsTouchEvents()) {
         return;
       }
       const { movementX, movementY } = event;
-      this.moveItemIfHeld(movementX, movementY);
+      this.moveNoteIfHeld(movementX, movementY);
     },
-    moveItemIfHeld(movementX: number, movementY: number) {
-      if (!this.movingItemReference) {
-        if (!this.heldItemReference) {
+    moveNoteIfHeld(movementX: number, movementY: number) {
+      if (!this.movingNoteReference) {
+        if (!this.heldNoteReference) {
           return;
         }
-        this.movingItemReference = this.heldItemReference;
-        this._lockItem(this.heldItemReference);
+        this.movingNoteReference = this.heldNoteReference;
+        this._lockNote(this.heldNoteReference);
       }
 
-      this._onBoardItemMoved({
-        itemReference: this.movingItemReference,
+      this._onBoardNoteMoved({
+        noteReference: this.movingNoteReference,
         movementX,
         movementY,
       });
     },
-    _lockItem: function (itemId: string): void {
-      const mutationPayload: LockRoomBoardItemInput = {
-        id: itemId,
+    _lockNote: function (noteId: string): void {
+      const mutationPayload: LockRoomBoardNoteInput = {
+        id: noteId,
         lockedBy: this.myId,
       };
       this.$apollo
         .mutate({
-          mutation: lockRoomBoardItem,
+          mutation: lockRoomBoardNote,
           variables: {
             input: mutationPayload,
           },
@@ -148,101 +148,101 @@ export default Vue.extend({
         .catch((error) => {
           this.$logger.error(error);
           this.$toasted.global.apollo_error(
-            `Could not move the item: ${error.message}`
+            `Could not move the note: ${error.message}`
           );
         });
     },
-    _onBoardItemPointerHeld: function (payload: ItemPointerEventPayload) {
-      this.heldItemReference = payload.itemId;
+    _onBoardNotePointerHeld: function (payload: NotePointerEventPayload) {
+      this.heldNoteReference = payload.noteId;
     },
-    _onBoardItemEditStart: function (itemId: string) {
-      if (this.editingItemReference) {
+    _onBoardNoteEditStart: function (noteId: string) {
+      if (this.editingNoteReference) {
         return;
       }
-      this.editingItemReference = itemId;
+      this.editingNoteReference = noteId;
     },
-    _onBoardItemEditFinish: function () {
-      this.editingItemReference = null;
+    _onBoardNoteEditFinish: function () {
+      this.editingNoteReference = null;
     },
-    _onBoardItemMoved: function ({
-      itemReference,
+    _onBoardNoteMoved: function ({
+      noteReference,
       movementX,
       movementY,
-    }: ItemMovedEventPayload) {
-      const item = this.itemsData.find((e) => e.id === itemReference);
-      if (!item) {
+    }: NoteMovedEventPayload) {
+      const note = this.notesData.find((e) => e.id === noteReference);
+      if (!note) {
         return;
       }
-      const { posX, posY } = item;
+      const { posX, posY } = note;
 
-      this.itemsData = patchArrayElement(
-        this.itemsData,
+      this.notesData = patchArrayElement(
+        this.notesData,
         {
           posX: Math.max(0, posX + movementX),
           posY: Math.max(0, posY + movementY),
           lockedBy: this.myId,
         },
-        (e) => e.id === itemReference
+        (e) => e.id === noteReference
       );
     },
-    _onBoardItemStoppedMoving: async function (): Promise<void> {
-      const itemRef = this.movingItemReference;
-      if (!itemRef) {
+    _onBoardNoteStoppedMoving: async function (): Promise<void> {
+      const noteRef = this.movingNoteReference;
+      if (!noteRef) {
         return;
       }
 
-      const item = this.itemsData.find((i) => i.id === itemRef);
-      if (!item) {
+      const note = this.notesData.find((i) => i.id === noteRef);
+      if (!note) {
         return;
       }
 
-      this.movingItemReference = null;
+      this.movingNoteReference = null;
 
-      const updateRoomBoardItemsPayload: MoveBoardItemInput = {
-        id: item.id,
-        posX: item.posX,
-        posY: item.posY,
+      const updateRoomBoardNotesPayload: MoveBoardNoteInput = {
+        id: note.id,
+        posX: note.posX,
+        posY: note.posY,
       };
 
       await this.$apollo
         .mutate({
-          mutation: moveBoardItem,
+          mutation: moveBoardNote,
           variables: {
-            input: updateRoomBoardItemsPayload,
+            input: updateRoomBoardNotesPayload,
           },
         })
         .catch((error) => {
           this.$toasted.global.apollo_error(
-            `Could not update the item: ${error.message}`
+            `Could not update the note: ${error.message}`
           );
         });
 
-      const mutationPayload: UnlockRoomBoardItemInput = {
-        id: item.id,
+      const mutationPayload: UnlockRoomBoardNoteInput = {
+        id: note.id,
       };
       await this.$apollo
         .mutate({
-          mutation: unlockRoomBoardItem,
+          mutation: unlockRoomBoardNote,
           variables: {
             input: mutationPayload,
           },
         })
         .catch((error) => {
           this.$toasted?.global?.apollo_error(
-            `Could not update the item: ${error.message}`
+            `Could not update the note: ${error.message}`
           );
         });
     },
   },
 });
 
-interface ItemPointerEventPayload {
-  itemId: string;
+interface NotePointerEventPayload {
+  noteId: string;
   pointerId: number;
 }
 
-interface ItemMovedEventPayload {
-  itemReference: string;
+interface NoteMovedEventPayload {
+  noteReference: string;
   movementX: number;
   movementY: number;
 }

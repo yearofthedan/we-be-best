@@ -9,41 +9,41 @@ export type Scalars = {
   Float: number;
 };
 
-export type ItemInput = {
+export type NoteInput = {
   id: Scalars['String'];
   posX: Scalars['Int'];
   posY: Scalars['Int'];
   lockedBy?: Maybe<Scalars['String']>;
 };
 
-export type MoveBoardItemInput = {
+export type MoveBoardNoteInput = {
   id: Scalars['String'];
   posX: Scalars['Int'];
   posY: Scalars['Int'];
 };
 
-export type LockRoomBoardItemInput = {
+export type LockRoomBoardNoteInput = {
   id: Scalars['ID'];
   lockedBy: Scalars['ID'];
 };
 
-export type UnlockRoomBoardItemInput = {
+export type UnlockRoomBoardNoteInput = {
   id: Scalars['ID'];
 };
 
-export type UpdateBoardItemTextInput = {
+export type UpdateBoardNoteTextInput = {
   id: Scalars['ID'];
   text: Scalars['String'];
 };
 
-export type UpdateBoardItemStyleInput = {
+export type UpdateBoardNoteStyleInput = {
   id: Scalars['ID'];
   style: Scalars['Int'];
 };
 
-export type AddRoomBoardItemInput = {
+export type AddRoomBoardNoteInput = {
   roomId: Scalars['ID'];
-  itemId: Scalars['String'];
+  noteId: Scalars['String'];
   posX: Scalars['Int'];
   posY: Scalars['Int'];
 };
@@ -57,11 +57,11 @@ export type Room = {
   __typename?: 'Room';
   id: Scalars['ID'];
   members: Array<Member>;
-  items: Array<Item>;
+  notes: Array<Note>;
 };
 
-export type Item = {
-  __typename?: 'Item';
+export type Note = {
+  __typename?: 'Note';
   id: Scalars['String'];
   posX: Scalars['Int'];
   posY: Scalars['Int'];
@@ -92,7 +92,7 @@ export type QueryRoomArgs = {
 export type Subscription = {
   __typename?: 'Subscription';
   memberUpdates: Member;
-  itemUpdates: Item;
+  noteUpdates: Note;
 };
 
 
@@ -101,20 +101,20 @@ export type SubscriptionMemberUpdatesArgs = {
 };
 
 
-export type SubscriptionItemUpdatesArgs = {
+export type SubscriptionNoteUpdatesArgs = {
   roomId: Scalars['ID'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   addMember: Member;
-  moveBoardItem: Item;
-  lockRoomBoardItem: Item;
-  unlockRoomBoardItem: Item;
-  addRoomBoardItem: Item;
-  updateBoardItemText: Item;
-  updateBoardItemStyle: Item;
-  deleteBoardItem: Item;
+  moveBoardNote: Note;
+  lockRoomBoardNote: Note;
+  unlockRoomBoardNote: Note;
+  addRoomBoardNote: Note;
+  updateBoardNoteText: Note;
+  updateBoardNoteStyle: Note;
+  deleteBoardNote: Note;
 };
 
 
@@ -123,133 +123,133 @@ export type MutationAddMemberArgs = {
 };
 
 
-export type MutationMoveBoardItemArgs = {
-  input: MoveBoardItemInput;
+export type MutationMoveBoardNoteArgs = {
+  input: MoveBoardNoteInput;
 };
 
 
-export type MutationLockRoomBoardItemArgs = {
-  input: LockRoomBoardItemInput;
+export type MutationLockRoomBoardNoteArgs = {
+  input: LockRoomBoardNoteInput;
 };
 
 
-export type MutationUnlockRoomBoardItemArgs = {
-  input: UnlockRoomBoardItemInput;
+export type MutationUnlockRoomBoardNoteArgs = {
+  input: UnlockRoomBoardNoteInput;
 };
 
 
-export type MutationAddRoomBoardItemArgs = {
-  input: AddRoomBoardItemInput;
+export type MutationAddRoomBoardNoteArgs = {
+  input: AddRoomBoardNoteInput;
 };
 
 
-export type MutationUpdateBoardItemTextArgs = {
-  input: UpdateBoardItemTextInput;
+export type MutationUpdateBoardNoteTextArgs = {
+  input: UpdateBoardNoteTextInput;
 };
 
 
-export type MutationUpdateBoardItemStyleArgs = {
-  input: UpdateBoardItemStyleInput;
+export type MutationUpdateBoardNoteStyleArgs = {
+  input: UpdateBoardNoteStyleInput;
 };
 
 
-export type MutationDeleteBoardItemArgs = {
+export type MutationDeleteBoardNoteArgs = {
   id: Scalars['ID'];
 };
 
-export type ItemBitsFragment = (
-  { __typename: 'Item' }
-  & Pick<Item, 'id' | 'posX' | 'posY' | 'lockedBy' | 'style' | 'text' | 'isDeleted'>
+export type NoteBitsFragment = (
+  { __typename: 'Note' }
+  & Pick<Note, 'id' | 'posX' | 'posY' | 'lockedBy' | 'style' | 'text' | 'isDeleted'>
 );
 
-export type AddRoomBoardItemMutationVariables = Exact<{
-  input: AddRoomBoardItemInput;
+export type AddRoomBoardNoteMutationVariables = Exact<{
+  input: AddRoomBoardNoteInput;
 }>;
 
 
-export type AddRoomBoardItemMutation = (
+export type AddRoomBoardNoteMutation = (
   { __typename?: 'Mutation' }
-  & { addRoomBoardItem: (
-    { __typename?: 'Item' }
-    & ItemBitsFragment
+  & { addRoomBoardNote: (
+    { __typename?: 'Note' }
+    & NoteBitsFragment
   ) }
 );
 
-export type UnlockRoomBoardItemMutationVariables = Exact<{
-  input: UnlockRoomBoardItemInput;
+export type UnlockRoomBoardNoteMutationVariables = Exact<{
+  input: UnlockRoomBoardNoteInput;
 }>;
 
 
-export type UnlockRoomBoardItemMutation = (
+export type UnlockRoomBoardNoteMutation = (
   { __typename?: 'Mutation' }
-  & { unlockRoomBoardItem: (
-    { __typename?: 'Item' }
-    & ItemBitsFragment
+  & { unlockRoomBoardNote: (
+    { __typename?: 'Note' }
+    & NoteBitsFragment
   ) }
 );
 
-export type LockRoomBoardItemMutationVariables = Exact<{
-  input: LockRoomBoardItemInput;
+export type LockRoomBoardNoteMutationVariables = Exact<{
+  input: LockRoomBoardNoteInput;
 }>;
 
 
-export type LockRoomBoardItemMutation = (
+export type LockRoomBoardNoteMutation = (
   { __typename?: 'Mutation' }
-  & { lockRoomBoardItem: (
-    { __typename?: 'Item' }
-    & ItemBitsFragment
+  & { lockRoomBoardNote: (
+    { __typename?: 'Note' }
+    & NoteBitsFragment
   ) }
 );
 
-export type MoveBoardItemMutationVariables = Exact<{
-  input: MoveBoardItemInput;
+export type MoveBoardNoteMutationVariables = Exact<{
+  input: MoveBoardNoteInput;
 }>;
 
 
-export type MoveBoardItemMutation = (
+export type MoveBoardNoteMutation = (
   { __typename?: 'Mutation' }
-  & { moveBoardItem: (
-    { __typename?: 'Item' }
-    & ItemBitsFragment
+  & { moveBoardNote: (
+    { __typename?: 'Note' }
+    & NoteBitsFragment
   ) }
 );
 
-export type UpdateBoardItemTextMutationVariables = Exact<{
-  input: UpdateBoardItemTextInput;
+export type UpdateBoardNoteTextMutationVariables = Exact<{
+  input: UpdateBoardNoteTextInput;
 }>;
 
 
-export type UpdateBoardItemTextMutation = (
+export type UpdateBoardNoteTextMutation = (
   { __typename?: 'Mutation' }
-  & { updateBoardItemText: (
-    { __typename?: 'Item' }
-    & ItemBitsFragment
+  & { updateBoardNoteText: (
+    { __typename?: 'Note' }
+    & NoteBitsFragment
   ) }
 );
 
-export type UpdateBoardItemStyleMutationVariables = Exact<{
-  input: UpdateBoardItemStyleInput;
+export type UpdateBoardNoteStyleMutationVariables = Exact<{
+  input: UpdateBoardNoteStyleInput;
 }>;
 
 
-export type UpdateBoardItemStyleMutation = (
+export type UpdateBoardNoteStyleMutation = (
   { __typename?: 'Mutation' }
-  & { updateBoardItemStyle: (
-    { __typename?: 'Item' }
-    & ItemBitsFragment
+  & { updateBoardNoteStyle: (
+    { __typename?: 'Note' }
+    & NoteBitsFragment
   ) }
 );
 
-export type DeleteBoardItemMutationVariables = Exact<{
+export type DeleteBoardNoteMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type DeleteBoardItemMutation = (
+export type DeleteBoardNoteMutation = (
   { __typename?: 'Mutation' }
-  & { deleteBoardItem: (
-    { __typename?: 'Item' }
-    & Pick<Item, 'id' | 'isDeleted'>
+  & { deleteBoardNote: (
+    { __typename?: 'Note' }
+    & Pick<Note, 'id' | 'isDeleted'>
   ) }
 );
 
@@ -275,16 +275,16 @@ export type MemberUpdatesSubscription = (
   ) }
 );
 
-export type ItemUpdatesSubscriptionVariables = Exact<{
+export type NoteUpdatesSubscriptionVariables = Exact<{
   roomId: Scalars['ID'];
 }>;
 
 
-export type ItemUpdatesSubscription = (
+export type NoteUpdatesSubscription = (
   { __typename?: 'Subscription' }
-  & { itemUpdates: (
-    { __typename?: 'Item' }
-    & ItemBitsFragment
+  & { noteUpdates: (
+    { __typename?: 'Note' }
+    & NoteBitsFragment
   ) }
 );
 
@@ -301,9 +301,9 @@ export type RoomQuery = (
     & { members: Array<(
       { __typename?: 'Member' }
       & Pick<Member, 'id' | 'name'>
-    )>, items: Array<(
-      { __typename?: 'Item' }
-      & ItemBitsFragment
+    )>, notes: Array<(
+      { __typename?: 'Note' }
+      & NoteBitsFragment
     )> }
   )> }
 );

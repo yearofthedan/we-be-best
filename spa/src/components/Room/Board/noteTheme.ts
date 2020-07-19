@@ -5,7 +5,7 @@ export const WHITEST_WHITE = 'hsla(0, 100%, 100%, 1)';
 export const BLACKEST_BLACK = 'hsla(0, 0%, 0%, 1)';
 export const GOLD_LEAF = 'hsla(43, 74%, 49%, 1)';
 
-export const itemTheme = [
+export const noteTheme = [
   {
     name: 'style-1',
     backgroundColour: LIGHT_CYAN,

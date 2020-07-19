@@ -87,8 +87,8 @@ article {
   --font-size-button: calc(4 * var(--unit-base-rem));
 
   --z-index-fab: 10000;
-  --z-index-board-item: 1000;
-  --z-index-board-item-moving: 2000;
+  --z-index-board-note: 1000;
+  --z-index-board-note-moving: 2000;
 
   --button-height: calc(var(--unit-base-rem) * 9);
 }

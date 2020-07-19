@@ -4,14 +4,14 @@ export const patchArrayElement = <T>(
   predicate: (e: T) => boolean
 ): T[] => {
   const current = array.find(predicate);
-  const itemIndex = array.findIndex(predicate);
-  if (!current || itemIndex === -1) {
+  const entryIndex = array.findIndex(predicate);
+  if (!current || entryIndex === -1) {
     throw new Error('element not found in array');
   }
   return [
-    ...array.slice(0, itemIndex),
+    ...array.slice(0, entryIndex),
     { ...current, ...update },
-    ...array.slice(itemIndex + 1),
+    ...array.slice(entryIndex + 1),
   ];
 };
 
@@ -30,14 +30,14 @@ export const removeArrayElement = <T>(
 
 export const upsertArrayElement = <T>(
   array: T[],
-  item: T,
+  entry: T,
   predicate: (e: T) => boolean
 ): T[] => {
   const index = array.findIndex(predicate);
 
   if (index === -1) {
-    return [...array, item];
+    return [...array, entry];
   }
 
-  return [...array.slice(0, index), item, ...array.slice(index + 1)];
+  return [...array.slice(0, index), entry, ...array.slice(index + 1)];
 };

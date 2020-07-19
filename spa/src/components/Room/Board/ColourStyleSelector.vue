@@ -16,7 +16,7 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'room-board-item-style-selector',
+  name: 'room-board-note-style-selector',
   props: {
     current: {
       type: String,

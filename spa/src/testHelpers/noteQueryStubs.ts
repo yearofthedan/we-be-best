@@ -1,26 +1,26 @@
 import {
-  addRoomBoardItem,
-  lockRoomBoardItem,
-  moveBoardItem,
-  updateBoardItemText,
-  deleteBoardItem,
-  unlockRoomBoardItem,
-  updateBoardItemStyle,
+  addRoomBoardNote,
+  lockRoomBoardNote,
+  moveBoardNote,
+  updateBoardNoteText,
+  deleteBoardNote,
+  unlockRoomBoardNote,
+  updateBoardNoteStyle,
 } from '@/graphql/boardQueries.graphql';
 import {
-  AddRoomBoardItemInput, Item,
-  MoveBoardItemInput,
-  UpdateBoardItemStyleInput,
-  UpdateBoardItemTextInput,
+  AddRoomBoardNoteInput, Note,
+  MoveBoardNoteInput,
+  UpdateBoardNoteStyleInput,
+  UpdateBoardNoteTextInput,
 } from '@type-definitions/graphql';
 
-export const ITEM_ID = 'ITEM123';
+export const NOTE_ID = 'NOTE123';
 export const ROOM_ID = 'ROOM123';
 export const MY_ID = 'me';
 
-export const buildItemResponse = (overrides: Partial<Item> = {}): Item => ({
-  __typename: 'Item',
-  id: 'ITEM123',
+export const buildNoteResponse = (overrides: Partial<Note> = {}): Note => ({
+  __typename: 'Note',
+  id: 'NOTE123',
   lockedBy: 'me',
   posY: 20,
   posX: 30,
@@ -30,17 +30,17 @@ export const buildItemResponse = (overrides: Partial<Item> = {}): Item => ({
   ...overrides,
 });
 
-export const makeHappyMoveBoardItemMutationStub = (inputOverrides: Partial<MoveBoardItemInput> = {}) => {
+export const makeHappyMoveBoardNoteMutationStub = (inputOverrides: Partial<MoveBoardNoteInput> = {}) => {
   const successData = {
-    moveBoardItem: buildItemResponse({
-      id: ITEM_ID,
+    moveBoardNote: buildNoteResponse({
+      id: NOTE_ID,
       posX: 0,
       posY: 0,
       lockedBy: null,
     }),
   };
   return {
-    query: moveBoardItem,
+    query: moveBoardNote,
     variables: {
       input: {...inputOverrides},
     },
@@ -48,12 +48,12 @@ export const makeHappyMoveBoardItemMutationStub = (inputOverrides: Partial<MoveB
   };
 };
 
-export const makeSadMoveBoardItemMutationStub = (inputOverrides: Partial<MoveBoardItemInput> = {}) => {
+export const makeSadMoveBoardNoteMutationStub = (inputOverrides: Partial<MoveBoardNoteInput> = {}) => {
   const errorData = {
     message: 'everything is broken',
   };
   return {
-    query: moveBoardItem,
+    query: moveBoardNote,
     variables: {
       input: {...inputOverrides},
     },
@@ -61,17 +61,17 @@ export const makeSadMoveBoardItemMutationStub = (inputOverrides: Partial<MoveBoa
   };
 };
 
-export const makeHappyLockRoomBoardItemMutationStub = (
+export const makeHappyLockRoomBoardNoteMutationStub = (
   inputOverrides = {},
 ) => {
   const successData = {
-    lockRoomBoardItem: buildItemResponse(),
+    lockRoomBoardNote: buildNoteResponse(),
   };
   return {
-    query: lockRoomBoardItem,
+    query: lockRoomBoardNote,
     variables: {
       input: {
-        id: 'item1',
+        id: 'note1',
         lockedBy: 'me',
         ...inputOverrides,
       },
@@ -80,17 +80,17 @@ export const makeHappyLockRoomBoardItemMutationStub = (
   };
 };
 
-export const makeSadLockRoomBoardItemMutationStub = (
+export const makeSadLockRoomBoardNoteMutationStub = (
   inputOverrides = {},
 ) => {
   const errorData = {
     message: 'everything is broken',
   };
   return {
-    query: lockRoomBoardItem,
+    query: lockRoomBoardNote,
     variables: {
       input: {
-        id: 'item1',
+        id: 'note1',
         lockedBy: 'me',
         ...inputOverrides,
       },
@@ -99,24 +99,24 @@ export const makeSadLockRoomBoardItemMutationStub = (
   };
 };
 
-export const makeHappyAddRoomBoardItemMutationStub = (
-  overrides?: Partial<AddRoomBoardItemInput>,
+export const makeHappyAddRoomBoardNoteMutationStub = (
+  overrides?: Partial<AddRoomBoardNoteInput>,
 ) => {
   const successData = {
-    addRoomBoardItem: buildItemResponse({
-      id: ITEM_ID,
+    addRoomBoardNote: buildNoteResponse({
+      id: NOTE_ID,
       posX: 0,
       posY: 0,
       lockedBy: null,
     }),
   };
   return {
-    query: addRoomBoardItem,
+    query: addRoomBoardNote,
     variables: {
       input: {
         posX: 0,
         posY: 0,
-        itemId: ITEM_ID,
+        noteId: NOTE_ID,
         roomId: ROOM_ID,
         ...overrides,
       },
@@ -125,19 +125,19 @@ export const makeHappyAddRoomBoardItemMutationStub = (
   };
 };
 
-export const makeSadAddRoomBoardItemMutationStub = (
-  overrides?: Partial<AddRoomBoardItemInput>,
+export const makeSadAddRoomBoardNoteMutationStub = (
+  overrides?: Partial<AddRoomBoardNoteInput>,
 ) => {
   const errorData = {
     message: 'everything is broken',
   };
   return {
-    query: addRoomBoardItem,
+    query: addRoomBoardNote,
     variables: {
       input: {
         posX: 0,
         posY: 0,
-        itemId: ITEM_ID,
+        noteId: NOTE_ID,
         roomId: ROOM_ID,
         ...overrides,
       },
@@ -146,12 +146,12 @@ export const makeSadAddRoomBoardItemMutationStub = (
   };
 };
 
-export const makeHappyUnlockRoomBoardItemMutationStub = (inputOverrides = {id: 'item1'}) => {
+export const makeHappyUnlockRoomBoardNoteMutationStub = (inputOverrides = {id: 'note1'}) => {
   const successData = {
-    unlockRoomBoardItem: buildItemResponse(),
+    unlockRoomBoardNote: buildNoteResponse(),
   };
   return {
-    query: unlockRoomBoardItem,
+    query: unlockRoomBoardNote,
     variables: {
       input: {...inputOverrides},
     },
@@ -159,12 +159,12 @@ export const makeHappyUnlockRoomBoardItemMutationStub = (inputOverrides = {id: '
   };
 };
 
-export const makeSadUnlockRoomBoardItemMutationStub = (inputOverrides = {id: 'item1'}) => {
+export const makeSadUnlockRoomBoardNoteMutationStub = (inputOverrides = {id: 'note1'}) => {
   const errorData = {
     message: 'everything is broken',
   };
   return {
-    query: unlockRoomBoardItem,
+    query: unlockRoomBoardNote,
     variables: {
       input: {...inputOverrides},
     },
@@ -172,14 +172,14 @@ export const makeSadUnlockRoomBoardItemMutationStub = (inputOverrides = {id: 'it
   };
 };
 
-export const makeHappyUpdateBoardItemTextMutationStub = (
-  inputOverrides: Partial<UpdateBoardItemTextInput> = {},
+export const makeHappyUpdateBoardNoteTextMutationStub = (
+  inputOverrides: Partial<UpdateBoardNoteTextInput> = {},
 ) => {
   const successData = {
-    updateBoardItemText: buildItemResponse({text: 'some content'}),
+    updateBoardNoteText: buildNoteResponse({text: 'some content'}),
   };
   return {
-    query: updateBoardItemText,
+    query: updateBoardNoteText,
     variables: {
       input: {
         id: 'some-id',
@@ -191,14 +191,14 @@ export const makeHappyUpdateBoardItemTextMutationStub = (
   };
 };
 
-export const makeSadUpdateRoomBoardItemMutationStub = (
+export const makeSadUpdateRoomBoardNoteMutationStub = (
   inputOverrides = {},
 ) => {
   const errorData = {
     message: 'everything is broken',
   };
   return {
-    query: updateBoardItemText,
+    query: updateBoardNoteText,
     variables: {
       input: {
         id: 'some-id',
@@ -210,14 +210,14 @@ export const makeSadUpdateRoomBoardItemMutationStub = (
   };
 };
 
-export const makeHappyUpdateBoardItemStyleMutationStub = (
-  inputOverrides: Partial<UpdateBoardItemStyleInput> = {},
+export const makeHappyUpdateBoardNoteStyleMutationStub = (
+  inputOverrides: Partial<UpdateBoardNoteStyleInput> = {},
 ) => {
   const successData = {
-    updateBoardItemStyle: buildItemResponse({style: 3}),
+    updateBoardNoteStyle: buildNoteResponse({style: 3}),
   };
   return {
-    query: updateBoardItemStyle,
+    query: updateBoardNoteStyle,
     variables: {
       input: {
         id: 'some-id',
@@ -229,14 +229,14 @@ export const makeHappyUpdateBoardItemStyleMutationStub = (
   };
 };
 
-export const makeSadUpdateBoardItemStyleMutationStub = (
-  inputOverrides: Partial<UpdateBoardItemStyleInput> = {} = {},
+export const makeSadUpdateBoardNoteStyleMutationStub = (
+  inputOverrides: Partial<UpdateBoardNoteStyleInput> = {} = {},
 ) => {
   const errorData = {
     message: 'everything is broken',
   };
   return {
-    query: updateBoardItemStyle,
+    query: updateBoardNoteStyle,
     variables: {
       input: {
         id: 'some-id',
@@ -248,18 +248,18 @@ export const makeSadUpdateBoardItemStyleMutationStub = (
   };
 };
 
-export const makeHappyDeleteBoardItemMutationStub = (
+export const makeHappyDeleteBoardNoteMutationStub = (
   inputOverrides: { id?: string } = {},
 ) => {
   const successData = {
-    deleteBoardItem: {
+    deleteBoardNote: {
       id: 'some-id',
       isDeleted: true,
       ...inputOverrides,
     },
   };
   return {
-    query: deleteBoardItem,
+    query: deleteBoardNote,
     variables: {
       id: 'some-id',
       ...inputOverrides,
@@ -268,14 +268,14 @@ export const makeHappyDeleteBoardItemMutationStub = (
   };
 };
 
-export const makeSadDeleteBoardItemMutationStub = (
+export const makeSadDeleteBoardNoteMutationStub = (
   inputOverrides: { id?: string } = {},
 ) => {
   const errorData = {
     message: 'everything is broken',
   };
   return {
-    query: deleteBoardItem,
+    query: deleteBoardNote,
     variables: {
       id: 'some-id',
       ...inputOverrides,

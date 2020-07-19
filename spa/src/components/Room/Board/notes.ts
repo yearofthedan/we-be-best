@@ -1,10 +1,10 @@
 import { v4 } from 'uuid';
-import { Item } from '@type-definitions/graphql';
+import { Note } from '@type-definitions/graphql';
 
 export const DEFAULT_X = 100;
 export const DEFAULT_Y = 100;
 
-export interface ItemViewModel {
+export interface NoteViewModel {
   id: string;
   posX: number;
   posY: number;
@@ -15,8 +15,8 @@ export interface ItemViewModel {
   isNew?: boolean | null;
 }
 
-export const mapToItemsViewModel = (items: Item[]): ItemViewModel[] => {
-  return items.map((i) => {
+export const mapToNotesViewModel = (notes: Note[]): NoteViewModel[] => {
+  return notes.map((i) => {
     return {
       id: i.id,
       posX: i.posX,
@@ -30,7 +30,7 @@ export const mapToItemsViewModel = (items: Item[]): ItemViewModel[] => {
   });
 };
 
-const makeNewItem = (): ItemViewModel => ({
+const makeNewNote = (): NoteViewModel => ({
   id: v4(),
   posX: DEFAULT_X,
   posY: DEFAULT_Y,
@@ -39,4 +39,4 @@ const makeNewItem = (): ItemViewModel => ({
   isNew: true,
 });
 
-export default makeNewItem;
+export default makeNewNote;

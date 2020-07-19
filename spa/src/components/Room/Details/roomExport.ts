@@ -1,7 +1,7 @@
 import {
-  ItemViewModel,
-  mapToItemsViewModel,
-} from '@/components/Room/Board/items';
+  NoteViewModel,
+  mapToNotesViewModel,
+} from '@/components/Room/Board/notes';
 import {
   mapToMemberViewModel,
   MemberViewModel,
@@ -9,14 +9,14 @@ import {
 
 export const mapToJsonString = (
   id: string,
-  items: ItemViewModel[],
+  notes: NoteViewModel[],
   members: MemberViewModel[]
 ): string => {
   return JSON.stringify({
     room: {
       id,
       members: mapToMemberViewModel(members),
-      items: mapToItemsViewModel(items),
+      notes: mapToNotesViewModel(notes),
     },
   });
 };

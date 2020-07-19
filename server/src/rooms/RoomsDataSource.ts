@@ -6,7 +6,7 @@ export interface RoomModel {
   _id: string;
   id: string;
   members: MemberModel[];
-  items: ItemModel[];
+  notes: NoteModel[];
 }
 
 export interface MemberModel {
@@ -15,7 +15,7 @@ export interface MemberModel {
   room: string;
 }
 
-export interface ItemModel {
+export interface NoteModel {
   id: string;
   posY: number;
   posX: number;
@@ -26,10 +26,10 @@ export interface ItemModel {
   style?: number;
 }
 
-export type NewItemParam = Pick<ItemModel, 'id'|'posX'|'posY'|'text'>
-export type UpdateItemParam = Partial<ItemModel> & Pick<ItemModel, 'id'>;
+export type NewNoteParam = Pick<NoteModel, 'id'|'posX'|'posY'|'text'>
+export type UpdateNoteParam = Partial<NoteModel> & Pick<NoteModel, 'id'>;
 
-const buildItem = ({id, posX, posY, text, lockedBy, room}: ItemModel): ItemModel => ({
+const buildNote = ({id, posX, posY, text, lockedBy, room}: NoteModel): NoteModel => ({
   id,
   posX,
   posY,
@@ -48,74 +48,74 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
       throw new UserInputError('could not find room', { invalidArgs: ['id']});
     }
 
-    const items = room.items.filter(item => !item.isDeleted);
-    return { ...room, items };
+    const notes = room.notes.filter(note => !note.isDeleted);
+    return { ...room, notes };
   }
 
-  async deleteItem(itemId: string): Promise<ItemModel | undefined> {
+  async deleteNote(noteId: string): Promise<NoteModel | undefined> {
     const result = await this.collection.findOneAndUpdate(
       {
-        'items.id': itemId
+        'notes.id': noteId
       },
-      {$set: { 'items.$.isDeleted': true }},
+      {$set: { 'notes.$.isDeleted': true }},
       {
-        projection: { items: 1 },
+        projection: { notes: 1 },
         returnOriginal: false,
       },
     );
 
     if (result.value === null) {
-      throw new UserInputError('could not find item to update', { invalidArgs: ['id']});
+      throw new UserInputError('could not find note to update', { invalidArgs: ['id']});
     }
 
-    return result.value?.items.find(i => i.id === itemId);
+    return result.value?.notes.find(i => i.id === noteId);
   }
 
-  async updateItem(item: UpdateItemParam): Promise<ItemModel> {
-    const updateSpecification = Object.entries(item)
+  async updateNote(note: UpdateNoteParam): Promise<NoteModel> {
+    const updateSpecification = Object.entries(note)
       .filter(([, value]) => value !== undefined)
       .reduce(
         // @ts-ignore //todo this is erroring on SPA build needs investigation
-        (accumulator: { [key: string]: keyof ItemModel }, [key, value]: [string, ValueOf<ItemModel>]) => ({
+        (accumulator: { [key: string]: keyof NoteModel }, [key, value]: [string, ValueOf<NoteModel>]) => ({
           ...accumulator,
-          [`items.$.${[key]}`]: value,
+          [`notes.$.${[key]}`]: value,
         }),
         {},
       );
 
     const result = await this.collection.findOneAndUpdate(
       {
-        'items.id': item.id
+        'notes.id': note.id
       },
       {$set: updateSpecification},
       {
-        projection: { items: 1 },
+        projection: { notes: 1 },
         returnOriginal: false,
       },
     );
 
     if (result.value === null) {
-      throw new UserInputError('could not find item to update', { invalidArgs: ['id']});
+      throw new UserInputError('could not find note to update', { invalidArgs: ['id']});
     }
 
-    return result.value?.items.find(i => i.id === item.id) as ItemModel;
+    return result.value?.notes.find(i => i.id === note.id) as NoteModel;
   }
 
-  async addItem(roomId: string, item: NewItemParam): Promise<ItemModel | undefined> {
+  async addNote(roomId: string, note: NewNoteParam): Promise<NoteModel | undefined> {
     const result = await this.collection.findOneAndUpdate(
       {id: roomId},
-      {$push: {items: buildItem({...item, room: roomId})}},
+      {$push: {notes: buildNote({...note, room: roomId})}},
       {
         projection: {
-          items: {
-            $elemMatch: {id: item.id},
+          notes: {
+            $elemMatch: {id: note.id},
           },
         },
         returnOriginal: false,
       },
     );
 
-    return result.value?.items[0];
+    return result.value?.notes[0];
   }
 
   async addMember(roomId: string, memberName: string): Promise<MemberModel | undefined> {
@@ -127,7 +127,7 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
 
     return (await this.collection.findOneAndUpdate(
       {id: roomId},
-      { $push: {members: member}, $setOnInsert: {items: []} },
+      { $push: {members: member}, $setOnInsert: {notes: []} },
       {
         projection: {
           members: {

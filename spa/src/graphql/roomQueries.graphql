@@ -1,4 +1,4 @@
-fragment ItemBits on Item {
+fragment NoteBits on Note {
     __typename
     id
     posX
@@ -25,9 +25,9 @@ subscription memberUpdates($roomId: ID!) {
     }
 }
 
-subscription itemUpdates($roomId: ID!) {
-    itemUpdates(roomId: $roomId) {
-        ...ItemBits
+subscription noteUpdates($roomId: ID!) {
+    noteUpdates(roomId: $roomId) {
+        ...NoteBits
     }
 }
 
@@ -38,8 +38,8 @@ query room($id: ID!) {
             id
             name
         }
-        items {
-            ...ItemBits
+        notes {
+            ...NoteBits
         }
     }
 }

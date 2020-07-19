@@ -15,8 +15,8 @@
       <i class="ri-zoom-in-line"></i>
     </button-action>
     <button-action
-      @click="$emit('add-item', $event)"
-      aria-label="Add item"
+      @click="$emit('add-note', $event)"
+      aria-label="Add note"
       type="button"
       ><i class="ri-sticky-note-fill"></i>
     </button-action>

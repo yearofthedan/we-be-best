@@ -1,7 +1,7 @@
-import {ItemViewModel} from '@/components/Room/Board/items';
+import {NoteViewModel} from '@/components/Room/Board/notes';
 
-export const buildItemViewModel = (overrides: Partial<ItemViewModel> = {}): ItemViewModel => ({
-    id: 'ITEM123',
+export const buildNoteViewModel = (overrides: Partial<NoteViewModel> = {}): NoteViewModel => ({
+    id: 'NOTE123',
     lockedBy: 'me',
     posY: 20,
     posX: 30,

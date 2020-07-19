@@ -1,38 +1,38 @@
-input ItemInput {
+input NoteInput {
     id: String!
     posX: Int!
     posY: Int!
     lockedBy: String
 }
 
-input MoveBoardItemInput {
+input MoveBoardNoteInput {
     id: String!
     posX: Int!
     posY: Int!
 }
 
-input LockRoomBoardItemInput {
+input LockRoomBoardNoteInput {
     id: ID!
     lockedBy: ID!
 }
 
-input UnlockRoomBoardItemInput {
+input UnlockRoomBoardNoteInput {
     id: ID!
 }
 
-input UpdateBoardItemTextInput {
+input UpdateBoardNoteTextInput {
     id: ID!
     text: String!
 }
 
-input UpdateBoardItemStyleInput {
+input UpdateBoardNoteStyleInput {
     id: ID!
     style: Int!
 }
 
-input AddRoomBoardItemInput {
+input AddRoomBoardNoteInput {
     roomId: ID!
-    itemId: String!
+    noteId: String!
     posX: Int!
     posY: Int!
 }
@@ -45,10 +45,10 @@ input AddMemberInput {
 type Room {
     id: ID!
     members: [Member!]!
-    items: [Item!]!
+    notes: [Note!]!
 }
 
-type Item {
+type Note {
     id: String!
     posX: Int!
     posY: Int!
@@ -71,16 +71,16 @@ type Query {
 
 type Subscription {
     memberUpdates(roomId: ID!): Member!
-    itemUpdates(roomId: ID!): Item!
+    noteUpdates(roomId: ID!): Note!
 }
 
 type Mutation {
     addMember(input: AddMemberInput!): Member!
-    moveBoardItem(input: MoveBoardItemInput!): Item!
-    lockRoomBoardItem(input: LockRoomBoardItemInput!): Item!
-    unlockRoomBoardItem(input: UnlockRoomBoardItemInput!): Item!
-    addRoomBoardItem(input: AddRoomBoardItemInput!): Item!
-    updateBoardItemText(input: UpdateBoardItemTextInput!): Item!
-    updateBoardItemStyle(input: UpdateBoardItemStyleInput!): Item!
-    deleteBoardItem(id: ID!): Item!
+    moveBoardNote(input: MoveBoardNoteInput!): Note!
+    lockRoomBoardNote(input: LockRoomBoardNoteInput!): Note!
+    unlockRoomBoardNote(input: UnlockRoomBoardNoteInput!): Note!
+    addRoomBoardNote(input: AddRoomBoardNoteInput!): Note!
+    updateBoardNoteText(input: UpdateBoardNoteTextInput!): Note!
+    updateBoardNoteStyle(input: UpdateBoardNoteStyleInput!): Note!
+    deleteBoardNote(id: ID!): Note!
 }

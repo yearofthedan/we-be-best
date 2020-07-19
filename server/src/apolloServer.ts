@@ -6,26 +6,26 @@ import {loadSchemaSync} from '@graphql-tools/load';
 import {GraphQLFileLoader} from '@graphql-tools/graphql-file-loader';
 import {addResolversToSchema} from '@graphql-tools/schema';
 import RoomsDataSource from './rooms/RoomsDataSource';
-import itemUpdatesSubscriptionFilter from './items/itemUpdatesSubscriptionFilter';
+import noteUpdatesSubscriptionFilter from './notes/noteUpdatesSubscriptionFilter';
 import memberSubscriptionFilter from './members/memberSubscriptionFilter';
 import {
-  addRoomBoardItem,
-  deleteBoardItem,
-  lockRoomBoardItem,
-  moveBoardItem,
-  unlockRoomBoardItem,
-  updateBoardItemStyle,
-  updateBoardItemText,
-} from './items/itemResolvers';
+  addRoomBoardNote,
+  deleteBoardNote,
+  lockRoomBoardNote,
+  moveBoardNote,
+  unlockRoomBoardNote,
+  updateBoardNoteStyle,
+  updateBoardNoteText,
+} from './notes/noteResolvers';
 import {resolveRoom} from './rooms/roomResolvers';
 import {addMember} from './members/memberResolvers';
-import {Item, Member} from '@type-definitions/graphql';
+import {Note, Member} from '@type-definitions/graphql';
 
 export interface DataSources {
   Rooms: RoomsDataSource;
 }
 
-export const ITEM_CHANGED_TOPIC = 'item_changed_topic';
+export const NOTE_CHANGED_TOPIC = 'note_changed_topic';
 export const MEMBER_CHANGED_TOPIC = 'member_changed_topic';
 
 const pubSub = new PubSub();
@@ -36,7 +36,7 @@ const initMongo = async () => {
   const uri = await mongod.getUri();
   const client = new MongoClient(uri, { useUnifiedTopology: true });
   await client.connect();
-  await client.db().collection(ROOMS_COLLECTION).createIndex({'items.id': 1});
+  await client.db().collection(ROOMS_COLLECTION).createIndex({'notes.id': 1});
 
   return client;
 };
@@ -47,12 +47,12 @@ export const resolvers = {
     room: resolveRoom,
   },
   Subscription: {
-    itemUpdates: {
+    noteUpdates: {
       subscribe: withFilter(
-        () => pubSub.asyncIterator(ITEM_CHANGED_TOPIC),
-        itemUpdatesSubscriptionFilter,
+        () => pubSub.asyncIterator(NOTE_CHANGED_TOPIC),
+        noteUpdatesSubscriptionFilter,
       ),
-        resolve: (payload: Item) => payload
+        resolve: (payload: Note) => payload
     },
     memberUpdates: {
       subscribe: withFilter(
@@ -64,13 +64,13 @@ export const resolvers = {
   },
   Mutation: {
     addMember: addMember,
-    lockRoomBoardItem: lockRoomBoardItem,
-    unlockRoomBoardItem: unlockRoomBoardItem,
-    moveBoardItem: moveBoardItem,
-    addRoomBoardItem: addRoomBoardItem,
-    updateBoardItemText: updateBoardItemText,
-    updateBoardItemStyle: updateBoardItemStyle,
-    deleteBoardItem: deleteBoardItem,
+    lockRoomBoardNote: lockRoomBoardNote,
+    unlockRoomBoardNote: unlockRoomBoardNote,
+    moveBoardNote: moveBoardNote,
+    addRoomBoardNote: addRoomBoardNote,
+    updateBoardNoteText: updateBoardNoteText,
+    updateBoardNoteStyle: updateBoardNoteStyle,
+    deleteBoardNote: deleteBoardNote,
   }
 };
 

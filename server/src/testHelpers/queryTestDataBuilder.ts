@@ -1,43 +1,43 @@
 import {
-  AddRoomBoardItemInput, Item,
+  AddRoomBoardNoteInput, Note,
   AddMemberInput,
-  LockRoomBoardItemInput, Member, MoveBoardItemInput, Room, UnlockRoomBoardItemInput, UpdateBoardItemStyleInput,
-  UpdateBoardItemTextInput,
+  LockRoomBoardNoteInput, Member, MoveBoardNoteInput, Room, UnlockRoomBoardNoteInput, UpdateBoardNoteStyleInput,
+  UpdateBoardNoteTextInput,
 } from '@type-definitions/graphql';
 
-export const buildAddItemInput = (overrides: Partial<AddRoomBoardItemInput> = {}): AddRoomBoardItemInput => ({
+export const buildAddNoteInput = (overrides: Partial<AddRoomBoardNoteInput> = {}): AddRoomBoardNoteInput => ({
   roomId: 'ROOM_123',
-  itemId: 'item1',
+  noteId: 'note1',
   posX: 0,
   posY: 0,
   ...overrides
 });
 
-export const buildUpdateBoardItemTextInput = (overrides: Partial<UpdateBoardItemTextInput> = {}): UpdateBoardItemTextInput => ({
-  id: 'item1',
+export const buildUpdateBoardNoteTextInput = (overrides: Partial<UpdateBoardNoteTextInput> = {}): UpdateBoardNoteTextInput => ({
+  id: 'note1',
   text: 'some text',
   ...overrides
 });
 
-export const buildUpdateBoardItemStyleInput = (overrides: Partial<UpdateBoardItemStyleInput> = {}): UpdateBoardItemStyleInput => ({
-  id: 'item1',
+export const buildUpdateBoardNoteStyleInput = (overrides: Partial<UpdateBoardNoteStyleInput> = {}): UpdateBoardNoteStyleInput => ({
+  id: 'note1',
   style: 1,
   ...overrides
 });
 
-export const buildLockItemInput = (overrides: Partial<LockRoomBoardItemInput> = {}): LockRoomBoardItemInput => ({
-  id: 'item1',
+export const buildLockNoteInput = (overrides: Partial<LockRoomBoardNoteInput> = {}): LockRoomBoardNoteInput => ({
+  id: 'note1',
   lockedBy: 'me-id',
   ...overrides
 });
 
-export const buildUnlockItemInput = (overrides: Partial<UnlockRoomBoardItemInput> = {}): UnlockRoomBoardItemInput => ({
-  id: 'item1',
+export const buildUnlockNoteInput = (overrides: Partial<UnlockRoomBoardNoteInput> = {}): UnlockRoomBoardNoteInput => ({
+  id: 'note1',
   ...overrides
 });
 
-export const buildUpdateItemsInput = (overrides: Partial<MoveBoardItemInput> = {}): MoveBoardItemInput => ({
-    id: 'ITEM_123',
+export const buildUpdateNotesInput = (overrides: Partial<MoveBoardNoteInput> = {}): MoveBoardNoteInput => ({
+    id: 'NOTE_123',
     posX: 0,
     posY: 0,
   ...overrides
@@ -49,8 +49,8 @@ export const buildAddMemberInput = (overrides: Partial<AddMemberInput> = {}): Ad
   ...overrides
 });
 
-export const buildItemResult = (overrides: Partial<Item> = {}): Item => ({
-  id: 'ITEM_123',
+export const buildNoteResult = (overrides: Partial<Note> = {}): Note => ({
+  id: 'NOTE_123',
   posX: 0,
   posY: 0,
   text: 'some text',
@@ -69,6 +69,6 @@ export const buildMemberResult = (override: Partial<Member> = {}): Member => ({
 export const buildRoomResult = (overrides: Partial<Room> = {}): Room => ({
   id: 'ROOM_123',
   members: [buildMemberResult()],
-  items: [buildItemResult()],
+  notes: [buildNoteResult()],
   ...overrides
 });

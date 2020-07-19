@@ -16,7 +16,7 @@ describe('roomResolvers', () => {
     connection = await MongoClient.connect(await new MongoMemoryServer().getUri(), { useUnifiedTopology: true });
     const db = await connection.db();
     roomsCollection = await db.createCollection(ROOMS_COLLECTION);
-    await roomsCollection.createIndex({'items.id': 1});
+    await roomsCollection.createIndex({'notes.id': 1});
   });
   afterAll(async () => {
     await connection.close();
@@ -28,12 +28,12 @@ describe('roomResolvers', () => {
 
   describe('resolveRoom', () => {
     it('gets the room', async () => {
-      const room = buildRoomModel({ id: 'ROOM_123', items: [], members: []});
+      const room = buildRoomModel({ id: 'ROOM_123', notes: [], members: []});
       await roomsCollection.insertOne({...room});
 
       const result = await resolveRoom(undefined, {id: 'ROOM_123'}, {dataSources: {Rooms: rooms}});
 
-      expect(result).toEqual({ id: 'ROOM_123', items: [], members: []});
+      expect(result).toEqual({ id: 'ROOM_123', notes: [], members: []});
     });
   });
 });

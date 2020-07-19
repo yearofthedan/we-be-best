@@ -2,19 +2,19 @@ import {Collection} from 'apollo-datasource-mongodb';
 import {Db, MongoClient} from 'mongodb';
 import {MongoMemoryServer} from 'mongodb-memory-server';
 import {UserInputError} from 'apollo-server-express';
-import {buildItemModel, buildRoomMemberModel, buildRoomModel} from '@/testHelpers/storedTestDataBuilder';
-import RoomsDataSource, {NewItemParam, RoomModel, UpdateItemParam} from './RoomsDataSource';
+import {buildNoteModel, buildRoomMemberModel, buildRoomModel} from '@/testHelpers/storedTestDataBuilder';
+import RoomsDataSource, {NewNoteParam, RoomModel, UpdateNoteParam} from './RoomsDataSource';
 
 const ROOMS_COLLECTION = 'rooms';
-const buildNewItemParam = (overrides: Partial<NewItemParam> = {}): NewItemParam => ({
-  id: 'item1',
+const buildNewNoteParam = (overrides: Partial<NewNoteParam> = {}): NewNoteParam => ({
+  id: 'note1',
   posX: 0,
   posY: 0,
   text: 'some text',
   ...overrides
 });
-const buildUpdateItemParam = (overrides: Partial<UpdateItemParam> = {}): UpdateItemParam => ({
-  id: 'item1',
+const buildUpdateNoteParam = (overrides: Partial<UpdateNoteParam> = {}): UpdateNoteParam => ({
+  id: 'note1',
   posX: 0,
   posY: 0,
   text: 'some text',
@@ -31,7 +31,7 @@ describe('RoomsDataSource', () => {
     connection = await MongoClient.connect(await new MongoMemoryServer().getUri(), { useUnifiedTopology: true });
     db = await connection.db();
     roomsCollection = await db.createCollection(ROOMS_COLLECTION);
-    await roomsCollection.createIndex({'items.id': 1});
+    await roomsCollection.createIndex({'notes.id': 1});
   });
 
   beforeEach(async () => {
@@ -58,22 +58,22 @@ describe('RoomsDataSource', () => {
       expect(roomModel).toEqual(existingRoomModel);
     });
 
-    it('does not return deleted items', async () => {
-      const deletedItem = buildItemModel({ id: '1', isDeleted: true });
-      const activeItem = buildItemModel({id: '2'});
-      const activeItemWithIsDeletedKey = buildItemModel({ isDeleted: undefined, id: '3', });
+    it('does not return deleted notes', async () => {
+      const deletedNote = buildNoteModel({ id: '1', isDeleted: true });
+      const activeNote = buildNoteModel({id: '2'});
+      const activeNoteWithIsDeletedKey = buildNoteModel({ isDeleted: undefined, id: '3', });
       const existingRoomModel = buildRoomModel({
         id: 'ROOM_123',
         members: [buildRoomMemberModel({ name: 'me'})],
-        items: [deletedItem, activeItem]
+        notes: [deletedNote, activeNote]
       });
       await roomsCollection.insertOne(existingRoomModel);
 
       const roomModel = await rooms.getRoom('ROOM_123');
 
-      expect(roomModel.items).toContainEqual(activeItem);
-      expect(roomModel.items).not.toContainEqual(deletedItem);
-      expect(roomModel.items).not.toContainEqual(activeItemWithIsDeletedKey);
+      expect(roomModel.notes).toContainEqual(activeNote);
+      expect(roomModel.notes).not.toContainEqual(deletedNote);
+      expect(roomModel.notes).not.toContainEqual(activeNoteWithIsDeletedKey);
     });
 
     it('throws an error if the room is not there', async () => {
@@ -83,147 +83,147 @@ describe('RoomsDataSource', () => {
     });
   });
 
-  describe('addItem', () => {
-    it('adds an item', async () => {
-      const room = buildRoomModel({id: 'ROOM_123', items: []});
+  describe('addNote', () => {
+    it('adds a note', async () => {
+      const room = buildRoomModel({id: 'ROOM_123', notes: []});
       await roomsCollection.insertOne({...room});
-      const itemParams = buildNewItemParam({
-        id: 'ITEM_123',
+      const noteParams = buildNewNoteParam({
+        id: 'NOTE_123',
         posX: 10,
         posY: 20,
         text: 'some text'
       });
 
-      const itemModel = await rooms.addItem(room.id, itemParams);
+      const noteModel = await rooms.addNote(room.id, noteParams);
 
-      expect(itemModel).toEqual({
-        id: itemParams.id,
-        posX: itemParams.posX,
-        posY: itemParams.posY,
-        text: itemParams.text,
+      expect(noteModel).toEqual({
+        id: noteParams.id,
+        posX: noteParams.posX,
+        posY: noteParams.posY,
+        text: noteParams.text,
         room: room.id,
         lockedBy: null,
       });
     });
   });
 
-  describe('updateItem', () => {
-    it('updates an existing item', async () => {
-      const existingItemModel = buildItemModel({id: 'ITEM_123', room: 'ROOM_123'});
-      const room = buildRoomModel({id: 'ROOM_123', items: [existingItemModel]});
+  describe('updateNote', () => {
+    it('updates an existing note', async () => {
+      const existingNoteModel = buildNoteModel({id: 'NOTE_123', room: 'ROOM_123'});
+      const room = buildRoomModel({id: 'ROOM_123', notes: [existingNoteModel]});
       await roomsCollection.insertOne({...room});
 
-      const itemParams = buildUpdateItemParam({
-        id: 'ITEM_123',
+      const noteParams = buildUpdateNoteParam({
+        id: 'NOTE_123',
         text: 'YOLO',
         posX: 100,
         posY: 300,
       });
 
-      const itemModel = await rooms.updateItem(itemParams);
+      const noteModel = await rooms.updateNote(noteParams);
 
-      expect(itemModel).toEqual({
-        ...existingItemModel,
-        text: itemParams.text,
+      expect(noteModel).toEqual({
+        ...existingNoteModel,
+        text: noteParams.text,
         posX: 100,
         posY: 300,
       });
     });
 
     it('does not overwrite undefined keys', async () => {
-      const existingItemModel = buildItemModel({id: 'ITEM_123', room: 'ROOM_123'});
-      const room = buildRoomModel({id: 'ROOM_123', items: [existingItemModel]});
+      const existingNoteModel = buildNoteModel({id: 'NOTE_123', room: 'ROOM_123'});
+      const room = buildRoomModel({id: 'ROOM_123', notes: [existingNoteModel]});
       await roomsCollection.insertOne({...room});
 
-      const itemParams = buildUpdateItemParam({
-        id: 'ITEM_123',
+      const noteParams = buildUpdateNoteParam({
+        id: 'NOTE_123',
         text: 'YOLO',
         posX: undefined,
         posY: undefined,
       });
 
-      const itemModel = await rooms.updateItem(itemParams);
+      const noteModel = await rooms.updateNote(noteParams);
 
-      expect(itemModel).toEqual({
-        ...existingItemModel,
-        text: itemParams.text
+      expect(noteModel).toEqual({
+        ...existingNoteModel,
+        text: noteParams.text
       });
     });
 
     it('does overwrite null keys', async () => {
-      const existingItemModel = buildItemModel({id: 'ITEM_123', room: 'ROOM_123'});
-      const room = buildRoomModel({id: 'ROOM_123', items: [existingItemModel]});
+      const existingNoteModel = buildNoteModel({id: 'NOTE_123', room: 'ROOM_123'});
+      const room = buildRoomModel({id: 'ROOM_123', notes: [existingNoteModel]});
       await roomsCollection.insertOne({...room});
 
-      const itemParams = buildUpdateItemParam({
-        id: 'ITEM_123',
+      const noteParams = buildUpdateNoteParam({
+        id: 'NOTE_123',
         text: null,
         posX: null,
         posY: null,
       });
 
-      const itemModel = await rooms.updateItem(itemParams);
+      const noteModel = await rooms.updateNote(noteParams);
 
-      expect(itemModel).toEqual({
-        ...existingItemModel,
+      expect(noteModel).toEqual({
+        ...existingNoteModel,
         text: null,
         posX: null,
         posY: null,
       });
     });
 
-    it('updates the correct item in the list', async () => {
-      const existingItemModelFirst = buildItemModel({id: 'ITEM_1', room: 'ROOM_123'});
-      const existingItemModelSecond = buildItemModel({id: 'ITEM_2', room: 'ROOM_123'});
-      const existingItemModelThird = buildItemModel({id: 'ITEM_3', room: 'ROOM_123'});
+    it('updates the correct note in the list', async () => {
+      const existingNoteModelFirst = buildNoteModel({id: 'NOTE_1', room: 'ROOM_123'});
+      const existingNoteModelSecond = buildNoteModel({id: 'NOTE_2', room: 'ROOM_123'});
+      const existingNoteModelThird = buildNoteModel({id: 'NOTE_3', room: 'ROOM_123'});
 
       const room = buildRoomModel(
-        {id: 'ROOM_123', items: [existingItemModelFirst, existingItemModelSecond, existingItemModelThird]}
+        {id: 'ROOM_123', notes: [existingNoteModelFirst, existingNoteModelSecond, existingNoteModelThird]}
       );
       await roomsCollection.insertOne({...room});
 
-      const itemParams = buildUpdateItemParam({
-        id: 'ITEM_2',
+      const noteParams = buildUpdateNoteParam({
+        id: 'NOTE_2',
         text: 'interesting',
         posX: undefined, posY: undefined,
       });
 
-      const itemModel = await rooms.updateItem(itemParams);
+      const noteModel = await rooms.updateNote(noteParams);
 
-      expect(itemModel).toEqual({
-        ...existingItemModelSecond,
+      expect(noteModel).toEqual({
+        ...existingNoteModelSecond,
         text: 'interesting',
       });
     });
 
-    it('throws an error if the item is not there', async () => {
-      await roomsCollection.insertOne(buildRoomModel({id: 'ROOM_123', items: [buildItemModel()]}));
-      const itemParams = buildUpdateItemParam({ id: 'UNKNOWN_ITEM' });
+    it('throws an error if the note is not there', async () => {
+      await roomsCollection.insertOne(buildRoomModel({id: 'ROOM_123', notes: [buildNoteModel()]}));
+      const noteParams = buildUpdateNoteParam({ id: 'UNKNOWN_NOTE' });
 
-      const expectedError = new UserInputError('could not find item to update', { invalidArgs: ['id']});
-      await expect(rooms.updateItem(itemParams)).rejects.toThrow(expectedError);
+      const expectedError = new UserInputError('could not find note to update', { invalidArgs: ['id']});
+      await expect(rooms.updateNote(noteParams)).rejects.toThrow(expectedError);
     });
   });
 
-  describe('deleteItem', () => {
-    it('deletes an existing item', async () => {
-      const existingItemModel = buildItemModel({id: 'ITEM_123', room: 'ROOM_123'});
-      const room = buildRoomModel({id: 'ROOM_123', items: [existingItemModel]});
+  describe('deleteNote', () => {
+    it('deletes an existing note', async () => {
+      const existingNoteModel = buildNoteModel({id: 'NOTE_123', room: 'ROOM_123'});
+      const room = buildRoomModel({id: 'ROOM_123', notes: [existingNoteModel]});
       await roomsCollection.insertOne({...room});
 
-      const itemModel = await rooms.deleteItem('ITEM_123');
+      const noteModel = await rooms.deleteNote('NOTE_123');
 
-      expect(itemModel).toEqual({
-        ...existingItemModel,
+      expect(noteModel).toEqual({
+        ...existingNoteModel,
         isDeleted: true
       });
     });
 
-    it('throws an error if the item is not there', async () => {
-      await roomsCollection.insertOne(buildRoomModel({id: 'ROOM_123', items: [buildItemModel()]}));
+    it('throws an error if the note is not there', async () => {
+      await roomsCollection.insertOne(buildRoomModel({id: 'ROOM_123', notes: [buildNoteModel()]}));
 
-      const expectedError = new UserInputError('could not find item to update', { invalidArgs: ['id']});
-      await expect(rooms.deleteItem('UNKNOWN_ITEM')).rejects.toThrow(expectedError);
+      const expectedError = new UserInputError('could not find note to update', { invalidArgs: ['id']});
+      await expect(rooms.deleteNote('UNKNOWN_NOTE')).rejects.toThrow(expectedError);
     });
   });
 
