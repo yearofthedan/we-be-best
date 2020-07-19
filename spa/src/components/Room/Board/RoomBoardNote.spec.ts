@@ -38,6 +38,7 @@ describe('<room-board-note />', () => {
           myId: 'me',
           note: buildNoteViewModel({ posX: 2, posY: 1 }),
           moving: false,
+          editable: true,
         },
       });
 
@@ -53,6 +54,7 @@ describe('<room-board-note />', () => {
           myId: 'me',
           note: buildNoteViewModel({ text: 'some text' }),
           moving: false,
+          editable: true,
         },
       });
 
@@ -65,6 +67,7 @@ describe('<room-board-note />', () => {
           myId: 'me',
           note: buildNoteViewModel(),
           moving: false,
+          editable: true,
         },
       });
 
@@ -80,6 +83,7 @@ describe('<room-board-note />', () => {
           myId: 'me',
           note: buildNoteViewModel({ style: 100 }),
           moving: false,
+          editable: true,
         },
       });
 
@@ -99,6 +103,7 @@ describe('<room-board-note />', () => {
             myId: 'me',
             note: buildNoteViewModel({ id: 'note123', posX: 2, posY: 1 }),
             moving: true,
+            editable: true,
           },
         });
 
@@ -116,6 +121,7 @@ describe('<room-board-note />', () => {
             myId: 'me',
             note: buildNoteViewModel({ id: 'note123', posX: 2, posY: 1 }),
             moving: true,
+            editable: true,
           },
         });
 
@@ -136,6 +142,7 @@ describe('<room-board-note />', () => {
           propsData: {
             myId: 'me',
             note: buildNoteViewModel(),
+            editable: true,
           },
         });
 
@@ -165,6 +172,7 @@ describe('<room-board-note />', () => {
               lockedBy: null,
             }),
             moving: true,
+            editable: true,
           },
         });
 
@@ -190,6 +198,7 @@ describe('<room-board-note />', () => {
               lockedBy: null,
             }),
             moving: true,
+            editable: true,
           },
         });
 
@@ -205,6 +214,7 @@ describe('<room-board-note />', () => {
           myId: 'me',
           note: buildNoteViewModel({ lockedBy: 'me' }),
           moving: true,
+          editable: true,
         },
       });
 
@@ -221,6 +231,7 @@ describe('<room-board-note />', () => {
           myId: 'me',
           note: buildNoteViewModel({ lockedBy: 'someone' }),
           moving: true,
+          editable: true,
         },
       });
 
@@ -234,6 +245,14 @@ describe('<room-board-note />', () => {
   });
 
   describe('editing', () => {
+    const editTextAndSave = async (text: string) => {
+      await userEvent.dblClick(screen.getByRole('listitem'));
+      await fireEvent.input(screen.getByRole('textbox'), {
+        target: { innerText: text },
+      });
+      await userEvent.click(screen.getByRole('button', { name: /save/i }));
+    };
+
     it('lets me update the themed style while editing', async () => {
       const { queryMocks } = renderWithApollo(
         RoomBoardNote,
@@ -251,7 +270,7 @@ describe('<room-board-note />', () => {
               posX: 2,
               posY: 1,
             }),
-            editing: true,
+            editable: true,
             moving: false,
           },
           mocks: {
@@ -286,7 +305,7 @@ describe('<room-board-note />', () => {
         {
           propsData: {
             myId: 'me',
-            editing: true,
+            editable: true,
             note: buildNoteViewModel({
               id: 'note123',
               posX: 2,
@@ -321,12 +340,31 @@ describe('<room-board-note />', () => {
             posY: 1,
             text: 'some text',
           }),
+          editable: true,
         },
       });
 
       await userEvent.dblClick(screen.getByRole('listitem'));
       expect(emitted().editstart).not.toBeUndefined();
       expect(emitted().editstart[0]).toEqual(['note123']);
+    });
+
+    it('does not edit if the note is not editable', async () => {
+      const { emitted } = render(RoomBoardNote, {
+        propsData: {
+          myId: 'me',
+          note: buildNoteViewModel({
+            id: 'note123',
+            posX: 2,
+            posY: 1,
+            text: 'some text',
+          }),
+          editable: false,
+        },
+      });
+
+      await userEvent.dblClick(screen.getByRole('listitem'));
+      expect(emitted().editstart).toBeUndefined();
     });
 
     it('sends an update when I save while editing', async () => {
@@ -349,7 +387,7 @@ describe('<room-board-note />', () => {
               posY: 1,
               text: 'some text',
             }),
-            editing: true,
+            editable: true,
           },
           mocks: {
             $toasted: { global: { apollo_error: jest.fn() } },
@@ -357,16 +395,45 @@ describe('<room-board-note />', () => {
         }
       );
 
-      await fireEvent.input(screen.getByRole('textbox'), {
-        target: { innerText: updatedText },
+      await editTextAndSave(updatedText);
+      await screen.findByText(updatedText);
+      expect(queryMocks[0]).toHaveBeenCalledWith({
+        input: { id: noteId, text: updatedText },
       });
-      await userEvent.click(screen.getByRole('button', { name: /save/i }));
-      await waitFor(() =>
-        expect(queryMocks[0]).toHaveBeenCalledWith({
-          input: { id: noteId, text: updatedText },
-        })
-      );
     });
+
+    it('reverts to the original text when an error occurs while updating', async () => {
+      const updatedText = 'updated content';
+      const noteId = 'note123';
+      renderWithApollo(
+        RoomBoardNote,
+        [
+          makeSadUpdateRoomBoardNoteMutationStub({
+            id: noteId,
+            text: updatedText,
+          }),
+        ],
+        {
+          propsData: {
+            myId: 'me',
+            editable: true,
+            note: buildNoteViewModel({
+              id: noteId,
+              text: 'original text',
+            }),
+          },
+          mocks: {
+            $toasted: { global: { apollo_error: jest.fn() } },
+            $logger: { error: jest.fn() },
+          },
+        }
+      );
+
+      await editTextAndSave(updatedText);
+
+      expect(await screen.findByText('original text')).toBeInTheDocument();
+    });
+
     it('displays a toast update when an error occurs while updating', async () => {
       const updatedText = 'updated content';
       const noteId = 'note123';
@@ -381,7 +448,7 @@ describe('<room-board-note />', () => {
         {
           propsData: {
             myId: 'me',
-            editing: true,
+            editable: true,
             note: buildNoteViewModel({
               id: noteId,
               posX: 2,
@@ -396,10 +463,7 @@ describe('<room-board-note />', () => {
         }
       );
 
-      await fireEvent.input(screen.getByRole('textbox'), {
-        target: { innerText: updatedText },
-      });
-      await userEvent.click(screen.getByRole('button', { name: /save/i }));
+      await editTextAndSave(updatedText);
       await sleep(5);
 
       expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
@@ -427,7 +491,7 @@ describe('<room-board-note />', () => {
               posY: 1,
               text: 'some text',
             }),
-            editing: true,
+            editable: true,
           },
           mocks: {
             $toasted: { global: { apollo_error: jest.fn() } },
@@ -461,7 +525,7 @@ describe('<room-board-note />', () => {
               posY: 1,
               text: 'some text',
             }),
-            editing: true,
+            editable: true,
           },
           mocks: {
             $toasted: {
@@ -476,6 +540,7 @@ describe('<room-board-note />', () => {
         }
       );
 
+      await userEvent.dblClick(screen.getByRole('listitem'));
       await userEvent.click(screen.getByRole('button', { name: /delete/i }));
       await sleep(5);
 

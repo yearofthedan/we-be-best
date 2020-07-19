@@ -44,14 +44,7 @@
       aria-label="download data"
       v-on:click="onExport"
     >
-      <i
-        v-on:click="
-          'return false';
-
-
-        "
-        class="ri-file-chart-fill"
-      ></i>
+      <i class="ri-file-chart-fill"></i>
     </a>
     <button-action aria-label="copy room link" v-on:click="$emit('share')">
       <i class="ri-links-line"></i>
@@ -102,7 +95,8 @@ export default Vue.extend({
   },
   methods: {
     onExport: function (event: MouseEvent) {
-      (event.target as HTMLAnchorElement).href =
+      const target = event.target as HTMLAnchorElement;
+      target.href =
         'data:text/json;charset=utf-8,' +
         encodeURIComponent(
           mapToJsonString(this.roomId, this.notes, this.members)
@@ -128,6 +122,10 @@ section {
   background: var(--colour-primary);
   color: var(--colour-primary-text);
   box-shadow: 1px 1px 2px 0px var(--colour-shadow);
+}
+
+i {
+  pointer-events: none;
 }
 
 label {

@@ -14,7 +14,9 @@
       v-bind:note="note"
       v-bind:moving="_getIsMoving(note.id)"
       v-bind:my-id="myId"
-      v-bind:editing="editingNoteReference === note.id"
+      v-bind:editable="
+        !editingNoteReference || editingNoteReference === note.id
+      "
       v-on:pointerheld="_onBoardNotePointerHeld"
       v-on:editstart="_onBoardNoteEditStart"
       v-on:editfinish="_onBoardNoteEditFinish"
@@ -154,9 +156,6 @@ export default Vue.extend({
       this.heldNoteReference = payload.noteId;
     },
     _onBoardNoteEditStart: function (noteId: string) {
-      if (this.editingNoteReference) {
-        return;
-      }
       this.editingNoteReference = noteId;
     },
     _onBoardNoteEditFinish: function () {

@@ -57,6 +57,7 @@ interface PointerHeldEventPayload {
 }
 
 type DataProperties = {
+  editing: boolean;
   text: string;
   selectedStyle: number;
   styleOptions: {
@@ -77,9 +78,9 @@ export default Vue.extend({
       type: Object as () => NoteViewModel,
       required: true,
     },
-    editing: {
+    editable: {
       type: Boolean,
-      required: false,
+      required: true,
     },
     moving: {
       type: Boolean,
@@ -95,6 +96,7 @@ export default Vue.extend({
       text: this.note.text,
       selectedStyle: this.note.style || 0,
       styleOptions: noteTheme,
+      editing: false,
     };
   },
   computed: {
@@ -141,12 +143,14 @@ export default Vue.extend({
       }
     },
     _onSaveClick: async function (): Promise<void> {
+      const priorText = this.note.text;
       const mutationPayload = {
         id: this.note.id,
         text: this.text,
       };
 
       try {
+        this.editing = false;
         this.$emit('editfinish');
         await this.$apollo.mutate<
           UpdateBoardNoteTextMutation,
@@ -156,23 +160,20 @@ export default Vue.extend({
           variables: {
             input: mutationPayload,
           },
-          optimisticResponse: {
-            __typename: 'Mutation',
-            updateBoardNoteText: {
-              __typename: 'Note',
-              ...this.note,
-            },
-          },
         });
       } catch (e) {
         this.$logger.error(e);
         this.$toasted.global.apollo_error(
           `Could not save note changes: ${e.message}`
         );
+        this.text = priorText;
       }
     },
     _onEditClick: function (): void {
-      this.$emit('editstart', this.note.id);
+      if (this.editable) {
+        this.editing = true;
+        this.$emit('editstart', this.note.id);
+      }
     },
     _onPointerDown: function (event: PointerEvent): void {
       if (!supportsTouchEvents()) {
