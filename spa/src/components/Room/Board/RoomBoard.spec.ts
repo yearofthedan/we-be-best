@@ -54,7 +54,9 @@ const renderComponent = (
       myId: MY_ID,
       zoomFactor: 1,
       roomId: ROOM_ID,
-      notes: [buildNoteViewModel({ id: NOTE_ID, posX: 10, posY: 10 })],
+      notes: {
+        NOTE_ID: buildNoteViewModel({ id: NOTE_ID, posX: 10, posY: 10 }),
+      },
       ...props,
     },
     mocks: {

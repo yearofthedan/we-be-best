@@ -28,14 +28,17 @@ export const mapToNoteViewModel = (notes: Note): NoteViewModel => {
 
 export type NotesViewModel = { [id: string]: NoteViewModel };
 
-export const mapToNotesViewModel = (notes: Note[]): NotesViewModel => {
+export const mapToNotesViewModel = (
+  notes: Note[],
+  initialData: NotesViewModel = {}
+): NotesViewModel => {
   return notes
     .filter((note) => !note.isDeleted)
     .map(mapToNoteViewModel)
     .reduce((vm, curr) => {
       vm[curr.id] = curr;
       return vm;
-    }, {} as NotesViewModel);
+    }, initialData);
 };
 
 const makeNewNote = (): NoteViewModel => ({

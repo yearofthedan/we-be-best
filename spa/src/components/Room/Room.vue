@@ -7,7 +7,7 @@
         v-bind:zoom-factor="zoomFactor"
         v-bind:my-id="myId"
         v-bind:room-id="roomId"
-        v-bind:notes="notesData"
+        v-bind:notes="this.notesData"
         v-bind:background="background"
       />
       <room-details v-bind:members="members" v-bind:room-id="roomId" />
@@ -108,8 +108,12 @@ export default Vue.extend({
     };
   },
   watch: {
-    room: function (newVal) {
-      this.notesData = mapToNotesViewModel(newVal.notes ?? []);
+    room: {
+      handler: function (newVal) {
+        this.notesData = mapToNotesViewModel(newVal?.notes ?? [], {
+          ...this.notesData,
+        });
+      },
     },
   },
   computed: {
