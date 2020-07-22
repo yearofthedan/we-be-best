@@ -6,15 +6,15 @@
     v-on:pointerdown="_onPointerDown"
     v-on:dblclick="_onEditClick"
     v-bind:data-moving="moving"
-    v-bind:data-editing="editing"
+    v-bind:data-editing="isDirty"
     v-bind:data-locked-by="!lockedByMe && note.lockedBy"
   >
-    <template v-if="editing">
+    <template v-if="isDirty">
       <colour-style-selector
         v-bind:options="styleOptions"
         v-on:input="_onStyleChange"
       />
-      <auto-expanding-text-box v-model="text" ref="textbox" />
+      <auto-expanding-text-box v-model="noteText" ref="textbox" />
       <div id="action-button-group">
         <button-action aria-label="delete" v-on:click="_onDeleteClick"
           ><i class="ri-delete-bin-4-line"></i
@@ -25,7 +25,7 @@
       </div>
     </template>
     <template v-else>
-      {{ text }}
+      {{ this.noteText }}
     </template>
   </li>
 </template>
@@ -60,9 +60,11 @@ interface PointerHeldEventPayload {
 }
 
 type DataProperties = {
-  editing: boolean;
-  text: string;
-  selectedStyle: number;
+  isDirty: boolean;
+  noteText: string;
+  noteStyle: number;
+  notePosX: number;
+  notePosY: number;
   styleOptions: {
     name: string;
     backgroundColour: string;
@@ -100,11 +102,27 @@ export default Vue.extend({
   },
   data(): DataProperties {
     return {
-      text: this.note.text,
-      selectedStyle: this.note.style || 0,
       styleOptions: noteTheme,
-      editing: this.note.isNew ?? false,
+      isDirty: this.note.isNew ?? false,
+      noteText: this.note.text,
+      noteStyle: this.note.style,
+      notePosX: this.note.posX,
+      notePosY: this.note.posY,
     };
+  },
+  watch: {
+    note: {
+      handler: function (newVal: NoteViewModel) {
+        if (this.isDirty) {
+          return;
+        }
+        this.noteText = newVal.text;
+        this.noteStyle = newVal.style;
+        this.notePosX = newVal.posX;
+        this.notePosY = newVal.posY;
+      },
+      deep: true,
+    },
   },
   computed: {
     styleObject: function (): {
@@ -113,19 +131,18 @@ export default Vue.extend({
       '--theme-primary-colour': string;
       '--theme-text-colour': string;
     } {
-      const style =
-        this.styleOptions[this.selectedStyle] ?? this.styleOptions[0];
+      const style = this.styleOptions[this.noteStyle] ?? this.styleOptions[0];
       return {
-        left: `${this.note.posX}px`,
-        top: `${this.note.posY}px`,
+        left: `${this.notePosX}px`,
+        top: `${this.notePosY}px`,
         '--theme-primary-colour': style.backgroundColour,
         '--theme-text-colour': style.textColour,
       };
     },
-    elementId: function () {
+    elementId: function (): string {
       return `note-${this.note.id}`;
     },
-    lockedByMe: function () {
+    lockedByMe: function (): boolean {
       return this.note.lockedBy === this.myId;
     },
   },
@@ -152,7 +169,7 @@ export default Vue.extend({
     _onSaveClick: async function (): Promise<void> {
       const priorText = this.note.text;
       try {
-        this.editing = false;
+        this.isDirty = false;
         this.$emit('editfinish');
 
         if (this.note.isNew) {
@@ -182,7 +199,7 @@ export default Vue.extend({
           variables: {
             input: {
               id: this.note.id,
-              text: this.text,
+              text: this.noteText,
             },
           },
         });
@@ -191,12 +208,12 @@ export default Vue.extend({
         this.$toasted.global.apollo_error(
           `Could not save note changes: ${e.message}`
         );
-        this.text = priorText;
+        this.noteText = priorText;
       }
     },
     _onEditClick: function (): void {
       if (this.editable) {
-        this.editing = true;
+        this.isDirty = true;
         this.$emit('editstart', this.note.id);
       }
     },
@@ -216,7 +233,7 @@ export default Vue.extend({
     _onMove: function (event: MouseEvent): void {
       if (
         (this.note.lockedBy && !this.lockedByMe) ||
-        this.editing ||
+        this.isDirty ||
         event.button !== MOUSE_BUTTONS.primary
       ) {
         return;
@@ -228,7 +245,7 @@ export default Vue.extend({
       } as PointerHeldEventPayload);
     },
     _onStyleChange: async function (style: string) {
-      this.selectedStyle = this.styleOptions.findIndex((s) => s.name === style);
+      this.noteStyle = this.styleOptions.findIndex((s) => s.name === style);
 
       ((this.$refs.textbox as Vue).$el as HTMLElement).focus();
 
@@ -241,7 +258,7 @@ export default Vue.extend({
           variables: {
             input: {
               id: this.note.id,
-              style: this.selectedStyle,
+              style: this.noteStyle,
             },
           },
         });

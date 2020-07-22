@@ -277,6 +277,31 @@ describe('<room-board-note />', () => {
       );
       expect(mocks.$logger.error).toHaveBeenCalled();
     });
+    it('does not update a note content if it is being edited', async () => {
+      const { updateProps } = await renderComponent({
+        note: buildNoteViewModel({
+          id: 'NOTE123',
+          text: 'some text',
+        }),
+      });
+
+      await userEvent.dblClick(screen.getByRole('listitem'));
+
+      await updateProps({
+        note: buildNoteViewModel({
+          id: 'NOTE123',
+          text: 'some updated text',
+          posX: 100,
+          posY: 100,
+        }),
+      });
+
+      expect(screen.getByText('some text')).toBeInTheDocument();
+      expect(screen.getByRole('listitem')).not.toHaveStyle(`
+        top:  100px;
+        left: 100px;
+      `);
+    });
     it('sends an editing event when I double click', async () => {
       const { emitted } = await renderComponent();
 
@@ -314,7 +339,6 @@ describe('<room-board-note />', () => {
         input: { id: noteId, text: updatedText },
       });
     });
-
     it('adds rather than updating when the note is new', async () => {
       const noteId = 'NOTE123';
       const updatedText = 'updated content';

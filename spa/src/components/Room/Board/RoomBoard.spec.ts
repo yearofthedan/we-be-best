@@ -97,6 +97,7 @@ describe('<room-board />', () => {
 
     expect(screen.getByRole('listitem')).toHaveStyle(`top:  20px; left: 20px;`);
   });
+
   describe('when editing a note', () => {
     it('lets me edit a note', async () => {
       renderComponent();
