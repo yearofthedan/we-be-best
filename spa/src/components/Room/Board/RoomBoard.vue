@@ -11,6 +11,7 @@
   >
     <room-board-note
       v-for="note in notesData"
+      v-bind:default-to-editing="note.id === autoEditNoteId"
       v-bind:room-id="roomId"
       v-bind:note="note"
       v-bind:moving="_getIsMoving(note.id)"
@@ -33,8 +34,8 @@ import {
   lockRoomBoardNote,
   moveBoardNote,
   unlockRoomBoardNote,
-} from '@/graphql/boardQueries.graphql';
-import { NoteViewModel, NotesViewModel } from '@/components/Room/Board/notes';
+} from '@/graphql/noteQueries.graphql';
+import { NotesViewModel, NoteViewModel } from '@/components/Room/Board/notes';
 import { patchArrayElement } from '@/common/arrays';
 import { supportsTouchEvents } from '@/common/dom';
 import {
@@ -56,6 +57,9 @@ export default Vue.extend({
     notes: {
       type: Object as () => NotesViewModel,
       required: true,
+    },
+    autoEditNoteId: {
+      type: String,
     },
     myId: {
       type: String,
@@ -94,13 +98,25 @@ export default Vue.extend({
     window.addEventListener('mousemove', this._onMouseMove);
     window.addEventListener('pointermove', this._onPointerMove);
     window.addEventListener('pointerup', this._onPointerUp);
-    window.addEventListener('mouseup', this._onPointerUp);
+    window.addEventListener('mouseup', this._onMouseUp);
   },
   methods: {
     _getIsMoving: function (noteId: string): boolean {
       return noteId === this.movingNoteReference;
     },
     _onPointerUp: function (): void {
+      if (!supportsTouchEvents()) {
+        return;
+      }
+
+      this._onBoardNoteStoppedMoving();
+      this.heldNoteReference = null;
+    },
+    _onMouseUp: function (): void {
+      if (supportsTouchEvents()) {
+        return;
+      }
+
       this._onBoardNoteStoppedMoving();
       this.heldNoteReference = null;
     },

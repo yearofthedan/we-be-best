@@ -8,6 +8,7 @@
         v-bind:my-id="myId"
         v-bind:room-id="roomId"
         v-bind:notes="this.notesData"
+        v-bind:autoEditNoteId="autoEditNoteId"
         v-bind:background="background"
       />
       <room-details v-bind:members="members" v-bind:room-id="roomId" />
@@ -28,13 +29,14 @@
 <script lang="ts">
 import Vue from 'vue';
 import { ApolloError } from 'apollo-client';
-import makeNewNote, {
+import {
   mapToNotesViewModel,
   NotesViewModel,
+  NoteViewModel,
 } from '@/components/Room/Board/notes';
 import RoomBoard from '@/components/Room/Board/RoomBoard.vue';
 import RoomDetails from '@/components/Room/Details/RoomDetails.vue';
-import { removeArrayElement, upsertArrayElement } from '@/common/arrays';
+import { upsertArrayElement } from '@/common/arrays';
 
 import {
   memberUpdates,
@@ -67,16 +69,10 @@ interface RoomComponentData {
   zoomFactor: number;
   background: string;
   notesData: NotesViewModel;
+  autoEditNoteId: string | null;
 }
 
-const resolveUpdate = <T extends { id: string; isDeleted?: boolean | null }>(
-  array: T[],
-  update: T
-) => {
-  if (update.isDeleted) {
-    return removeArrayElement(array, (e) => e.id === update.id);
-  }
-
+const resolveUpdate = <T extends { id: string }>(array: T[], update: T) => {
   return upsertArrayElement(array, update, (e) => e.id === update.id);
 };
 
@@ -105,6 +101,7 @@ export default Vue.extend({
       zoomFactor: 1,
       background: 'QUADRANTS',
       notesData: {},
+      autoEditNoteId: null,
     };
   },
   watch: {
@@ -213,9 +210,8 @@ export default Vue.extend({
     _onZoomIn: function () {
       this.zoomFactor += 0.2;
     },
-    _onAddNote: async function (): Promise<void> {
-      const newNote = makeNewNote();
-      this.notesData = { ...this.notesData, [newNote.id]: newNote };
+    _onAddNote: async function (note: NoteViewModel): Promise<void> {
+      this.autoEditNoteId = note.id;
     },
   },
 });

@@ -44,10 +44,6 @@ export type UpdateBoardNoteStyleInput = {
 export type AddRoomBoardNoteInput = {
   roomId: Scalars['ID'];
   noteId: Scalars['String'];
-  text: Scalars['String'];
-  style: Scalars['Int'];
-  posX: Scalars['Int'];
-  posY: Scalars['Int'];
 };
 
 export type AddMemberInput = {

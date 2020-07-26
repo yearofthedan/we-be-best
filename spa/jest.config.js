@@ -6,7 +6,7 @@ module.exports = {
   coveragePathIgnorePatterns: [
     '<rootDir>/src/testHelpers',
     '<rootDir>/src/graphql/roomQueries.graphql',
-    '<rootDir>/src/graphql/boardQueries.graphql',
+    '<rootDir>/src/graphql/noteQueries.graphql',
   ],
   transform: {
     '\\.(gql|graphql)$': 'jest-transform-graphql',

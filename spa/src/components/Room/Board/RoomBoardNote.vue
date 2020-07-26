@@ -6,10 +6,10 @@
     v-on:pointerdown="_onPointerDown"
     v-on:dblclick="_onEditClick"
     v-bind:data-moving="moving"
-    v-bind:data-editing="isDirty"
+    v-bind:data-editing="isEditing"
     v-bind:data-locked-by="!lockedByMe && note.lockedBy"
   >
-    <template v-if="isDirty">
+    <template v-if="isEditing">
       <colour-style-selector
         v-bind:options="styleOptions"
         v-on:input="_onStyleChange"
@@ -32,18 +32,15 @@
 <script lang="ts">
 import Vue from 'vue';
 import {
-  addRoomBoardNote,
   deleteBoardNote,
   updateBoardNoteStyle,
   updateBoardNoteText,
-} from '@/graphql/boardQueries.graphql';
+} from '@/graphql/noteQueries.graphql';
 import AutoExpandingTextBox from '@/components/Room/Board/AutoExpandingTextBox.vue';
 import { MOUSE_BUTTONS, supportsTouchEvents } from '@/common/dom';
 import ColourStyleSelector from '@/components/Room/Board/ColourStyleSelector.vue';
 import {
-  AddRoomBoardNoteMutation,
   DeleteBoardNoteMutation,
-  MutationAddRoomBoardNoteArgs,
   MutationDeleteBoardNoteArgs,
   MutationUpdateBoardNoteStyleArgs,
   MutationUpdateBoardNoteTextArgs,
@@ -60,7 +57,7 @@ interface PointerHeldEventPayload {
 }
 
 type DataProperties = {
-  isDirty: boolean;
+  isEditing: boolean;
   noteText: string;
   noteStyle: number;
   notePosX: number;
@@ -99,11 +96,15 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+    defaultToEditing: {
+      type: Boolean,
+      default: false,
+    },
   },
   data(): DataProperties {
     return {
       styleOptions: noteTheme,
-      isDirty: this.note.isNew ?? false,
+      isEditing: this.defaultToEditing,
       noteText: this.note.text,
       noteStyle: this.note.style,
       notePosX: this.note.posX,
@@ -113,7 +114,7 @@ export default Vue.extend({
   watch: {
     note: {
       handler: function (newVal: NoteViewModel) {
-        if (this.isDirty) {
+        if (this.isEditing) {
           return;
         }
         this.noteText = newVal.text;
@@ -149,7 +150,7 @@ export default Vue.extend({
   methods: {
     _onDeleteClick: async function (): Promise<void> {
       try {
-        this.$emit('editfinish');
+        this.isEditing = false;
         await this.$apollo.mutate<
           DeleteBoardNoteMutation,
           MutationDeleteBoardNoteArgs
@@ -169,27 +170,8 @@ export default Vue.extend({
     _onSaveClick: async function (): Promise<void> {
       const priorText = this.note.text;
       try {
-        this.isDirty = false;
+        this.isEditing = false;
         this.$emit('editfinish');
-
-        if (this.note.isNew) {
-          await this.$apollo.mutate<
-            AddRoomBoardNoteMutation,
-            MutationAddRoomBoardNoteArgs
-          >({
-            mutation: addRoomBoardNote,
-            variables: {
-              input: {
-                roomId: this.roomId,
-                noteId: this.note.id,
-                text: this.note.text,
-                posX: this.note.posX,
-                posY: this.note.posY,
-                style: this.note.style,
-              },
-            },
-          });
-        }
 
         await this.$apollo.mutate<
           UpdateBoardNoteTextMutation,
@@ -213,7 +195,7 @@ export default Vue.extend({
     },
     _onEditClick: function (): void {
       if (this.editable) {
-        this.isDirty = true;
+        this.isEditing = true;
         this.$emit('editstart', this.note.id);
       }
     },
@@ -233,7 +215,7 @@ export default Vue.extend({
     _onMove: function (event: MouseEvent): void {
       if (
         (this.note.lockedBy && !this.lockedByMe) ||
-        this.isDirty ||
+        this.isEditing ||
         event.button !== MOUSE_BUTTONS.primary
       ) {
         return;

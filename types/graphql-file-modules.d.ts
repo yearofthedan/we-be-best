@@ -1,5 +1,5 @@
 
-declare module '@/graphql/boardQueries.graphql' {
+declare module '@/graphql/noteQueries.graphql' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
   export const NoteBits: DocumentNode;

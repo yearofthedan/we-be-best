@@ -14,10 +14,7 @@
     >
       <i class="ri-zoom-in-line"></i>
     </button-action>
-    <button-action
-      @click="$emit('add-note', $event)"
-      aria-label="Add note"
-      type="button"
+    <button-action @click="onAddNote" aria-label="Add note" type="button"
       ><i class="ri-sticky-note-fill"></i>
     </button-action>
     <label>
@@ -54,10 +51,15 @@
 <script lang="ts">
 import Vue from 'vue';
 import ButtonAction from '@/components/atoms/ButtonAction.vue';
-import { NotesViewModel } from '@/components/Room/Board/notes';
+import makeNewNote, { NotesViewModel } from '@/components/Room/Board/notes';
 import { MemberViewModel } from '@/components/Room/members';
 import { mapToJsonString } from '@/components/Room/roomExport';
 import { BACKGROUND_OPTIONS } from '@/components/Room/roomStyle';
+import {
+  AddRoomBoardNoteMutation,
+  MutationAddRoomBoardNoteArgs,
+} from '@type-definitions/graphql';
+import { addRoomBoardNote } from '@/graphql/noteQueries.graphql';
 
 export default Vue.extend({
   name: 'room-controls',
@@ -105,6 +107,30 @@ export default Vue.extend({
     onShare: function () {
       const path = `${window.location.host}/?room=${this.roomId}`;
       navigator.clipboard.writeText(path);
+    },
+    onAddNote: async function (): Promise<void> {
+      const newNote = makeNewNote();
+      this.$emit('add-note', newNote);
+
+      try {
+        await this.$apollo.mutate<
+          AddRoomBoardNoteMutation,
+          MutationAddRoomBoardNoteArgs
+        >({
+          mutation: addRoomBoardNote,
+          variables: {
+            input: {
+              roomId: this.roomId,
+              noteId: newNote.id,
+            },
+          },
+        });
+      } catch (error) {
+        this.$logger.error(error);
+        this.$toasted.global.apollo_error(
+          `Could not add note: ${error.message}`
+        );
+      }
     },
   },
 });

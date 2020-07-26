@@ -23,8 +23,8 @@ export const addRoomBoardNote = async (
   { input }: MutationAddRoomBoardNoteArgs,
   { dataSources, pubSub }: { dataSources: Pick<DataSources, 'Rooms'>; pubSub: PubSub }
 ): Promise<Note> => {
-  const { noteId, roomId, posX, posY, text, style } = input;
-  const noteModel = await dataSources.Rooms.addNote(roomId, { id: noteId, posY, posX, text, style });
+  const { noteId, roomId } = input;
+  const noteModel = await dataSources.Rooms.addNote(roomId, noteId);
   const result = mapToNoteResponse(noteModel);
 
   await pubSub.publish(NOTE_CHANGED_TOPIC, result);

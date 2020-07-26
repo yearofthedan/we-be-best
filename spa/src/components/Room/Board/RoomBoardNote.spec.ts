@@ -9,11 +9,9 @@ import { PointerDownEvent } from '@/testHelpers/jsdomFriendlyPointerEvents';
 import userEvent from '@testing-library/user-event';
 import { waitFor } from '@testing-library/dom';
 import {
-  makeHappyAddRoomBoardNoteMutationStub,
   makeHappyDeleteBoardNoteMutationStub,
   makeHappyUpdateBoardNoteStyleMutationStub,
   makeHappyUpdateBoardNoteTextMutationStub,
-  makeSadAddRoomBoardNoteMutationStub,
   makeSadDeleteBoardNoteMutationStub,
   makeSadUpdateBoardNoteStyleMutationStub,
   makeSadUpdateRoomBoardNoteMutationStub,
@@ -36,6 +34,7 @@ interface RoomBoardNoteProps {
   moving: boolean;
   editable: boolean;
   roomId: string;
+  defaultToEditing: boolean;
 }
 
 const renderComponent = async (
@@ -60,6 +59,7 @@ const renderComponent = async (
       moving: false,
       myId: 'me',
       roomId: 'ROOM123',
+      defaultToEditing: false,
       ...props,
     },
     mocks,
@@ -197,18 +197,6 @@ describe('<room-board-note />', () => {
 
       expect(emitted().pointerheld).toBeUndefined();
     });
-    it('does not allow moving when the note is new', async () => {
-      const { emitted } = await renderComponent({
-        note: buildNoteViewModel({ isNew: true }),
-      });
-
-      await fireEvent(
-        screen.getByRole('listitem'),
-        new PointerDownEvent({ pointerId: 1000 })
-      );
-
-      expect(emitted().pointerheld).toBeUndefined();
-    });
   });
 
   describe('editing', () => {
@@ -315,6 +303,11 @@ describe('<room-board-note />', () => {
       await userEvent.dblClick(screen.getByRole('listitem'));
       expect(emitted().editstart).toBeUndefined();
     });
+    it('defaults to editing if set default-to-editing true', async () => {
+      await renderComponent({ defaultToEditing: true });
+
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
     it('sends an update when I save while editing', async () => {
       const noteId = 'NOTE123';
       const updatedText = 'updated content';
@@ -338,60 +331,6 @@ describe('<room-board-note />', () => {
       expect(queryMocks[0]).toHaveBeenCalledWith({
         input: { id: noteId, text: updatedText },
       });
-    });
-    it('adds rather than updating when the note is new', async () => {
-      const noteId = 'NOTE123';
-      const updatedText = 'updated content';
-      const { queryMocks } = await renderComponent(
-        {
-          note: buildNoteViewModel({
-            id: noteId,
-            text: 'some text',
-            isNew: true,
-          }),
-        },
-        [
-          makeHappyAddRoomBoardNoteMutationStub({
-            noteId: noteId,
-            text: updatedText,
-          }),
-        ]
-      );
-
-      await editTextAndSave(updatedText);
-      await screen.findByText(updatedText);
-      expect(queryMocks[0]).toHaveBeenCalledWith({
-        input: {
-          noteId: noteId,
-          posX: 30,
-          posY: 20,
-          roomId: 'ROOM123',
-          style: 0,
-          text: 'some text',
-        },
-      });
-    });
-    it('displays a toast when an error occurs while adding', async () => {
-      const updatedText = 'updated content';
-      const noteId = 'NOTE123';
-      const { mocks } = await renderComponent(
-        {
-          note: buildNoteViewModel({
-            id: noteId,
-            text: 'some text',
-            isNew: true,
-          }),
-        },
-        [makeSadAddRoomBoardNoteMutationStub()]
-      );
-
-      await editTextAndSave(updatedText);
-      await sleep(5);
-
-      expect(mocks.$toasted.global.apollo_error).toHaveBeenCalledWith(
-        'Could not save note changes: GraphQL error: everything is broken'
-      );
-      expect(mocks.$logger.error).toHaveBeenCalled();
     });
     it('reverts to the original text when an error occurs while updating', async () => {
       const noteId = 'NOTE123';

@@ -6,11 +6,12 @@ export const mapToJsonString = (
   notes: NotesViewModel,
   members: MemberViewModel[]
 ): string => {
+  const notesData = Object.values(notes).map(({ lockedBy, ...rest }) => rest);
   return JSON.stringify({
     room: {
       id,
       members,
-      notes,
+      notesData,
     },
   });
 };

@@ -10,15 +10,15 @@ import {
   updateBoardNoteText,
 } from './noteResolvers';
 import RoomsDataSource, {RoomModel} from '../rooms/RoomsDataSource';
-import {NOTE_CHANGED_TOPIC} from '../apolloServer';
+import {NOTE_CHANGED_TOPIC} from '@/apolloServer';
 import {
   buildAddNoteInput,
   buildLockNoteInput,
   buildUnlockNoteInput, buildUpdateBoardNoteStyleInput,
   buildUpdateBoardNoteTextInput,
   buildUpdateNotesInput,
-} from '../testHelpers/queryTestDataBuilder';
-import {buildNoteData, buildNoteModel, buildRoomModel} from '../testHelpers/storedTestDataBuilder';
+} from '@/testHelpers/queryTestDataBuilder';
+import {buildNoteData, buildNoteModel, buildRoomModel} from '@/testHelpers/storedTestDataBuilder';
 
 const ROOMS_COLLECTION = 'rooms';
 
@@ -101,17 +101,15 @@ describe('noteResolvers', () => {
 
       expect(result).toEqual({
         id: noteInput.noteId,
-        posX: noteInput.posX,
-        posY: noteInput.posY,
-        lockedBy: null,
+        posX: 0,
+        posY: 0,
         text: '',
         room: { id: 'ROOM_123' },
       });
       expect(publishStub).toHaveBeenCalledWith(NOTE_CHANGED_TOPIC, {
         id: noteInput.noteId,
-        posX: noteInput.posX,
-        posY: noteInput.posY,
-        lockedBy: null,
+        posX: 0,
+        posY: 0,
         text: '',
         room: { id: 'ROOM_123' },
       });

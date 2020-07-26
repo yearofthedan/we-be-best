@@ -87,7 +87,7 @@ const apolloServer = async (): Promise<ApolloServer> => {
     dataSources: () => ({
       Rooms: new RoomsDataSource(mongoClient.db().collection(ROOMS_COLLECTION))
     }),
-    context: ({req, connection}) => {
+    context: ({connection}) => {
       if (connection) {
         return {
           dataSources: {

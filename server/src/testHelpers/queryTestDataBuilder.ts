@@ -8,10 +8,6 @@ import {
 export const buildAddNoteInput = (overrides: Partial<AddRoomBoardNoteInput> = {}): AddRoomBoardNoteInput => ({
   roomId: 'ROOM_123',
   noteId: 'note1',
-  posX: 0,
-  posY: 0,
-  style: 0,
-  text: '',
   ...overrides
 });
 
@@ -66,11 +62,4 @@ export const buildMemberResult = (override: Partial<Member> = {}): Member => ({
     id: 'ROOM123'
   } as Room,
   ...override
-});
-
-export const buildRoomResult = (overrides: Partial<Room> = {}): Room => ({
-  id: 'ROOM_123',
-  members: [buildMemberResult()],
-  notes: [buildNoteResult()],
-  ...overrides
 });

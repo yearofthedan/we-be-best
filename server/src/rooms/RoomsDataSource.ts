@@ -26,16 +26,14 @@ export interface NoteModel {
   style?: number;
 }
 
-export type NewNoteParam = Pick<NoteModel, 'id'|'posX'|'posY'|'text'|'style'>
 export type UpdateNoteParam = Partial<NoteModel> & Pick<NoteModel, 'id'>;
 
-const buildNote = ({id, posX, posY, text, lockedBy, room}: NoteModel): NoteModel => ({
-  id,
-  posX,
-  posY,
-  text,
-  room,
-  lockedBy,
+const createNewNote = (roomId: string, noteId: string): NoteModel => ({
+  id: noteId,
+  posX: 0,
+  posY: 0,
+  text: '',
+  room: roomId,
 });
 
 type ValueOf<T> = T[keyof T];
@@ -101,14 +99,14 @@ class RoomsDataSource extends MongoDataSource<RoomModel> {
     return result.value?.notes.find(i => i.id === note.id) as NoteModel;
   }
 
-  async addNote(roomId: string, note: NewNoteParam): Promise<NoteModel | undefined> {
+  async addNote(roomId: string, noteId: string): Promise<NoteModel | undefined> {
     const result = await this.collection.findOneAndUpdate(
       {id: roomId},
-      {$push: {notes: buildNote({...note, room: roomId})}},
+      {$push: {notes: createNewNote(roomId, noteId)}},
       {
         projection: {
           notes: {
-            $elemMatch: {id: note.id},
+            $elemMatch: {id: noteId},
           },
         },
         returnOriginal: false,

@@ -3,16 +3,9 @@ import {Db, MongoClient} from 'mongodb';
 import {MongoMemoryServer} from 'mongodb-memory-server';
 import {UserInputError} from 'apollo-server-express';
 import {buildNoteModel, buildRoomMemberModel, buildRoomModel} from '@/testHelpers/storedTestDataBuilder';
-import RoomsDataSource, {NewNoteParam, RoomModel, UpdateNoteParam} from './RoomsDataSource';
+import RoomsDataSource, {RoomModel, UpdateNoteParam} from './RoomsDataSource';
 
 const ROOMS_COLLECTION = 'rooms';
-const buildNewNoteParam = (overrides: Partial<NewNoteParam> = {}): NewNoteParam => ({
-  id: 'note1',
-  posX: 0,
-  posY: 0,
-  text: 'some text',
-  ...overrides
-});
 const buildUpdateNoteParam = (overrides: Partial<UpdateNoteParam> = {}): UpdateNoteParam => ({
   id: 'note1',
   posX: 0,
@@ -87,22 +80,14 @@ describe('RoomsDataSource', () => {
     it('adds a note', async () => {
       const room = buildRoomModel({id: 'ROOM_123', notes: []});
       await roomsCollection.insertOne({...room});
-      const noteParams = buildNewNoteParam({
-        id: 'NOTE_123',
-        posX: 10,
-        posY: 20,
-        text: 'some text'
-      });
-
-      const noteModel = await rooms.addNote(room.id, noteParams);
+      const noteModel = await rooms.addNote(room.id, 'NOTE_123');
 
       expect(noteModel).toEqual({
-        id: noteParams.id,
-        posX: noteParams.posX,
-        posY: noteParams.posY,
-        text: noteParams.text,
+        id: 'NOTE_123',
+        posX: 0,
+        posY: 0,
+        text: '',
         room: room.id,
-        lockedBy: null,
       });
     });
   });

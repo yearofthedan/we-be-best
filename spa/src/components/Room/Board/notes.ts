@@ -11,18 +11,16 @@ export interface NoteViewModel {
   lockedBy?: string | null;
   text: string;
   style: number;
-  isNew?: boolean | null;
 }
 
-export const mapToNoteViewModel = (notes: Note): NoteViewModel => {
+export const mapToNoteViewModel = (note: Note): NoteViewModel => {
   return {
-    id: notes.id,
-    posX: notes.posX,
-    posY: notes.posY,
-    lockedBy: notes.lockedBy,
-    text: notes.text,
-    style: notes.style ?? 0,
-    isNew: null,
+    id: note.id,
+    posX: note.posX,
+    posY: note.posY,
+    lockedBy: note.lockedBy,
+    text: note.text,
+    style: note.style ?? 0,
   };
 };
 
@@ -32,13 +30,20 @@ export const mapToNotesViewModel = (
   notes: Note[],
   initialData: NotesViewModel = {}
 ): NotesViewModel => {
+  const workingInitial = { ...initialData };
   return notes
-    .filter((note) => !note.isDeleted)
+    .filter((note) => {
+      if (note.isDeleted) {
+        delete workingInitial[note.id];
+        return false;
+      }
+      return true;
+    })
     .map(mapToNoteViewModel)
     .reduce((vm, curr) => {
       vm[curr.id] = curr;
       return vm;
-    }, initialData);
+    }, workingInitial);
 };
 
 const makeNewNote = (): NoteViewModel => ({
@@ -47,7 +52,6 @@ const makeNewNote = (): NoteViewModel => ({
   posY: DEFAULT_Y,
   text: '',
   style: 1,
-  isNew: true,
 });
 
 export default makeNewNote;

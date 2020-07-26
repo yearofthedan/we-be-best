@@ -5,7 +5,10 @@ import {
   makeHappyRoomNoteUpdatesSubscription,
   makeHappyRoomQueryStub,
 } from '@/testHelpers/roomQueryStubs';
-import { buildNoteResponse } from '@/testHelpers/noteQueryStubs';
+import {
+  buildNoteResponse,
+  makeHappyAddRoomBoardNoteMutationStub,
+} from '@/testHelpers/noteQueryStubs';
 import userEvent from '@testing-library/user-event';
 import { fireEvent, waitFor } from '@testing-library/dom';
 
@@ -32,6 +35,7 @@ const renderComponent = async (
       makeHappyRoomQueryStub(),
       makeHappyRoomMemberUpdateSubscription(),
       makeHappyRoomNoteUpdatesSubscription(),
+      makeHappyAddRoomBoardNoteMutationStub(),
     ],
     {
       propsData: { roomId: '123', myId: 'me', ...props },
@@ -45,6 +49,8 @@ const renderComponent = async (
   await screen.findByLabelText('board');
   return result;
 };
+
+jest.mock('uuid');
 
 describe('<room />', () => {
   it('renders the members in the room', async () => {
@@ -171,19 +177,6 @@ describe('<room />', () => {
         'data-background',
         'BLANK'
       );
-    });
-  });
-
-  describe('when adding a note', () => {
-    it('lets me add a note', async () => {
-      await renderComponent();
-
-      const itemsLength = screen.getAllByRole('listitem').length;
-
-      await screen.findByRole('button', { name: /add/i });
-      await userEvent.click(screen.getByRole('button', { name: /add/i }));
-
-      expect(screen.getAllByRole('listitem').length).toEqual(itemsLength + 1);
     });
   });
 });

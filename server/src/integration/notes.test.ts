@@ -76,10 +76,6 @@ describe('integration: notes', () => {
         input: {
           roomId: '123',
           noteId: 'note123',
-          posX: 10,
-          posY: 10,
-          text: '',
-          style: 0
         },
       },
     });

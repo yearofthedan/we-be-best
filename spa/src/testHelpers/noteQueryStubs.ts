@@ -6,7 +6,7 @@ import {
   deleteBoardNote,
   unlockRoomBoardNote,
   updateBoardNoteStyle,
-} from '@/graphql/boardQueries.graphql';
+} from '@/graphql/noteQueries.graphql';
 import {
   AddRoomBoardNoteInput, Note,
   MoveBoardNoteInput,
@@ -107,15 +107,12 @@ export const makeHappyAddRoomBoardNoteMutationStub = (
       id: NOTE_ID,
       posX: 0,
       posY: 0,
-      lockedBy: null,
     }),
   };
   return {
     query: addRoomBoardNote,
     variables: {
       input: {
-        posX: 0,
-        posY: 0,
         noteId: NOTE_ID,
         roomId: ROOM_ID,
         ...overrides,
