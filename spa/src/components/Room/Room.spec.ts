@@ -153,6 +153,15 @@ describe('<room />', () => {
 
       expect(screen.getByLabelText('board')).toHaveStyle(`--zoom-factor:0.8;`);
     });
+
+    it('resets the factor by 1 when I click to reset zoom', async () => {
+      await renderComponent();
+
+      await userEvent.click(screen.getByRole('button', { name: 'zoom out' }));
+      await userEvent.click(screen.getByRole('button', { name: 'reset zoom' }));
+
+      expect(screen.getByLabelText('board')).toHaveStyle(`--zoom-factor:1;`);
+    });
   });
   describe('changing board background', () => {
     it('defaults to quadrants', async () => {

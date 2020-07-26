@@ -15,6 +15,7 @@
       <room-controls
         v-on:zoom-in="_onZoomIn"
         v-on:zoom-out="_onZoomOut"
+        v-on:zoom-reset="_onZoomReset"
         v-on:add-note="_onAddNote"
         v-on:change-background="_onChangeBackground"
         v-bind:background="background"
@@ -209,6 +210,9 @@ export default Vue.extend({
     },
     _onZoomIn: function () {
       this.zoomFactor += 0.2;
+    },
+    _onZoomReset: function () {
+      this.zoomFactor = 1;
     },
     _onAddNote: async function (note: NoteViewModel): Promise<void> {
       this.autoEditNoteId = note.id;

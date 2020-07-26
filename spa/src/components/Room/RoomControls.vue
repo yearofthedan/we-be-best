@@ -8,6 +8,13 @@
       <i class="ri-zoom-out-line"></i>
     </button-action>
     <button-action
+      @click="$emit('zoom-reset', $event)"
+      aria-label="reset zoom"
+      type="button"
+    >
+      <i class="ri-focus-line"></i>
+    </button-action>
+    <button-action
       @click="$emit('zoom-in', $event)"
       aria-label="zoom in"
       type="button"
@@ -145,7 +152,7 @@ export default Vue.extend({
 section {
   position: fixed;
   display: grid;
-  grid-template-columns: repeat(6, max-content);
+  grid-template-columns: repeat(7, max-content);
   grid-column-gap: calc(2 * var(--unit-base-rem));
   align-items: center;
   padding: calc(2 * var(--unit-base-rem));
