@@ -107,6 +107,11 @@ export default Vue.extend({
     onShare: function () {
       const path = `${window.location.host}/?room=${this.roomId}`;
       navigator.clipboard.writeText(path);
+      this.$toasted.info('link copied', {
+        position: 'top-center',
+        duration: 600,
+        theme: 'outline',
+      });
     },
     onAddNote: async function (): Promise<void> {
       const newNote = makeNewNote();

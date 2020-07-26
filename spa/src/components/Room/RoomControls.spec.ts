@@ -46,6 +46,7 @@ describe('<room-controls />', () => {
         roomId: 'ROOMID1',
         background: BACKGROUND_OPTIONS.BLANK,
       },
+      mocks: { $toasted: { info: jest.fn() } },
     });
 
     await userEvent.click(
@@ -69,7 +70,6 @@ describe('<room-controls />', () => {
           roomId: 'ROOM123',
           background: BACKGROUND_OPTIONS.BLANK,
         },
-        mocks: { $toasted: { show: jest.fn() } },
       }
     );
 
