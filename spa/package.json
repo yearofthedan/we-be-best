@@ -19,7 +19,7 @@
     "core-js": "^3.6.4",
     "graphql": "^15.3.0",
     "graphql-tag": "^2.10.4",
-    "nanoid": "^3.1.10",
+    "nanoid": "^3.1.31",
     "subscriptions-transport-ws": "^0.9.17",
     "uuid": "^8.2.0",
     "vue": "^2.6.11",
